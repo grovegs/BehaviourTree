@@ -20,9 +20,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      PROJECT_ID: GroveGames.DependencyInjection
-      PROJECT_NAME: Dependency Injection
-      PACKAGE_NAME: dependency-injection
+      PROJECT_ID: GroveGames.BehaviourTree
+      PROJECT_NAME: Behaviour Tree
+      PACKAGE_NAME: behaviour-tree
 
     steps:
       - name: 📥 Checkout Code

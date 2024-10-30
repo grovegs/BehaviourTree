@@ -48,12 +48,12 @@ public class Blackboard
 
         if (!blackboard.TryGetValue(key, out var data))
         {
-            return default;
+            return defaultValue;
         }
 
         if (data == null)
         {
-            return default(T);
+            return defaultValue;
         }
 
         return (T)data;

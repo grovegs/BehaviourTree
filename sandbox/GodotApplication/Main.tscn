@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://5k3oln57k63y"]
+
+[ext_resource type="Script" path="res://Main.cs" id="1_gb60r"]
+[ext_resource type="Script" path="res://MainInstaller.cs" id="2_oy75v"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_gb60r")
+
+[node name="Installer" type="Node" parent="."]
+script = ExtResource("2_oy75v")

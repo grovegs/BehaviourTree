@@ -1,0 +1,12 @@
+{
+    "[csharp]": {
+        "editor.codeActionsOnSave": {
+            "source.addMissingImports": "explicit",
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnType": false
+    },
+}

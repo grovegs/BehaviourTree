@@ -1,0 +1,17 @@
+<Project Sdk="Godot.NET.Sdk/4.3.0">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ImplicitUsings>false</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn);0436</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\GroveGames.BehaviourTree.Godot\GroveGames.BehaviourTree.Godot.csproj" />
+  </ItemGroup>
+
+</Project>

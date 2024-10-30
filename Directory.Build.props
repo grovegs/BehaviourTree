@@ -1,0 +1,35 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>1591;1573</NoWarn>
+
+    <RootNamespace>GroveGames.BehaviourTree</RootNamespace>
+    <Title>GroveGames.BehaviourTree</Title>
+    <Description>A lightweight behaviour tree framework developed by Grove Games for .NET and Godot</Description>
+    <Company>Grove Games</Company>
+    <Authors>Grove Games</Authors>
+    <Copyright>© Grove Games</Copyright>
+
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageTags>godot; behaviour-tree</PackageTags>
+    <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Icon.png</PackageIcon>
+
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/grovegs/BehaviourTree</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

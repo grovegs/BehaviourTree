@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="GodotSharp" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="../GroveGames.DependencyInjection/GroveGames.DependencyInjection.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="addons/**" />
+    <Compile Remove="addons/**" />
+  </ItemGroup>
+
+</Project>

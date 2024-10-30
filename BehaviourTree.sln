@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E085CCD7-DFF3-426A-9C11-19F5C0039144}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D9F6DD39-4BB4-410D-8D17-2ADBE8BB9842}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroveGames.BehaviourTree", "src\GroveGames.BehaviourTree\GroveGames.BehaviourTree.csproj", "{8E047BC7-93FE-48D7-AADF-10887FA2CEC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroveGames.BehaviourTree.Godot", "src\GroveGames.BehaviourTree.Godot\GroveGames.BehaviourTree.Godot.csproj", "{66511639-F52E-41CF-BD8E-D662780BD1AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroveGames.BehaviourTree.Tests", "tests\GroveGames.BehaviourTree.Tests\GroveGames.BehaviourTree.Tests.csproj", "{2E401343-5AB9-472B-9E86-25B8240FBF39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroveGames.BehaviourTree.Godot.Tests", "tests\GroveGames.BehaviourTree.Godot.Tests\GroveGames.BehaviourTree.Godot.Tests.csproj", "{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E047BC7-93FE-48D7-AADF-10887FA2CEC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E047BC7-93FE-48D7-AADF-10887FA2CEC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E047BC7-93FE-48D7-AADF-10887FA2CEC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E047BC7-93FE-48D7-AADF-10887FA2CEC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66511639-F52E-41CF-BD8E-D662780BD1AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66511639-F52E-41CF-BD8E-D662780BD1AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66511639-F52E-41CF-BD8E-D662780BD1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66511639-F52E-41CF-BD8E-D662780BD1AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E401343-5AB9-472B-9E86-25B8240FBF39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E401343-5AB9-472B-9E86-25B8240FBF39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E401343-5AB9-472B-9E86-25B8240FBF39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E401343-5AB9-472B-9E86-25B8240FBF39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E047BC7-93FE-48D7-AADF-10887FA2CEC4} = {E085CCD7-DFF3-426A-9C11-19F5C0039144}
+		{66511639-F52E-41CF-BD8E-D662780BD1AF} = {E085CCD7-DFF3-426A-9C11-19F5C0039144}
+		{2E401343-5AB9-472B-9E86-25B8240FBF39} = {D9F6DD39-4BB4-410D-8D17-2ADBE8BB9842}
+		{B9F66A6D-60DB-45B2-8A39-1AF7BFEF4970} = {D9F6DD39-4BB4-410D-8D17-2ADBE8BB9842}
+	EndGlobalSection
+EndGlobal

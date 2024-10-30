@@ -1,0 +1,50 @@
+name: 🧪 Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: GroveGames.DependencyInjection
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: 📦 Set Dynamic Paths
+        run: |
+          echo "CORE_TEST_PROJECT=tests/$PROJECT_ID.Tests/$PROJECT_ID.Tests.csproj" >> $GITHUB_ENV
+          echo "GODOT_TEST_PROJECT=tests/$PROJECT_ID.Godot.Tests/$PROJECT_ID.Godot.Tests.csproj" >> $GITHUB_ENV
+
+      - name: 📦 Restore Core Project
+        run: dotnet restore $CORE_TEST_PROJECT
+
+      - name: 📦 Restore Godot Project
+        run: dotnet restore $GODOT_TEST_PROJECT
+
+      - name: 🏗️ Build Core Project
+        run: dotnet build --no-restore $CORE_TEST_PROJECT
+
+      - name: 🏗️ Build Godot Project
+        run: dotnet build --no-restore $GODOT_TEST_PROJECT
+
+      - name: ✅ Run Core Tests
+        run: dotnet test --no-build --no-restore $CORE_TEST_PROJECT
+
+      - name: ✅ Run Godot Tests
+        run: dotnet test --no-build --no-restore $GODOT_TEST_PROJECT

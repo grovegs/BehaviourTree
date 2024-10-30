@@ -4,7 +4,7 @@ namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public class Sequence : Composite
 {
-    private int _successIndex;
+    private int _currentChildIndex;
 
     public Sequence(Blackboard blackboard) : base(blackboard)
     {
@@ -14,9 +14,9 @@ public class Sequence : Composite
     public override NodeState Evaluate()
     {
 
-        while (_successIndex < childeren.Count)
+        while (_currentChildIndex < childeren.Count)
         {
-            var child = childeren[_successIndex];
+            var child = childeren[_currentChildIndex];
 
             child.BeforeEvaluate();
             var state = child.Evaluate();
@@ -27,11 +27,11 @@ public class Sequence : Composite
                     return NodeState.RUNNING;
 
                 case NodeState.FAILURE:
-                    _successIndex = 0;
+                    _currentChildIndex = 0;
                     return NodeState.FAILURE;
 
                 case NodeState.SUCCESS:
-                    _successIndex++;
+                    _currentChildIndex++;
                     break;
             }
 

@@ -17,4 +17,9 @@ public abstract class BehaviourTree
             root.Evaluate();
         }
     }
+
+    public virtual void Interrupt()
+    {
+        root.Interrupt();
+    }
 }

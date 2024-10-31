@@ -31,4 +31,9 @@ public class Node
     {
 
     }
+
+    public virtual void Interrupt()
+    {
+
+    }
 }

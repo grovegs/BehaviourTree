@@ -13,12 +13,12 @@ public class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 
-    public Parallel(Blackboard blackboard, ParallelPolicy policy) : base(blackboard)
+    public Parallel(ParallelPolicy policy) : base()
     {
         _policy = policy;
     }
 
-    public override NodeState Evaluate()
+    public override NodeState Evaluate(Blackboard blackboard, double delta)
     {
         var allSuccess = true;
         var anyChildRunning = false;
@@ -26,7 +26,7 @@ public class Parallel : Composite
         foreach (var child in childeren)
         {
             child.BeforeEvaluate();
-            var status = child.Evaluate();
+            var status = child.Evaluate(blackboard, delta);
 
             switch (status)
             {

@@ -13,7 +13,9 @@ public abstract class BehaviourTree
     {
         if (root != null)
         {
+            root.BeforeEvaluate();
             root.Evaluate(blackboard, delta);
+            root.AfterEvaluate();
         }
     }
 

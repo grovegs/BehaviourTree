@@ -3,113 +3,133 @@ name: 🚀 Release
 on:
   workflow_dispatch:
     inputs:
-      version_bump:
+      version_type:
         description: "Select the version to increment (major, minor, patch)"
         required: true
-        default: "patch"
+        default: patch
         type: choice
         options:
           - major
           - minor
           - patch
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
+env:
+  NAME: BehaviourTree
+  AUTHOR: GroveGames
 
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      PROJECT_ID: GroveGames.BehaviourTree
-      PROJECT_NAME: Behaviour Tree
-      PACKAGE_NAME: behaviour-tree
+jobs:
+  set_metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump_version.outputs.next_version }}
+      artifact: ${{ steps.generate_artifact.outputs.artifact }}
+      title: ${{ steps.generate_title.outputs.title }}
 
     steps:
-      - name: 📥 Checkout Code
+      - name: 🔄 Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🛠️ Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+      - name: 🔧 Bump Version
+        id: bump_version
+        uses: grovegs/actions/.github/actions/bump-version@main
         with:
-          global-json-file: global.json
+          version-type: ${{ inputs.version_type }}
 
-      - name: 📦 Set Dynamic Paths
+      - name: 📦 Generate Artifact
+        id: generate_artifact
         run: |
-          echo "CORE_PROJECT=src/$PROJECT_ID/$PROJECT_ID.csproj" >> $GITHUB_ENV
-          echo "GODOT_PROJECT=src/$PROJECT_ID.Godot/$PROJECT_ID.Godot.csproj" >> $GITHUB_ENV
-          echo "GODOT_ADDON=src/$PROJECT_ID.Godot/addons/$PROJECT_ID" >> $GITHUB_ENV
+          artifact=$(echo $NAME | sed -E 's/([a-z])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')-${{ steps.bump_version.outputs.next_version }}
+          echo artifact=$artifact >> $GITHUB_OUTPUT
 
-      - name: 📦 Restore Core Project
-        run: dotnet restore $CORE_PROJECT
-
-      - name: 📦 Restore Godot Project
-        run: dotnet restore $GODOT_PROJECT
-
-      - name: 🏗️ Build Core Project
-        run: dotnet build --no-restore --configuration Release $CORE_PROJECT
-
-      - name: 🏗️ Build Godot Project
-        run: dotnet build --no-restore --configuration Release $GODOT_PROJECT
-
-      - name: 🔖 Get Latest Tag
-        id: get_tag
+      - name: 📝 Generate Title
+        id: generate_title
         run: |
-          git fetch --tags
-          latest_tag=$(git tag --sort=-v:refname | head -n 1 || echo "0.0.0")
-          echo "latest_tag=${latest_tag:-0.0.0}" >> $GITHUB_OUTPUT
+          title="$(echo $NAME | sed -E 's/([a-z])([A-Z])/\1 \2/g') ${{ steps.bump_version.outputs.next_version }}"
+          echo title=$title >> $GITHUB_OUTPUT
 
-      - name: 🧮 Calculate Version
-        id: calculate_version
-        run: |
-          IFS='.' read -r major minor patch <<< "${{ steps.get_tag.outputs.latest_tag }}"
-          case "${{ github.event.inputs.version_bump }}" in
-            major) major=$((major + 1)); minor=0; patch=0 ;;
-            minor) minor=$((minor + 1)); patch=0 ;;
-            patch) patch=$((patch + 1)) ;;
-          esac
-          echo "PROJECT_VERSION=$major.$minor.$patch" >> $GITHUB_ENV
+  build_core:
+    needs: set_metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
 
-      - name: 📦 Pack Core NuGet Package
-        run: |
-          dotnet pack --no-build --configuration Release /p:PackageVersion=$PROJECT_VERSION --output $RUNNER_TEMP $CORE_PROJECT
-          mv $RUNNER_TEMP/$PROJECT_ID.$PROJECT_VERSION.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION.nupkg
+      - name: 🏗️ Dotnet Build
+        uses: grovegs/actions/.github/actions/build-dotnet@main
+        with:
+          project: src/$AUTHOR.$NAME/$AUTHOR.$NAME.csproj
+          version: ${{ needs.set_metadata.outputs.version }}
+          configuration: Release
 
-      - name: 📦 Pack Godot NuGet Package
-        run: |
-          dotnet pack --no-build --configuration Release /p:PackageVersion=$PROJECT_VERSION --output $RUNNER_TEMP $GODOT_PROJECT
-          mv $RUNNER_TEMP/$PROJECT_ID.Godot.$PROJECT_VERSION.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot.nupkg
+      - name: 📦 Pack Nuget
+        uses: grovegs/actions/.github/actions/pack-nuget@main
+        with:
+          project: src/$AUTHOR.$NAME/$AUTHOR.$NAME.csproj
+          version: ${{ needs.set_metadata.outputs.version }}
+          configuration: Release
+          artifact: ${{ needs.set_metadata.outputs.artifact }}
 
-      - name: 📦 Pack Godot Addon
-        run: |
-          OUTPUT_NAME=$PACKAGE_NAME-$PROJECT_VERSION-godot-addon
-          OUTPUT_DIR=$RUNNER_TEMP/$OUTPUT_NAME
-          mkdir -p $OUTPUT_DIR
-          cp -r $GODOT_ADDON $OUTPUT_DIR
-          cp README.md LICENSE $OUTPUT_DIR/$PROJECT_ID
-          sed -i 's/version="[^"]*"/version="'$PROJECT_VERSION'"/' $OUTPUT_DIR/$PROJECT_ID/plugin.cfg
-          cd $RUNNER_TEMP && zip -r $OUTPUT_NAME.zip $OUTPUT_NAME
+  build_godot:
+    needs: set_metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
 
-      - name: 🔖 Create Tag and Push
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag "$PROJECT_VERSION"
-          git push origin "$PROJECT_VERSION"
+      - name: 🏗️ Dotnet Build
+        uses: grovegs/actions/.github/actions/build-dotnet@main
+        with:
+          project: src/$AUTHOR.$NAME.Godot/$AUTHOR.$NAME.Godot.csproj
+          version: ${{ needs.set_metadata.outputs.version }}
+          configuration: Release
 
-      - name: 📝 Create GitHub Release
-        run: |
-          if [[ "${{ steps.get_tag.outputs.latest_tag }}" != "0.0.0" ]]; then
-            gh release create $PROJECT_VERSION $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot-addon.zip \
-            --title "$PROJECT_NAME $PROJECT_VERSION" --generate-notes --notes-start-tag "${{ steps.get_tag.outputs.latest_tag }}"
-          else
-            gh release create $PROJECT_VERSION $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot.nupkg $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot-addon.zip \
-            --title "$PROJECT_NAME $PROJECT_VERSION"
-          fi
+      - name: 📦 Pack Nuget
+        uses: grovegs/actions/.github/actions/pack-nuget@main
+        with:
+          project: src/$AUTHOR.$NAME.Godot/$AUTHOR.$NAME.Godot.csproj
+          version: ${{ needs.set_metadata.outputs.version }}
+          configuration: Release
+          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot
 
-      - name: 🚀 Publish Core NuGet Package
-        run: dotnet nuget push $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION.nupkg --api-key $NUGET_API_KEY --skip-duplicate --source https://api.nuget.org/v3/index.json
+      - name: 🎮 Pack Godot
+        uses: grovegs/actions/.github/actions/pack-godot@main
+        with:
+          addon: src/$AUTHOR.$NAME.Godot/addons/$AUTHOR.$NAME
+          version: ${{ needs.set_metadata.outputs.version }}
+          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot-addon
 
-      - name: 🚀 Publish Godot NuGet Package
-        run: dotnet nuget push $RUNNER_TEMP/$PACKAGE_NAME-$PROJECT_VERSION-godot.nupkg --api-key $NUGET_API_KEY --skip-duplicate --source https://api.nuget.org/v3/index.json
+  release_core:
+    needs: [set_metadata, build_core]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Release Nuget
+        uses: grovegs/actions/.github/actions/release-nuget@main
+        with:
+          artifact: ${{ needs.set_metadata.outputs.artifact }}
+          api-key: ${{ secrets.NUGET_API_KEY }}
+
+  release_godot:
+    needs: [set_metadata, build_godot]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📦 Release Nuget
+        uses: grovegs/actions/.github/actions/release-nuget@main
+        with:
+          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot
+          api-key: ${{ secrets.NUGET_API_KEY }}
+
+  release_github:
+    needs: [set_metadata, build_core, build_godot]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Release Github
+        uses: grovegs/actions/.github/actions/release-github@main
+        with:
+          title: ${{ needs.set_metadata.outputs.title }}
+          version: ${{ needs.set_metadata.outputs.version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

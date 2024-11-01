@@ -7,7 +7,7 @@ public class Composite : Node
     protected readonly IList<Node> childeren;
     protected int processingChild;
 
-    public Composite(Blackboard blackboard) : base(blackboard)
+    public Composite() : base()
     {
         childeren = [];
     }

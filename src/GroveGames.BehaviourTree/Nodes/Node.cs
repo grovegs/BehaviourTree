@@ -4,20 +4,14 @@ namespace GroveGames.BehaviourTree.Nodes;
 
 public class Node
 {
-    protected readonly Blackboard blackboard;
     protected Node parent;
-
-    public Node(Blackboard blackboard)
-    {
-        this.blackboard = blackboard;
-    }
 
     public void SetParent(Node parent)
     {
         this.parent = parent;
     }
 
-    public virtual NodeState Evaluate()
+    public virtual NodeState Evaluate(Blackboard blackboard, double delta)
     {
         return NodeState.FAILURE;
     }

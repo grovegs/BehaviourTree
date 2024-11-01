@@ -10,11 +10,11 @@ public abstract class BehaviourTree
 
     public abstract void SetupTree();
 
-    public virtual void Tick()
+    public virtual void Tick(Blackboard blackboard, float delta)
     {
         if (root != null)
         {
-            root.Evaluate();
+            root.Evaluate(blackboard, delta);
         }
     }
 

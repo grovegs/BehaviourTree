@@ -10,7 +10,7 @@ public abstract class BehaviourTree
 
     public abstract void SetupTree();
 
-    public virtual void Tick(Blackboard blackboard, float delta)
+    public virtual void Tick(Blackboard blackboard, double delta)
     {
         if (root != null)
         {

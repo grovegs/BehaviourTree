@@ -14,4 +14,9 @@
       Include="..\..\src\GroveGames.BehaviourTree.Godot\GroveGames.BehaviourTree.Godot.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\GroveGames.BehaviourTree\GroveGames.BehaviourTree.csproj" />
+  </ItemGroup>
+
 </Project>

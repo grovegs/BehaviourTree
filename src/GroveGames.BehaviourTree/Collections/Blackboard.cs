@@ -18,11 +18,11 @@ public class Blackboard : IBlackboard
 
     public T? GetValue<T>(string key)
     {
-        return _database.TryGetValue(key, out var value) ? (T)value : default(T);
+        return _database.TryGetValue(key, out var value) ? (T)value : default;
     }
 
     public void SetValue<T>(string key, T obj) where T : notnull
     {
-        _database.TryAdd(key, obj);
+        _database[key] = obj;
     }
 }

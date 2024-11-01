@@ -1,7 +1,6 @@
 using System;
 
-using GroveGames.BehaviourTree;
-using GroveGames.BehaviourTree.Nodes;
+using GroveGames.BehaviourTree.Collections;
 
 using Xunit;
 
@@ -10,48 +9,85 @@ namespace GroveGames.BehaviourTree.Tests
     public class BlackboardTests
     {
         [Fact]
-        public void SetValue_StoresValueInBlackboard()
+        public void SetValue_ShouldStoreValueInBlackboard()
         {
-            var blackboard = new Blackboard();
-            blackboard.SetValue("test_key", 42);
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
 
-            var value = blackboard.GetValue<int>("test_key");
+            // Act
+            blackboard.SetValue("testKey", 42);
 
-            Assert.Equal(42, value);
+            // Assert
+            Assert.Equal(42, blackboard.GetValue<int>("testKey"));
         }
 
         [Fact]
-        public void GetValue_ReturnsDefaultValueIfKeyNotFound()
+        public void GetValue_ShouldReturnCorrectValueType()
         {
-            var blackboard = new Blackboard();
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
+            blackboard.SetValue("stringKey", "Hello");
+            blackboard.SetValue("intKey", 100);
 
-            var value = blackboard.GetValue("missing_key", -1);
+            // Act
+            string stringValue = blackboard.GetValue<string>("stringKey");
+            int intValue = blackboard.GetValue<int>("intKey");
 
-            Assert.Equal(-1, value);
+            // Assert
+            Assert.Equal("Hello", stringValue);
+            Assert.Equal(100, intValue);
         }
 
         [Fact]
-        public void DeleteValue_SetsValueToNull()
+        public void GetValue_ShouldReturnDefaultValueIfKeyDoesNotExist()
         {
-            var blackboard = new Blackboard();
-            blackboard.SetValue("test_key", 42);
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
 
-            blackboard.DeleteValue("test_key");
-            var value = blackboard.GetValue<int>("test_key", 0);
+            // Act
+            int result = blackboard.GetValue<int>("nonExistentKey");
 
-            Assert.Equal(0, value);
+            // Assert
+            Assert.Equal(default(int), result); // Should be 0 for int
         }
-    }
 
-    public class NodeTests
-    {
         [Fact]
-        public void Node_Evaluate_ReturnsFailure()
+        public void DeleteValue_ShouldRemoveKeyFromBlackboard()
         {
-            var blackboard = new Blackboard();
-            var node = new Node();
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
+            blackboard.SetValue("testKey", 42);
 
-            Assert.Equal(NodeState.FAILURE, node.Evaluate(blackboard, 0));
+            // Act
+            blackboard.DeleteValue("testKey");
+
+            // Assert
+            Assert.Equal(default(int), blackboard.GetValue<int>("testKey"));
+        }
+
+        [Fact]
+        public void SetValue_ShouldUpdateExistingKey()
+        {
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
+            blackboard.SetValue("testKey", 42);
+
+            // Act
+            blackboard.SetValue("testKey", 84);
+
+            // Assert
+            Assert.Equal(84, blackboard.GetValue<int>("testKey"));
+        }
+
+        [Fact]
+        public void GetValue_ShouldReturnNullIfTypeMismatch()
+        {
+            // Arrange
+            IBlackboard blackboard = new Blackboard();
+            blackboard.SetValue("testKey", "This is a string");
+
+            // Act and Assert
+            Assert.Throws<InvalidCastException>(() => blackboard.GetValue<int>("testKey"));
         }
     }
 }

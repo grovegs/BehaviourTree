@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -8,17 +9,17 @@ namespace GroveGames.BehaviourTree.Tests;
 // Helper classes for testing
 public class SuccessNode : Node
 {
-    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.SUCCESS;
+    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.SUCCESS;
 }
 
 public class FailureNode : Node
 {
-    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.FAILURE;
+    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.FAILURE;
 }
 
 public class RunningNode : Node
 {
-    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.RUNNING;
+    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.RUNNING;
 }
 
 public class CompositeTests

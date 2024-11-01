@@ -1,4 +1,4 @@
-using System;
+using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -18,7 +18,7 @@ public class Parallel : Composite
         _policy = policy;
     }
 
-    public override NodeState Evaluate(Blackboard blackboard, double delta)
+    public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
         var allSuccess = true;
         var anyChildRunning = false;

@@ -1,10 +1,12 @@
 using System;
 
+using GroveGames.BehaviourTree.Collections;
+
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public class Selector : Composite
 {
-    public override NodeState Evaluate(Blackboard blackboard, double delta)
+    public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
         while (processingChild < childeren.Count)
         {

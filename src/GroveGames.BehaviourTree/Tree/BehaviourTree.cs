@@ -1,5 +1,4 @@
-using System;
-
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree.Tree;
@@ -10,7 +9,7 @@ public abstract class BehaviourTree
 
     public abstract void SetupTree();
 
-    public virtual void Tick(Blackboard blackboard, double delta)
+    public virtual void Tick(IBlackboard blackboard, double delta)
     {
         if (root != null)
         {

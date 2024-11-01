@@ -1,4 +1,4 @@
-using System;
+using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
@@ -11,7 +11,7 @@ public class Node
         this.parent = parent;
     }
 
-    public virtual NodeState Evaluate(Blackboard blackboard, double delta)
+    public virtual NodeState Evaluate(IBlackboard blackboard, double delta)
     {
         return NodeState.FAILURE;
     }

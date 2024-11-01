@@ -49,9 +49,9 @@ namespace GroveGames.BehaviourTree.Tests
         public void Node_Evaluate_ReturnsFailure()
         {
             var blackboard = new Blackboard();
-            var node = new Node(blackboard);
+            var node = new Node();
 
-            Assert.Equal(NodeState.FAILURE, node.Evaluate());
+            Assert.Equal(NodeState.FAILURE, node.Evaluate(blackboard, 0));
         }
     }
 }

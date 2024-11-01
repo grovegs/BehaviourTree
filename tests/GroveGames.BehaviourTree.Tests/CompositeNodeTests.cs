@@ -3,150 +3,173 @@ using GroveGames.BehaviourTree.Nodes.Composites;
 
 using Parallel = GroveGames.BehaviourTree.Nodes.Composites.Parallel;
 
-namespace GroveGames.BehaviourTree.Tests
+namespace GroveGames.BehaviourTree.Tests;
+
+// Helper classes for testing
+public class SuccessNode : Node
 {
-    public class CompositeNodeTests
+    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.SUCCESS;
+}
+
+public class FailureNode : Node
+{
+    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.FAILURE;
+}
+
+public class RunningNode : Node
+{
+    public override NodeState Evaluate(Blackboard blackboard, double delta) => NodeState.RUNNING;
+}
+
+public class CompositeTests
+{
+    [Fact]
+    public void Composite_AddChild_SetsParent()
     {
-        private class SuccessNode : Node
-        {
-            public SuccessNode(Blackboard blackboard) : base(blackboard) { }
+        var composite = new Composite();
+        var child = new Node();
+        composite.AddChild(child);
+        var field = typeof(Node).GetField("parent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(child);
+        Assert.NotNull(field);
+        Assert.Same(composite, field);
+    }
 
-            public override NodeState Evaluate() => NodeState.SUCCESS;
-        }
-
-        private class RunningNode : Node
-        {
-            public RunningNode(Blackboard blackboard) : base(blackboard) { }
-
-            public override NodeState Evaluate() => NodeState.RUNNING;
-        }
-
-        private class FailureNode : Node
-        {
-            public FailureNode(Blackboard blackboard) : base(blackboard) { }
-
-            public override NodeState Evaluate() => NodeState.FAILURE;
-        }
-
-        [Fact]
-        public void Sequence_Evaluate_ReturnsSuccessWhenAllChildrenSucceed()
-        {
-            var blackboard = new Blackboard();
-            var sequence = new Sequence(blackboard);
-            sequence.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new SuccessNode(blackboard));
-
-            Assert.Equal(NodeState.SUCCESS, sequence.Evaluate());
-        }
-
-        [Fact]
-        public void Sequence_Evaluate_ReturnsFailureWhenAnyChildFails()
-        {
-            var blackboard = new Blackboard();
-            var sequence = new Sequence(blackboard);
-            sequence.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new FailureNode(blackboard));
-
-            Assert.Equal(NodeState.FAILURE, sequence.Evaluate());
-        }
-
-        [Fact]
-        public void Sequence_Evaluate_ReturnsRunningWhenChildIsRunning()
-        {
-            var blackboard = new Blackboard();
-            var sequence = new Sequence(blackboard);
-            sequence.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new RunningNode(blackboard));
-
-            Assert.Equal(NodeState.RUNNING, sequence.Evaluate());
-        }
-
-        [Fact]
-        public void Selector_Evaluate_ReturnsSuccessWhenAnyChildSucceeds()
-        {
-            var blackboard = new Blackboard();
-            var selector = new Selector(blackboard);
-            selector.AddChild(new FailureNode(blackboard))
-                    .AddChild(new SuccessNode(blackboard));
-
-            Assert.Equal(NodeState.SUCCESS, selector.Evaluate());
-        }
-
-        [Fact]
-        public void Selector_Evaluate_ReturnsFailureWhenAllChildrenFail()
-        {
-            var blackboard = new Blackboard();
-            var selector = new Selector(blackboard);
-            selector.AddChild(new FailureNode(blackboard))
-                    .AddChild(new FailureNode(blackboard));
-
-            Assert.Equal(NodeState.FAILURE, selector.Evaluate());
-        }
-
-        [Fact]
-        public void Selector_Evaluate_ReturnsRunningWhenChildIsRunning()
-        {
-            var blackboard = new Blackboard();
-            var selector = new Selector(blackboard);
-            selector.AddChild(new FailureNode(blackboard))
-                    .AddChild(new RunningNode(blackboard));
-
-            Assert.Equal(NodeState.RUNNING, selector.Evaluate());
-        }
-
-        [Fact]
-        public void Parallel_Evaluate_ReturnsSuccessWhenPolicyIsAllSuccessAndAllChildrenSucceed()
-        {
-            var blackboard = new Blackboard();
-            var parallel = new Parallel(blackboard, ParallelPolicy.ALL_SUCCESS);
-            parallel.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new SuccessNode(blackboard));
-
-            Assert.Equal(NodeState.SUCCESS, parallel.Evaluate());
-        }
-
-        [Fact]
-        public void Parallel_Evaluate_ReturnsFailureWhenPolicyIsAllSuccessAndAnyChildFails()
-        {
-            var blackboard = new Blackboard();
-            var parallel = new Parallel(blackboard, ParallelPolicy.ALL_SUCCESS);
-            parallel.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new FailureNode(blackboard));
-
-            Assert.Equal(NodeState.FAILURE, parallel.Evaluate());
-        }
-
-        [Fact]
-        public void Parallel_Evaluate_ReturnsRunningWhenPolicyIsAnySuccessAndChildIsRunning()
-        {
-            var blackboard = new Blackboard();
-            var parallel = new Parallel(blackboard, ParallelPolicy.ANY_SUCCESS);
-            parallel.AddChild(new RunningNode(blackboard))
-                    .AddChild(new FailureNode(blackboard));
-
-            Assert.Equal(NodeState.RUNNING, parallel.Evaluate());
-        }
-
-        [Fact]
-        public void Parallel_Evaluate_ReturnsSuccessWhenPolicyIsAnySuccessAndAnyChildSucceeds()
-        {
-            var blackboard = new Blackboard();
-            var parallel = new Parallel(blackboard, ParallelPolicy.ANY_SUCCESS);
-            parallel.AddChild(new FailureNode(blackboard))
-                    .AddChild(new SuccessNode(blackboard));
-
-            Assert.Equal(NodeState.SUCCESS, parallel.Evaluate());
-        }
-
-        [Fact]
-        public void Parallel_Evaluate_ReturnsFailureWhenPolicyIsFirstFailureAndAnyChildFails()
-        {
-            var blackboard = new Blackboard();
-            var parallel = new Parallel(blackboard, ParallelPolicy.FIRST_FAILURE);
-            parallel.AddChild(new SuccessNode(blackboard))
-                    .AddChild(new FailureNode(blackboard));
-
-            Assert.Equal(NodeState.FAILURE, parallel.Evaluate());
-        }
+    [Fact]
+    public void Composite_Interrupt_ResetsProcessingChildIndex()
+    {
+        var composite = new Composite();
+        var child = new SuccessNode();
+        composite.AddChild(child);
+        composite.Interrupt();
+        var field = typeof(Composite).GetField("processingChild", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(composite);
+        Assert.NotNull(field);
+        Assert.Equal(0, field);
     }
 }
+
+public class SelectorTests
+{
+    [Fact]
+    public void Selector_StopsOnSuccess()
+    {
+        var selector = new Selector();
+        selector.AddChild(new FailureNode())
+                .AddChild(new SuccessNode())
+                .AddChild(new RunningNode());
+
+        var result = selector.Evaluate(null, 0);
+        Assert.Equal(NodeState.SUCCESS, result);
+    }
+
+    [Fact]
+    public void Selector_ReturnsRunningIfChildIsRunning()
+    {
+        var selector = new Selector();
+        selector.AddChild(new FailureNode())
+                .AddChild(new RunningNode())
+                .AddChild(new SuccessNode());
+
+        var result = selector.Evaluate(null, 0);
+        Assert.Equal(NodeState.RUNNING, result);
+    }
+
+    [Fact]
+    public void Selector_ReturnsFailureIfAllChildrenFail()
+    {
+        var selector = new Selector();
+        selector.AddChild(new FailureNode())
+                .AddChild(new FailureNode());
+
+        var result = selector.Evaluate(null, 0);
+        Assert.Equal(NodeState.FAILURE, result);
+    }
+}
+
+public class SequenceTests
+{
+    [Fact]
+    public void Sequence_StopsOnFailure()
+    {
+        var sequence = new Sequence();
+        sequence.AddChild(new SuccessNode())
+                .AddChild(new FailureNode())
+                .AddChild(new RunningNode());
+
+        var result = sequence.Evaluate(null, 0);
+        Assert.Equal(NodeState.FAILURE, result);
+    }
+
+    [Fact]
+    public void Sequence_ReturnsRunningIfChildIsRunning()
+    {
+        var sequence = new Sequence();
+        sequence.AddChild(new SuccessNode())
+                .AddChild(new RunningNode())
+                .AddChild(new SuccessNode());
+
+        var result = sequence.Evaluate(null, 0);
+        Assert.Equal(NodeState.RUNNING, result);
+    }
+
+    [Fact]
+    public void Sequence_ReturnsSuccessIfAllChildrenSucceed()
+    {
+        var sequence = new Sequence();
+        sequence.AddChild(new SuccessNode())
+                .AddChild(new SuccessNode());
+
+        var result = sequence.Evaluate(null, 0);
+        Assert.Equal(NodeState.SUCCESS, result);
+    }
+}
+
+public class ParallelTests
+{
+    [Fact]
+    public void Parallel_AllSuccessPolicy_ReturnsSuccessIfAllChildrenSucceed()
+    {
+        var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
+        parallel.AddChild(new SuccessNode())
+                .AddChild(new SuccessNode());
+
+        var result = parallel.Evaluate(null, 0);
+        Assert.Equal(NodeState.SUCCESS, result);
+    }
+
+    [Fact]
+    public void Parallel_AnySuccessPolicy_ReturnsSuccessIfAnyChildSucceeds()
+    {
+        var parallel = new Parallel(ParallelPolicy.ANY_SUCCESS);
+        parallel.AddChild(new FailureNode())
+                .AddChild(new SuccessNode())
+                .AddChild(new RunningNode());
+
+        var result = parallel.Evaluate(null, 0);
+        Assert.Equal(NodeState.SUCCESS, result);
+    }
+
+    [Fact]
+    public void Parallel_FirstFailurePolicy_ReturnsFailureIfAnyChildFails()
+    {
+        var parallel = new Parallel(ParallelPolicy.FIRST_FAILURE);
+        parallel.AddChild(new SuccessNode())
+                .AddChild(new FailureNode())
+                .AddChild(new RunningNode());
+
+        var result = parallel.Evaluate(null, 0);
+        Assert.Equal(NodeState.FAILURE, result);
+    }
+
+    [Fact]
+    public void Parallel_ReturnsRunningIfAnyChildIsRunning()
+    {
+        var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
+        parallel.AddChild(new SuccessNode())
+                .AddChild(new RunningNode())
+                .AddChild(new SuccessNode());
+
+        var result = parallel.Evaluate(null, 0);
+        Assert.Equal(NodeState.RUNNING, result);
+    }
+}
+

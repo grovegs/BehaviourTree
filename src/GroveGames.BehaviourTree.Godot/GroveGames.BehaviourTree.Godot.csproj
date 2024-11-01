@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference
-      Include="../GroveGames.DependencyInjection/GroveGames.DependencyInjection.csproj" />
+      Include="../GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
   </ItemGroup>
 
   <ItemGroup>

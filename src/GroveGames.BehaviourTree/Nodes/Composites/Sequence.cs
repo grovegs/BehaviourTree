@@ -9,7 +9,7 @@ public class Sequence : Composite
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
 
-        var child = childeren[processingChild];
+        var child = childeren[processingChild % childeren.Count];
 
         child.BeforeEvaluate();
         var state = child.Evaluate(blackboard, delta);

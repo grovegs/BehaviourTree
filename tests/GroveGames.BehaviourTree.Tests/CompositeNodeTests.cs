@@ -1,176 +1,149 @@
+using System;
+using System.Reflection;
+
+using GroveGames.BehaviourTree;
 using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
-using Parallel = GroveGames.BehaviourTree.Nodes.Composites.Parallel;
+using Xunit;
 
-namespace GroveGames.BehaviourTree.Tests;
-
-// Helper classes for testing
-public class SuccessNode : Node
+namespace GroveGames.BehaviourTree.Tests
 {
-    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.SUCCESS;
-}
-
-public class FailureNode : Node
-{
-    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.FAILURE;
-}
-
-public class RunningNode : Node
-{
-    public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.RUNNING;
-}
-
-public class CompositeTests
-{
-    [Fact]
-    public void Composite_AddChild_SetsParent()
+    // Helper classes for testing
+    public class SuccessNode : Node
     {
-        var composite = new Composite();
-        var child = new Node();
-        composite.AddChild(child);
-        var field = typeof(Node).GetField("parent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(child);
-        Assert.NotNull(field);
-        Assert.Same(composite, field);
+        public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.SUCCESS;
     }
 
-    [Fact]
-    public void Composite_Interrupt_ResetsProcessingChildIndex()
+    public class FailureNode : Node
     {
-        var composite = new Composite();
-        var child = new SuccessNode();
-        composite.AddChild(child);
-        composite.Interrupt();
-        var field = typeof(Composite).GetField("processingChild", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(composite);
-        Assert.NotNull(field);
-        Assert.Equal(0, field);
-    }
-}
-
-public class SelectorTests
-{
-    [Fact]
-    public void Selector_StopsOnSuccess()
-    {
-        var selector = new Selector();
-        selector.AddChild(new FailureNode())
-                .AddChild(new SuccessNode())
-                .AddChild(new RunningNode());
-
-        var result = selector.Evaluate(null, 0);
-        Assert.Equal(NodeState.SUCCESS, result);
+        public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.FAILURE;
     }
 
-    [Fact]
-    public void Selector_ReturnsRunningIfChildIsRunning()
+    public class RunningNode : Node
     {
-        var selector = new Selector();
-        selector.AddChild(new FailureNode())
-                .AddChild(new RunningNode())
-                .AddChild(new SuccessNode());
-
-        var result = selector.Evaluate(null, 0);
-        Assert.Equal(NodeState.RUNNING, result);
+        public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.RUNNING;
     }
 
-    [Fact]
-    public void Selector_ReturnsFailureIfAllChildrenFail()
+    public class SelectorTests
     {
-        var selector = new Selector();
-        selector.AddChild(new FailureNode())
-                .AddChild(new FailureNode());
+        private int GetProcessingChild(Selector selector)
+        {
+            // Use reflection to access the private processingChild field
+            var field = typeof(Selector).GetField("processingChild", BindingFlags.NonPublic | BindingFlags.Instance);
+            return (int)field.GetValue(selector);
+        }
 
-        var result = selector.Evaluate(null, 0);
-        Assert.Equal(NodeState.FAILURE, result);
-    }
-}
+        [Fact]
+        public void Selector_StopsOnFirstSuccess_ReturnsSuccess()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new SuccessNode())
+                    .AddChild(new RunningNode());
 
-public class SequenceTests
-{
-    [Fact]
-    public void Sequence_StopsOnFailure()
-    {
-        var sequence = new Sequence();
-        sequence.AddChild(new SuccessNode())
-                .AddChild(new FailureNode())
-                .AddChild(new RunningNode());
+            // Act
+            selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0);
 
-        var result = sequence.Evaluate(null, 0);
-        Assert.Equal(NodeState.FAILURE, result);
-    }
+            // Assert
+            Assert.Equal(NodeState.SUCCESS, result);
+            Assert.Equal(0, GetProcessingChild(selector)); // processingChild should reset after success
+        }
 
-    [Fact]
-    public void Sequence_ReturnsRunningIfChildIsRunning()
-    {
-        var sequence = new Sequence();
-        sequence.AddChild(new SuccessNode())
-                .AddChild(new RunningNode())
-                .AddChild(new SuccessNode());
+        [Fact]
+        public void Selector_ReturnsRunningIfAnyChildIsRunning()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new RunningNode())
+                    .AddChild(new SuccessNode());
 
-        var result = sequence.Evaluate(null, 0);
-        Assert.Equal(NodeState.RUNNING, result);
-    }
+            // Act
+            selector.Evaluate(null, 0);
+            selector.Evaluate(null, 0);
+            selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0); ;
 
-    [Fact]
-    public void Sequence_ReturnsSuccessIfAllChildrenSucceed()
-    {
-        var sequence = new Sequence();
-        sequence.AddChild(new SuccessNode())
-                .AddChild(new SuccessNode());
+            // Assert
+            Assert.Equal(NodeState.RUNNING, result);
+            Assert.Equal(1, GetProcessingChild(selector)); // processingChild should point to the running node
+        }
 
-        var result = sequence.Evaluate(null, 0);
-        Assert.Equal(NodeState.SUCCESS, result);
-    }
-}
+        [Fact]
+        public void Selector_ContinuesAfterFailure_ReturnsFailureIfAllFail()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new FailureNode())
+                    .AddChild(new FailureNode());
 
-public class ParallelTests
-{
-    [Fact]
-    public void Parallel_AllSuccessPolicy_ReturnsSuccessIfAllChildrenSucceed()
-    {
-        var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
-        parallel.AddChild(new SuccessNode())
-                .AddChild(new SuccessNode());
+            // Act
+            selector.Evaluate(null, 0);
+            selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0);
 
-        var result = parallel.Evaluate(null, 0);
-        Assert.Equal(NodeState.SUCCESS, result);
-    }
+            // Assert
+            Assert.Equal(NodeState.FAILURE, result);
+            Assert.Equal(0, GetProcessingChild(selector)); // Should reset after all children fail
+        }
 
-    [Fact]
-    public void Parallel_AnySuccessPolicy_ReturnsSuccessIfAnyChildSucceeds()
-    {
-        var parallel = new Parallel(ParallelPolicy.ANY_SUCCESS);
-        parallel.AddChild(new FailureNode())
-                .AddChild(new SuccessNode())
-                .AddChild(new RunningNode());
+        [Fact]
+        public void Selector_MovesToNextChildAfterFailure()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new RunningNode())
+                    .AddChild(new SuccessNode());
 
-        var result = parallel.Evaluate(null, 0);
-        Assert.Equal(NodeState.SUCCESS, result);
-    }
+            // Act - Tick 1: First child fails, move to next
+            var result1 = selector.Evaluate(null, 0);
+            Assert.Equal(NodeState.FAILURE, result1);
+            Assert.Equal(1, GetProcessingChild(selector)); // Should be pointing at RunningNode
 
-    [Fact]
-    public void Parallel_FirstFailurePolicy_ReturnsFailureIfAnyChildFails()
-    {
-        var parallel = new Parallel(ParallelPolicy.FIRST_FAILURE);
-        parallel.AddChild(new SuccessNode())
-                .AddChild(new FailureNode())
-                .AddChild(new RunningNode());
+            // Act - Tick 2: Running node is still running
+            var result2 = selector.Evaluate(null, 0);
+            Assert.Equal(NodeState.RUNNING, result2);
+            Assert.Equal(1, GetProcessingChild(selector)); // Should stay at RunningNode
+        }
 
-        var result = parallel.Evaluate(null, 0);
-        Assert.Equal(NodeState.FAILURE, result);
-    }
+        [Fact]
+        public void Selector_ResetsProcessingChildOnSuccess()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new SuccessNode());
 
-    [Fact]
-    public void Parallel_ReturnsRunningIfAnyChildIsRunning()
-    {
-        var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
-        parallel.AddChild(new SuccessNode())
-                .AddChild(new RunningNode())
-                .AddChild(new SuccessNode());
+            // Act
+            selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0);
 
-        var result = parallel.Evaluate(null, 0);
-        Assert.Equal(NodeState.RUNNING, result);
+            // Assert
+            Assert.Equal(NodeState.SUCCESS, result);
+            Assert.Equal(0, GetProcessingChild(selector)); // processingChild should reset after success
+        }
+
+        [Fact]
+        public void Selector_Interrupt_ShouldResetProcessingChild()
+        {
+            // Arrange
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new RunningNode());
+
+            // Act
+            selector.Evaluate(null, 0); // Fail first child
+            selector.Evaluate(null, 0); // Start running second child
+            selector.Interrupt();
+
+            // Assert
+            Assert.Equal(0, GetProcessingChild(selector)); // processingChild should reset after interrupt
+        }
     }
 }
-

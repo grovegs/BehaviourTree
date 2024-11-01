@@ -9,29 +9,26 @@ public class Sequence : Composite
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
 
-        while (processingChild < childeren.Count)
+        var child = childeren[processingChild];
+
+        child.BeforeEvaluate();
+        var state = child.Evaluate(blackboard, delta);
+
+        switch (state)
         {
-            var child = childeren[processingChild];
+            case NodeState.RUNNING:
+                return NodeState.RUNNING;
 
-            child.BeforeEvaluate();
-            var state = child.Evaluate(blackboard, delta);
+            case NodeState.FAILURE:
+                processingChild = 0;
+                return NodeState.FAILURE;
 
-            switch (state)
-            {
-                case NodeState.RUNNING:
-                    return NodeState.RUNNING;
-
-                case NodeState.FAILURE:
-                    processingChild = 0;
-                    return NodeState.FAILURE;
-
-                case NodeState.SUCCESS:
-                    processingChild++;
-                    break;
-            }
-
-            child.AfterEvaluate();
+            case NodeState.SUCCESS:
+                processingChild++;
+                break;
         }
+
+        child.AfterEvaluate();
 
         return NodeState.SUCCESS;
     }

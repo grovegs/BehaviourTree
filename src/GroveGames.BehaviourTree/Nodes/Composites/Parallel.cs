@@ -9,7 +9,7 @@ public enum ParallelPolicy
     FIRST_FAILURE
 }
 
-public class Parallel : Composite
+public sealed class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 

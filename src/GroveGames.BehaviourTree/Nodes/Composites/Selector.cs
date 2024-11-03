@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
-public class Selector : Composite
+public sealed class Selector : Composite
 {
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {

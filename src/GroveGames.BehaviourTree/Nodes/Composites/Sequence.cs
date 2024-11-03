@@ -4,7 +4,7 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
-public class Sequence : Composite
+public sealed class Sequence : Composite
 {
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {

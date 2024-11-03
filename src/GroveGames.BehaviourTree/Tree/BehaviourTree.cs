@@ -11,16 +11,15 @@ public abstract class BehaviourTree
 
     public virtual void Tick(IBlackboard blackboard, double delta)
     {
-        if (root != null)
-        {
-            root.BeforeEvaluate();
-            root.Evaluate(blackboard, delta);
-            root.AfterEvaluate();
-        }
+
+        root?.BeforeEvaluate();
+        root?.Evaluate(blackboard, delta);
+        root?.AfterEvaluate();
+
     }
 
     public virtual void Interrupt()
     {
-        root.Interrupt();
+        root?.Interrupt();
     }
 }

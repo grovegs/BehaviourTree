@@ -5,8 +5,6 @@ using GroveGames.BehaviourTree.Nodes.Decorators;
 
 using Parallel = GroveGames.BehaviourTree.Nodes.Composites.Parallel;
 
-using Xunit;
-
 namespace GroveGames.BehaviourTree.Tests
 {
     // Helper classes for testing

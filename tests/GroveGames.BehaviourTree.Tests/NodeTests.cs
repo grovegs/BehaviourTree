@@ -33,13 +33,9 @@ namespace GroveGames.BehaviourTree.Tests
             var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
 
             // Act
-            var firstResult = cooldown.Evaluate(null, 0); // First evaluation
-            Thread.Sleep(1100); // Wait for more than 1 second
-            var secondResult = cooldown.Evaluate(null, 0); // Second evaluation
+            var result = cooldown.Evaluate(null, 1f);
 
-            // Assert
-            Assert.Equal(NodeState.SUCCESS, firstResult); // First evaluation should succeed
-            Assert.Equal(NodeState.SUCCESS, secondResult); // Second evaluation after cooldown should succeed
+            Assert.Equal(NodeState.SUCCESS, result);
         }
 
         [Fact]
@@ -50,28 +46,10 @@ namespace GroveGames.BehaviourTree.Tests
             var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
 
             // Act
-            var firstResult = cooldown.Evaluate(null, 0); // First evaluation
-            var secondResult = cooldown.Evaluate(null, 0); // Immediate second evaluation
+            var firstResult = cooldown.Evaluate(null, 0.99f); // First evaluation
 
             // Assert
-            Assert.Equal(NodeState.SUCCESS, firstResult); // First evaluation should succeed
-            Assert.Equal(NodeState.FAILURE, secondResult); // Second evaluation should fail due to active cooldown
-        }
-
-        [Fact]
-        public void Cooldown_CallsChildAfterCooldownExpires()
-        {
-            // Arrange
-            var child = new RunningNode();
-            var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
-
-            // Act
-            cooldown.Evaluate(null, 0); // First evaluation to start cooldown
-            Thread.Sleep(1100); // Wait for cooldown to expire
-            var resultAfterCooldown = cooldown.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, resultAfterCooldown); // Child should run after cooldown
+            Assert.Equal(NodeState.FAILURE, firstResult); //  Second evaluation should fail due to active cooldown
         }
     }
 

@@ -7,25 +7,29 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 public sealed class Cooldown : Decorator
 {
     private readonly float _waitTime;
-    private DateTime _lastExecutionTime;
+    private float _interval;
 
     public Cooldown(Node child, float waitTime) : base(child)
     {
         _waitTime = waitTime;
-        _lastExecutionTime = DateTime.MinValue;
     }
 
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
-        var currentTime = DateTime.Now;
-        var timeSinceLastExecution = (currentTime - _lastExecutionTime).TotalSeconds;
+        _interval += (float)delta;
 
-        if (timeSinceLastExecution >= _waitTime)
+        if (_interval >= _waitTime)
         {
-            _lastExecutionTime = currentTime;
+            _interval = 0f;
             return child != null ? child.Evaluate(blackboard, delta) : NodeState.FAILURE;
         }
 
         return NodeState.FAILURE;
+    }
+
+    public override void Interrupt()
+    {
+        _interval = 0f;
+        base.Interrupt();
     }
 }

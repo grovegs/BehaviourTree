@@ -20,7 +20,7 @@ public class Decorator : Node
 
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
-        return child.Evaluate(blackboard, delta);
+        return child != null ? child.Evaluate(blackboard, delta) : NodeState.FAILURE;
     }
 
     public override void AfterEvaluate()

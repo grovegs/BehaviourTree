@@ -14,6 +14,7 @@ public sealed class Cooldown : Decorator
     {
         _waitTime = waitTime;
         _lastExecutionTime = DateTime.MinValue;
+        _cooldownState = cooldownState;
     }
 
     public override NodeState Evaluate(IBlackboard blackboard, double delta)

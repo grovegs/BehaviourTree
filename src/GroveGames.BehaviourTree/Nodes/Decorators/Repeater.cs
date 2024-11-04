@@ -28,44 +28,43 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
 
         public override NodeState Evaluate(IBlackboard blackboard, double delta)
         {
-            while (true)
+            if (_repeatMode == RepeatMode.FixedCount && _currentCount >= _maxCount)
             {
-                var childStatus = base.Evaluate(blackboard, delta);
-
-                switch (_repeatMode)
-                {
-                    case RepeatMode.FixedCount:
-                        if (_currentCount >= _maxCount)
-                        {
-                            _currentCount = 0;
-                            return NodeState.SUCCESS;
-                        }
-                        _currentCount++;
-                        break;
-
-                    case RepeatMode.UntilSuccess:
-                        if (childStatus == NodeState.SUCCESS)
-                        {
-                            return NodeState.SUCCESS;
-                        }
-                        break;
-
-                    case RepeatMode.UntilFailure:
-                        if (childStatus == NodeState.FAILURE)
-                        {
-                            return NodeState.FAILURE;
-                        }
-                        break;
-
-                    case RepeatMode.Infinite:
-                        return NodeState.RUNNING;
-                }
-
-                if (childStatus == NodeState.RUNNING)
-                {
-                    return NodeState.RUNNING;
-                }
+                _currentCount = 0;
+                return NodeState.SUCCESS;
             }
+
+            var childStatus = base.Evaluate(blackboard, delta);
+
+            switch (_repeatMode)
+            {
+                case RepeatMode.FixedCount:
+                    if (childStatus == NodeState.SUCCESS || childStatus == NodeState.FAILURE)
+                    {
+                        _currentCount++;
+                        return NodeState.RUNNING;
+                    }
+                    break;
+
+                case RepeatMode.UntilSuccess:
+                    if (childStatus == NodeState.SUCCESS)
+                    {
+                        return NodeState.SUCCESS;
+                    }
+                    return NodeState.RUNNING;
+
+                case RepeatMode.UntilFailure:
+                    if (childStatus == NodeState.FAILURE)
+                    {
+                        return NodeState.FAILURE;
+                    }
+                    return NodeState.RUNNING;
+
+                case RepeatMode.Infinite:
+                    return NodeState.RUNNING;
+            }
+
+            return childStatus == NodeState.RUNNING ? NodeState.RUNNING : NodeState.SUCCESS;
         }
 
         public override void Interrupt()

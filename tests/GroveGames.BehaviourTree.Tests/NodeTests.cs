@@ -78,23 +78,17 @@ namespace GroveGames.BehaviourTree.Tests
     public class RepeaterTests
     {
         [Fact]
-        public void Repeater_FixedCount_RepeatsChildForSpecifiedTimes()
+        public void Repeater_FixedCount_RunsChildForSpecifiedTimes()
         {
             // Arrange
             var child = new SuccessNode();
             var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 3);
 
-            // Act
-            var result1 = repeater.Evaluate(null, 0);
-            var result2 = repeater.Evaluate(null, 0);
-            var result3 = repeater.Evaluate(null, 0);
-            var result4 = repeater.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.SUCCESS, result1);
-            Assert.Equal(NodeState.SUCCESS, result2);
-            Assert.Equal(NodeState.SUCCESS, result3);
-            Assert.Equal(NodeState.SUCCESS, result4);
+            // Act & Assert
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // First repeat
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Second repeat
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Third repeat
+            Assert.Equal(NodeState.SUCCESS, repeater.Evaluate(null, 0)); // Final success after max count
         }
 
         [Fact]
@@ -108,7 +102,7 @@ namespace GroveGames.BehaviourTree.Tests
             var result = repeater.Evaluate(null, 0);
 
             // Assert
-            Assert.Equal(NodeState.SUCCESS, result);
+            Assert.Equal(NodeState.SUCCESS, result); // Should stop repeating when child succeeds
         }
 
         [Fact]
@@ -122,7 +116,7 @@ namespace GroveGames.BehaviourTree.Tests
             var result = repeater.Evaluate(null, 0);
 
             // Assert
-            Assert.Equal(NodeState.FAILURE, result);
+            Assert.Equal(NodeState.FAILURE, result); // Should stop repeating when child fails
         }
 
         [Fact]
@@ -133,10 +127,25 @@ namespace GroveGames.BehaviourTree.Tests
             var repeater = new Repeater(child, RepeatMode.Infinite);
 
             // Act
-            var result = repeater.Evaluate(null, 0);
+            var result1 = repeater.Evaluate(null, 0);
+            var result2 = repeater.Evaluate(null, 0);
 
             // Assert
-            Assert.Equal(NodeState.RUNNING, result); // Should always return RUNNING in Infinite mode
+            Assert.Equal(NodeState.RUNNING, result1); // Should return RUNNING in Infinite mode
+            Assert.Equal(NodeState.RUNNING, result2); // Should continue returning RUNNING
+        }
+
+        [Fact]
+        public void Repeater_RunningChild_ReturnsRunningUntilComplete()
+        {
+            // Arrange
+            var child = new RunningNode();
+            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 2);
+
+            // Act & Assert
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // First tick: child is running
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Second tick: child is still running
+            // FixedCount should still return RUNNING if child hasn't completed
         }
 
         [Fact]
@@ -153,7 +162,7 @@ namespace GroveGames.BehaviourTree.Tests
             var resultAfterInterrupt = repeater.Evaluate(null, 0); // Start again after interrupt
 
             // Assert
-            Assert.Equal(NodeState.SUCCESS, resultAfterInterrupt); // Should start from the beginning after interrupt
+            Assert.Equal(NodeState.RUNNING, resultAfterInterrupt); // Should start from the beginning after interrupt
         }
     }
 

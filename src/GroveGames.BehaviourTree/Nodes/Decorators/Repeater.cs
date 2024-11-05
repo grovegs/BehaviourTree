@@ -1,17 +1,7 @@
-using System;
-
-using GroveGames.BehaviourTree;
 using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Decorators
 {
-    public enum RepeatMode
-    {
-        FixedCount,
-        UntilSuccess,
-        UntilFailure,
-        Infinite
-    }
 
     public sealed class Repeater : Decorator
     {
@@ -19,64 +9,64 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
         private readonly int _maxCount;
         private int _currentCount;
 
-        public Repeater(Node child, RepeatMode repeatMode, int maxCount = -1) : base(child)
+        public Repeater(INode parent, INode child, RepeatMode repeatMode, int maxCount = -1) : base(parent, child)
         {
             _repeatMode = repeatMode;
             _maxCount = maxCount;
             _currentCount = 0;
         }
 
-        public override NodeState Evaluate(IBlackboard blackboard, double delta)
+        public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
         {
             if (_repeatMode == RepeatMode.FixedCount && _currentCount >= _maxCount)
             {
                 _currentCount = 0;
-                return NodeState.SUCCESS;
+                return NodeState.Success;
             }
 
-            var childStatus = base.Evaluate(blackboard, delta);
+            var childStatus = base.Evaluate(blackboard, deltaTime);
 
             switch (_repeatMode)
             {
                 case RepeatMode.FixedCount:
-                    if (childStatus == NodeState.SUCCESS || childStatus == NodeState.FAILURE)
+                    if (childStatus == NodeState.Success || childStatus == NodeState.Failure)
                     {
                         _currentCount++;
-                        return NodeState.RUNNING;
+                        return NodeState.Running;
                     }
                     break;
 
                 case RepeatMode.UntilSuccess:
-                    if (childStatus == NodeState.SUCCESS)
+                    if (childStatus == NodeState.Success)
                     {
-                        return NodeState.SUCCESS;
+                        return NodeState.Success;
                     }
-                    return NodeState.RUNNING;
+                    return NodeState.Running;
 
                 case RepeatMode.UntilFailure:
-                    if (childStatus == NodeState.FAILURE)
+                    if (childStatus == NodeState.Failure)
                     {
-                        return NodeState.FAILURE;
+                        return NodeState.Failure;
                     }
-                    return NodeState.RUNNING;
+                    return NodeState.Running;
 
                 case RepeatMode.Infinite:
-                    return NodeState.RUNNING;
+                    return NodeState.Running;
             }
 
-            return childStatus == NodeState.RUNNING ? NodeState.RUNNING : NodeState.SUCCESS;
+            return childStatus == NodeState.Running ? NodeState.Running : NodeState.Success;
         }
 
         public override void Reset()
         {
+            base.Reset();
             _currentCount = 0;
-            child?.Reset();
         }
 
         public override void Abort()
         {
+            base.Abort();
             _currentCount = 0;
-            child?.Abort();
         }
     }
 }

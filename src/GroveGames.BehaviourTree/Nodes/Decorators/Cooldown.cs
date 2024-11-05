@@ -1,5 +1,3 @@
-using System;
-
 using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
@@ -9,32 +7,33 @@ public sealed class Cooldown : Decorator
     private readonly float _waitTime;
     private float _remainingTime;
 
-    public Cooldown(Node child, float waitTime) : base(child)
+    public Cooldown(INode parent, INode child, float waitTime) : base(parent, child)
     {
         _waitTime = waitTime;
+        _remainingTime = 0;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
     {
         if (_remainingTime > 0f)
         {
-            _remainingTime -= (float)delta;
-            return NodeState.FAILURE;
+            _remainingTime -= deltaTime;
+            return NodeState.Failure;
         }
 
         _remainingTime = _waitTime;
-        return base.Evaluate(blackboard, delta);
+        return base.Evaluate(blackboard, deltaTime);
     }
 
     public override void Reset()
     {
-        _remainingTime = 0f;
         base.Reset();
+        _remainingTime = 0f;
     }
 
     public override void Abort()
     {
-        _remainingTime = 0f;
         base.Abort();
+        _remainingTime = 0f;
     }
 }

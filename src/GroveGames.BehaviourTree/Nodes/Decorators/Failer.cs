@@ -1,19 +1,17 @@
-using System;
-
 using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Failer : Decorator
 {
-    public Failer(Node child) : base(child)
+    public Failer(INode parent, INode child) : base(parent, child)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
     {
-        var status = base.Evaluate(blackboard, delta);
+        var status = base.Evaluate(blackboard, deltaTime);
 
-        return status == NodeState.RUNNING ? NodeState.RUNNING : NodeState.FAILURE;
+        return status == NodeState.Running ? NodeState.Running : NodeState.Failure;
     }
 }

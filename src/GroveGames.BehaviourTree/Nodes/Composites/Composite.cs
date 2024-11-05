@@ -4,25 +4,39 @@ namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public class Composite : Node
 {
-    protected readonly IList<Node> childeren;
-    protected int processingChild;
+    protected readonly IList<Node> children;
+    protected int processingChildIndex;
 
     public Composite() : base()
     {
-        childeren = [];
+        children = [];
     }
 
     public Composite AddChild(Node child)
     {
         child.SetParent(this);
-        childeren.Add(child);
+        children.Add(child);
 
         return this;
     }
 
-    public override void Interrupt()
+    public override void Reset()
     {
-        childeren[processingChild % childeren.Count].Interrupt();
-        processingChild = 0;
+        processingChildIndex = 0;
+
+        foreach (var child in children)
+        {
+            child.Reset();
+        }
+    }
+
+    public override void Abort()
+    {
+        if (processingChildIndex < children.Count)
+        {
+            children[processingChildIndex].Abort();
+        }
+
+        Reset();
     }
 }

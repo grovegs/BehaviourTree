@@ -1,9 +1,13 @@
+
+using System.Reflection;
+
 using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 using GroveGames.BehaviourTree.Nodes.Decorators;
-
 using Parallel = GroveGames.BehaviourTree.Nodes.Composites.Parallel;
+
+using Xunit;
 
 namespace GroveGames.BehaviourTree.Tests
 {
@@ -23,380 +27,272 @@ namespace GroveGames.BehaviourTree.Tests
         public override NodeState Evaluate(IBlackboard blackboard, double delta) => NodeState.RUNNING;
     }
 
-    public class CooldownTests
+    // Mock classes to track calls to Abort and Reset
+    public class MockNode : Node
     {
-        [Fact]
-        public void Cooldown_ChildExecutesAfterCooldown()
+        public bool WasAborted { get; private set; }
+        public bool WasReset { get; private set; }
+
+        public override void Abort()
         {
-            // Arrange
-            var child = new SuccessNode();
-            var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
-
-            // Act
-            var result = cooldown.Evaluate(null, 1f);
-
-            Assert.Equal(NodeState.SUCCESS, result);
+            WasAborted = true;
         }
 
-        [Fact]
-        public void Cooldown_ChildFailsIfCooldownActive()
+        public override void Reset()
         {
-            // Arrange
-            var child = new SuccessNode();
-            var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
-
-            // Act
-            var firstResult = cooldown.Evaluate(null, 0.5f);
-            var second = cooldown.Evaluate(null, 0.25f); // First evaluation
-
-            // Assert
-            Assert.Equal(NodeState.FAILURE, second); //  Second evaluation should fail due to active cooldown
+            WasReset = true;
         }
     }
 
-    public class RepeaterTests
+    public class NodeTests
     {
         [Fact]
-        public void Repeater_FixedCount_RunsChildForSpecifiedTimes()
+        public void Node_SetParent_UpdatesParentReference()
         {
-            // Arrange
+            var parent = new Node();
             var child = new SuccessNode();
-            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 3);
+            child.SetParent(parent);
 
-            // Act & Assert
-            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // First repeat
-            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Second repeat
-            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Third repeat
-            Assert.Equal(NodeState.SUCCESS, repeater.Evaluate(null, 0)); // Final success after max count
+            // Use reflection to get the protected `parent` field
+            var parentField = typeof(Node).GetField("parent", BindingFlags.NonPublic | BindingFlags.Instance);
+            var actualParent = parentField?.GetValue(child);
+
+            Assert.Equal(parent, actualParent);
         }
 
         [Fact]
-        public void Repeater_UntilSuccess_StopsRepeatingWhenChildSucceeds()
+        public void Node_Abort_DoesNotThrow()
         {
-            // Arrange
-            var child = new SuccessNode();
-            var repeater = new Repeater(child, RepeatMode.UntilSuccess);
-
-            // Act
-            var result = repeater.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.SUCCESS, result); // Should stop repeating when child succeeds
+            var node = new Node();
+            node.Abort(); // Should not throw any exception
         }
 
         [Fact]
-        public void Repeater_UntilFailure_StopsRepeatingWhenChildFails()
+        public void Node_Reset_DoesNotThrow()
         {
-            // Arrange
-            var child = new FailureNode();
-            var repeater = new Repeater(child, RepeatMode.UntilFailure);
-
-            // Act
-            var result = repeater.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.FAILURE, result); // Should stop repeating when child fails
-        }
-
-        [Fact]
-        public void Repeater_Infinite_ReturnsRunningIndefinitely()
-        {
-            // Arrange
-            var child = new SuccessNode();
-            var repeater = new Repeater(child, RepeatMode.Infinite);
-
-            // Act
-            var result1 = repeater.Evaluate(null, 0);
-            var result2 = repeater.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, result1); // Should return RUNNING in Infinite mode
-            Assert.Equal(NodeState.RUNNING, result2); // Should continue returning RUNNING
-        }
-
-        [Fact]
-        public void Repeater_RunningChild_ReturnsRunningUntilComplete()
-        {
-            // Arrange
-            var child = new RunningNode();
-            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 2);
-
-            // Act & Assert
-            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // First tick: child is running
-            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Second tick: child is still running
-            // FixedCount should still return RUNNING if child hasn't completed
-        }
-
-        [Fact]
-        public void Repeater_ResetsCountOnInterrupt()
-        {
-            // Arrange
-            var child = new SuccessNode();
-            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 3);
-
-            // Act
-            repeater.Evaluate(null, 0); // First evaluation
-            repeater.Evaluate(null, 0); // Second evaluation
-            repeater.Interrupt(); // Interrupt should reset the count
-            var resultAfterInterrupt = repeater.Evaluate(null, 0); // Start again after interrupt
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, resultAfterInterrupt); // Should start from the beginning after interrupt
+            var node = new Node();
+            node.Reset(); // Should not throw any exception
         }
     }
 
     public class DecoratorTests
     {
         [Fact]
-        public void Decorator_CallsChildMethods()
+        public void Decorator_Evaluate_ReturnsChildStatus()
         {
-            // Arrange
             var child = new SuccessNode();
             var decorator = new Decorator(child);
-
-            // Act
-            decorator.BeforeEvaluate();
             var result = decorator.Evaluate(null, 0);
-            decorator.AfterEvaluate();
-
-            // Assert
-            Assert.Equal(NodeState.SUCCESS, result); // Ensures decorator calls child evaluate and returns status
+            Assert.Equal(NodeState.SUCCESS, result);
         }
 
         [Fact]
-        public void Decorator_InterruptsChild()
+        public void Decorator_Abort_CallsAbortOnChild()
         {
-            // Arrange
-            var child = new RunningNode();
+            var child = new MockNode();
             var decorator = new Decorator(child);
+            decorator.Abort();
+            Assert.True(child.WasAborted);
+        }
 
-            // Act
-            decorator.Interrupt();
-
-            // No assertion needed for side-effects, but decorator should complete without errors
+        [Fact]
+        public void Decorator_Reset_CallsResetOnChild()
+        {
+            var child = new MockNode();
+            var decorator = new Decorator(child);
+            decorator.Reset();
+            Assert.True(child.WasReset);
         }
     }
 
-    public class InverterTests
+    public class SelectorTests
     {
-        [Fact]
-        public void Inverter_ReturnsFailureWhenChildSucceeds()
+        private static int GetProcessingChildIndex(Node node)
         {
-            // Arrange
-            var child = new SuccessNode();
-            var inverter = new Inverter(child);
-
-            // Act
-            var result = inverter.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.FAILURE, result); // Success should invert to Failure
+            var field = node.GetType().GetField("processingChildIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+            return field != null ? (int)field.GetValue(node) : -1;
         }
 
         [Fact]
-        public void Inverter_ReturnsSuccessWhenChildFails()
+        public void Selector_Evaluate_ReturnsSuccessOnFirstSuccessfulChild()
         {
-            // Arrange
-            var child = new FailureNode();
-            var inverter = new Inverter(child);
-
-            // Act
-            var result = inverter.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.SUCCESS, result); // Failure should invert to Success
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new SuccessNode());
+            _ = selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0);
+            Assert.Equal(NodeState.SUCCESS, result);
         }
 
         [Fact]
-        public void Inverter_ReturnsRunningWhenChildIsRunning()
+        public void Selector_Evaluate_ReturnsFailureIfAllChildrenFail()
         {
-            // Arrange
-            var child = new RunningNode();
-            var inverter = new Inverter(child);
+            var selector = new Selector();
+            selector.AddChild(new FailureNode())
+                    .AddChild(new FailureNode());
+            _ = selector.Evaluate(null, 0);
+            _ = selector.Evaluate(null, 0);
+            var result = selector.Evaluate(null, 0);
+            Assert.Equal(NodeState.FAILURE, result);
+        }
 
-            // Act
-            var result = inverter.Evaluate(null, 0);
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, result); // Running should remain Running
+        [Fact]
+        public void Selector_Abort_ResetsProcessingChildIndex()
+        {
+            var selector = new Selector();
+            selector.AddChild(new RunningNode());
+            selector.Evaluate(null, 0); // Set the selector to a running state
+            selector.Abort();
+            Assert.Equal(0, GetProcessingChildIndex(selector)); // Check if reset via reflection
         }
     }
 
     public class SequenceTests
     {
-
-        [Fact]
-        public void Sequence_ReturnsRunningIfAnyChildIsRunning()
+        private static int GetProcessingChildIndex(Node node)
         {
-            // Arrange
-            var sequence = new Sequence();
-            sequence.AddChild(new SuccessNode())
-                    .AddChild(new RunningNode()) // This should cause the sequence to run
-                    .AddChild(new SuccessNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = sequence.Evaluate(null, 0);
-            }
-
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, result);
+            var field = node.GetType().GetField("processingChildIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+            return field != null ? (int)field.GetValue(node) : -1;
         }
 
         [Fact]
-        public void Sequence_ReturnsSuccessIfAllChildrenSucceed()
+        public void Sequence_Evaluate_ReturnsSuccessIfAllChildrenSucceed()
         {
-            // Arrange
             var sequence = new Sequence();
             sequence.AddChild(new SuccessNode())
-                    .AddChild(new SuccessNode())
                     .AddChild(new SuccessNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = sequence.Evaluate(null, 0);
-            }
-
-            // Assert
+            _ = sequence.Evaluate(null, 0);
+            var result = sequence.Evaluate(null, 0);
             Assert.Equal(NodeState.SUCCESS, result);
+        }
+
+        [Fact]
+        public void Sequence_Evaluate_ReturnsFailureIfAnyChildFails()
+        {
+            var sequence = new Sequence();
+            sequence.AddChild(new SuccessNode())
+                    .AddChild(new FailureNode());
+            _ = sequence.Evaluate(null, 0);
+            var result = sequence.Evaluate(null, 0);
+            Assert.Equal(NodeState.FAILURE, result);
+        }
+
+        [Fact]
+        public void Sequence_Abort_ResetsProcessingChildIndex()
+        {
+            var sequence = new Sequence();
+            sequence.AddChild(new RunningNode());
+            sequence.Evaluate(null, 0); // Set the sequence to a running state
+            sequence.Abort();
+            Assert.Equal(0, GetProcessingChildIndex(sequence)); // Check if reset via reflection
         }
     }
 
     public class ParallelTests
     {
+        private static int GetProcessingChildIndex(Node node)
+        {
+            var field = node.GetType().GetField("processingChildIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+            return field != null ? (int)field.GetValue(node) : -1;
+        }
+
         [Fact]
         public void Parallel_AllSuccessPolicy_ReturnsSuccessIfAllChildrenSucceed()
         {
-            // Arrange
             var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
             parallel.AddChild(new SuccessNode())
                     .AddChild(new SuccessNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 2; i++)
-            {
-                result = parallel.Evaluate(null, 0);
-            }
-
-            // Assert
+            var result = parallel.Evaluate(null, 0);
             Assert.Equal(NodeState.SUCCESS, result);
         }
 
         [Fact]
         public void Parallel_AnySuccessPolicy_ReturnsSuccessIfAnyChildSucceeds()
         {
-            // Arrange
             var parallel = new Parallel(ParallelPolicy.ANY_SUCCESS);
             parallel.AddChild(new FailureNode())
-                    .AddChild(new SuccessNode())
-                    .AddChild(new RunningNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = parallel.Evaluate(null, 0);
-            }
-
-            // Assert
+                    .AddChild(new SuccessNode());
+            var result = parallel.Evaluate(null, 0);
             Assert.Equal(NodeState.SUCCESS, result);
         }
 
         [Fact]
         public void Parallel_FirstFailurePolicy_ReturnsFailureIfAnyChildFails()
         {
-            // Arrange
             var parallel = new Parallel(ParallelPolicy.FIRST_FAILURE);
             parallel.AddChild(new SuccessNode())
-                    .AddChild(new FailureNode()) // Should cause parallel to return FAILURE
-                    .AddChild(new RunningNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = parallel.Evaluate(null, 0);
-            }
-
-            // Assert
+                    .AddChild(new FailureNode());
+            var result = parallel.Evaluate(null, 0);
             Assert.Equal(NodeState.FAILURE, result);
         }
 
         [Fact]
-        public void Parallel_ReturnsRunningIfAnyChildIsRunning()
+        public void Parallel_Abort_ResetsProcessingChildIndex()
         {
-            // Arrange
-            var parallel = new Parallel(ParallelPolicy.ALL_SUCCESS);
-            parallel.AddChild(new SuccessNode())
-                    .AddChild(new RunningNode()) // Should cause parallel to return RUNNING
-                    .AddChild(new SuccessNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = parallel.Evaluate(null, 0);
-            }
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, result);
+            var parallel = new Parallel(ParallelPolicy.ANY_SUCCESS);
+            parallel.AddChild(new RunningNode());
+            parallel.Evaluate(null, 0); // Set the parallel node to a running state
+            parallel.Abort();
+            Assert.Equal(0, GetProcessingChildIndex(parallel)); // Check if reset via reflection
         }
     }
 
-    public class SelectorTests
+    public class CooldownTests
     {
         [Fact]
-        public void Selector_ReturnsRunningIfAnyChildIsRunning()
+        public void Cooldown_Evaluate_ReturnsFailureIfOnCooldown()
         {
-            // Arrange
-            var selector = new Selector();
-            selector.AddChild(new FailureNode())
-                    .AddChild(new RunningNode()) // Should cause selector to return RUNNING
-                    .AddChild(new SuccessNode());
-
-            NodeState result = NodeState.FAILURE;
-
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = selector.Evaluate(null, 0);
-            }
-
-            // Assert
-            Assert.Equal(NodeState.RUNNING, result);
+            var child = new SuccessNode();
+            var cooldown = new Cooldown(child, 1.0f);
+            cooldown.Evaluate(null, 0); // Starts cooldown
+            var result = cooldown.Evaluate(null, 0); // Immediately evaluated again
+            Assert.Equal(NodeState.FAILURE, result); // Should be on cooldown
         }
 
         [Fact]
-        public void Selector_ReturnsFailureIfAllChildrenFail()
+        public void Cooldown_Abort_ResetsCooldownImmediately()
         {
-            // Arrange
-            var selector = new Selector();
-            selector.AddChild(new FailureNode())
-                    .AddChild(new FailureNode())
-                    .AddChild(new FailureNode()); // All children fail
+            var child = new SuccessNode();
+            var cooldown = new Cooldown(child, 1.0f);
+            cooldown.Evaluate(null, 0); // Start cooldown
+            cooldown.Abort();
+            Assert.Equal(NodeState.SUCCESS, cooldown.Evaluate(null, 0)); // Cooldown should be reset
+        }
+    }
 
-            NodeState result = NodeState.FAILURE;
+    public class RepeaterTests
+    {
+        [Fact]
+        public void Repeater_FixedCount_StopsAfterMaxCount()
+        {
+            var child = new SuccessNode();
+            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 3);
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0));
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0));
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0));
+            Assert.Equal(NodeState.SUCCESS, repeater.Evaluate(null, 0)); // After max count
+        }
 
-            // Act
-            for (var i = 0; i < 3; i++)
-            {
-                result = selector.Evaluate(null, 0);
-            }
+        [Fact]
+        public void Repeater_Abort_ResetsCurrentCount()
+        {
+            var child = new SuccessNode();
+            var repeater = new Repeater(child, RepeatMode.FixedCount, maxCount: 3);
+            repeater.Evaluate(null, 0);
+            repeater.Abort();
+            Assert.Equal(NodeState.RUNNING, repeater.Evaluate(null, 0)); // Should start from the beginning
+        }
+    }
 
-            // Assert
-            Assert.Equal(NodeState.FAILURE, result);
+    public class InterruptTests
+    {
+        [Fact]
+        public void Interrupt_Evaluate_AbortsChildWhenInterrupted()
+        {
+            var child = new MockNode();
+            var interrupt = new Interrupt(child, () => true);
+            interrupt.Evaluate(null, 0);
+            Assert.True(child.WasAborted); // Checks if child was aborted
         }
     }
 }

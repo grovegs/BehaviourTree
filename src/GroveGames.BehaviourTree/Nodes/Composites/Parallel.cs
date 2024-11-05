@@ -23,7 +23,7 @@ public sealed class Parallel : Composite
         var allSuccess = true;
         var anyChildRunning = false;
 
-        foreach (var child in childeren)
+        foreach (var child in children)
         {
             child.BeforeEvaluate();
             var status = child.Evaluate(blackboard, delta);

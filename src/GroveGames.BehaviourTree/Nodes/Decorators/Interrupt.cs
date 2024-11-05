@@ -17,7 +17,7 @@ public class Interrupt : Decorator
     {
         if (_shouldInterreupt())
         {
-            child?.Interrupt();
+            child?.Abort();
             return NodeState.FAILURE;
         }
 

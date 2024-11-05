@@ -8,28 +8,31 @@ public sealed class Sequence : Composite
 {
     public override NodeState Evaluate(IBlackboard blackboard, double delta)
     {
-
-        var child = childeren[processingChild % childeren.Count];
-
-        child.BeforeEvaluate();
-        var state = child.Evaluate(blackboard, delta);
-
-        switch (state)
+        if (processingChildIndex < children.Count)
         {
-            case NodeState.RUNNING:
-                return NodeState.RUNNING;
+            var child = children[processingChildIndex];
 
-            case NodeState.FAILURE:
-                processingChild = 0;
-                return NodeState.FAILURE;
+            child.BeforeEvaluate();
+            var state = child.Evaluate(blackboard, delta);
 
-            case NodeState.SUCCESS:
-                processingChild++;
-                break;
+            switch (state)
+            {
+                case NodeState.RUNNING:
+                    return NodeState.RUNNING;
+
+                case NodeState.FAILURE:
+                    processingChildIndex = 0;
+                    return NodeState.FAILURE;
+
+                case NodeState.SUCCESS:
+                    processingChildIndex++;
+                    return processingChildIndex == children.Count ? NodeState.SUCCESS : NodeState.RUNNING;
+            }
+
+            child.AfterEvaluate();
         }
 
-        child.AfterEvaluate();
-
+        Reset();
         return NodeState.SUCCESS;
     }
 }

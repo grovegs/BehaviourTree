@@ -28,8 +28,13 @@ public class Decorator : Node
         child?.AfterEvaluate();
     }
 
-    public override void Interrupt()
+    public override void Reset()
     {
-        child?.Interrupt();
+        child?.Reset();
+    }
+
+    public override void Abort()
+    {
+        child?.Abort();
     }
 }

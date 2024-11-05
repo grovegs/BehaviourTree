@@ -26,9 +26,15 @@ public sealed class Cooldown : Decorator
         return base.Evaluate(blackboard, delta);
     }
 
-    public override void Interrupt()
+    public override void Reset()
     {
         _remainingTime = 0f;
-        base.Interrupt();
+        base.Reset();
+    }
+
+    public override void Abort()
+    {
+        _remainingTime = 0f;
+        base.Abort();
     }
 }

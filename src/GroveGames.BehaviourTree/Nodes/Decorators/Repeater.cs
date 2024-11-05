@@ -67,10 +67,16 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
             return childStatus == NodeState.RUNNING ? NodeState.RUNNING : NodeState.SUCCESS;
         }
 
-        public override void Interrupt()
+        public override void Reset()
         {
             _currentCount = 0;
-            child.Interrupt();
+            child?.Reset();
+        }
+
+        public override void Abort()
+        {
+            _currentCount = 0;
+            child?.Abort();
         }
     }
 }

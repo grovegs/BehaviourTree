@@ -26,7 +26,12 @@ public class Node
 
     }
 
-    public virtual void Interrupt()
+    public virtual void Reset()
+    {
+
+    }
+
+    public virtual void Abort()
     {
 
     }

@@ -9,8 +9,8 @@ on:
       - main
 
 env:
-  NAME: BehaviourTree
-  AUTHOR: GroveGames
+  NAME: ${{ vars.PROJECT_NAME }}
+  AUTHOR: ${{ vars.PROJECT_AUTHOR }}
 
 jobs:
   core_tests:

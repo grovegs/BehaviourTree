@@ -46,10 +46,11 @@ namespace GroveGames.BehaviourTree.Tests
             var cooldown = new Cooldown(child, 1.0f); // 1-second cooldown
 
             // Act
-            var firstResult = cooldown.Evaluate(null, 0.99f); // First evaluation
+            var firstResult = cooldown.Evaluate(null, 0.5f);
+            var second = cooldown.Evaluate(null, 0.25f); // First evaluation
 
             // Assert
-            Assert.Equal(NodeState.FAILURE, firstResult); //  Second evaluation should fail due to active cooldown
+            Assert.Equal(NodeState.FAILURE, second); //  Second evaluation should fail due to active cooldown
         }
     }
 

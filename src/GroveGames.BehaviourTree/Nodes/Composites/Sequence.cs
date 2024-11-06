@@ -6,7 +6,7 @@ public sealed class Sequence : Composite
 {
     private int _processingChildIndex;
 
-    public Sequence(INode parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Sequence(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
     {
         _processingChildIndex = 0;
     }
@@ -51,5 +51,15 @@ public sealed class Sequence : Composite
         }
 
         _processingChildIndex = 0;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent AttachSequence(this IParent parent)
+    {
+        var sequence = new Sequence(parent, parent.Blackboard);
+        parent.Attach(sequence);
+        return parent;
     }
 }

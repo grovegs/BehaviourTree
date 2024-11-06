@@ -2,21 +2,20 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
-public class Composite : Node
+public abstract class Composite : Node, IParent
 {
     private readonly List<INode> _children;
 
     protected IReadOnlyList<INode> Children => _children;
 
-    public Composite(INode parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Composite(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
     {
         _children = [];
     }
 
-    public Composite AddChild(INode child)
+    public IParent Attach(INode node)
     {
-        _children.Add(child);
-
+        _children.Add(node);
         return this;
     }
 
@@ -28,3 +27,4 @@ public class Composite : Node
         }
     }
 }
+

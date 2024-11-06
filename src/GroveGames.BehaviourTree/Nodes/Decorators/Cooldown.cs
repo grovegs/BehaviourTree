@@ -7,7 +7,7 @@ public sealed class Cooldown : Decorator
     private readonly float _waitTime;
     private float _remainingTime;
 
-    public Cooldown(INode parent, IBlackboard blackboard, INode child, float waitTime) : base(parent, blackboard, child)
+    public Cooldown(IParent parent, IBlackboard blackboard, float waitTime) : base(parent, blackboard)
     {
         _waitTime = waitTime;
         _remainingTime = 0;
@@ -35,5 +35,14 @@ public sealed class Cooldown : Decorator
     {
         base.Abort();
         _remainingTime = 0f;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static void AttachCooldown(this IParent parent, float waitTime)
+    {
+        var cooldown = new Cooldown(parent, parent.Blackboard, waitTime);
+        parent.Attach(cooldown);
     }
 }

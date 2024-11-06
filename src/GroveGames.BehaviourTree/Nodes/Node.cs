@@ -6,13 +6,13 @@ public abstract class Node : INode
 {
     public static readonly INode Empty = new NullNode();
 
-    private readonly INode _parent;
+    private readonly IParent _parent;
     private readonly IBlackboard _blackboard;
 
-    protected INode Parent => _parent;
-    protected IBlackboard Blackboard => _blackboard;
+    protected IParent Parent => _parent;
+    public IBlackboard Blackboard => _blackboard;
 
-    public Node(INode parent, IBlackboard blackboard)
+    public Node(IParent parent, IBlackboard blackboard)
     {
         _parent = parent;
         _blackboard = blackboard;

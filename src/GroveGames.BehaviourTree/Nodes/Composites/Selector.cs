@@ -6,7 +6,7 @@ public sealed class Selector : Composite
 {
     private int _processingChildIndex;
 
-    public Selector(INode parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Selector(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
     {
         _processingChildIndex = 0;
     }
@@ -51,5 +51,15 @@ public sealed class Selector : Composite
         }
 
         _processingChildIndex = 0;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent AttachSelector(this IParent parent)
+    {
+        var selector = new Selector(parent, parent.Blackboard);
+        parent.Attach(selector);
+        return parent;
     }
 }

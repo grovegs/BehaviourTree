@@ -6,7 +6,7 @@ public sealed class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 
-    public Parallel(INode parent, IBlackboard blackboard, ParallelPolicy policy) : base(parent, blackboard)
+    public Parallel(IParent parent, IBlackboard blackboard, ParallelPolicy policy) : base(parent, blackboard)
     {
         _policy = policy;
     }
@@ -52,5 +52,15 @@ public sealed class Parallel : Composite
         }
 
         return anyChildRunning ? NodeState.Running : NodeState.Failure;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent AttachParallel(this IParent parent, ParallelPolicy policy)
+    {
+        var parallel = new Parallel(parent, parent.Blackboard, policy);
+        parent.Attach(parallel);
+        return parent;
     }
 }

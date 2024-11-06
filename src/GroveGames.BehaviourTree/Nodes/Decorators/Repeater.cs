@@ -1,4 +1,6 @@
 using GroveGames.BehaviourTree.Collections;
+using GroveGames.BehaviourTree.Nodes;
+using GroveGames.BehaviourTree.Nodes.Decorators;
 
 namespace GroveGames.BehaviourTree.Nodes.Decorators
 {
@@ -9,7 +11,7 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
         private readonly int _maxCount;
         private int _currentCount;
 
-        public Repeater(INode parent, IBlackboard blackboard, INode child, RepeatMode repeatMode, int maxCount = -1) : base(parent, blackboard, child)
+        public Repeater(IParent parent, IBlackboard blackboard, RepeatMode repeatMode, int maxCount = -1) : base(parent, blackboard)
         {
             _repeatMode = repeatMode;
             _maxCount = maxCount;
@@ -68,5 +70,14 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
             base.Abort();
             _currentCount = 0;
         }
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static void AttachRepeater(this IParent parent, RepeatMode repeatMode)
+    {
+        var repeater = new Repeater(parent, parent.Blackboard, repeatMode);
+        parent.Attach(repeater);
     }
 }

@@ -2,13 +2,12 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public class Decorator : Node
+public abstract class Decorator : Node, IParent
 {
-    protected readonly INode _child;
+    private INode _child;
 
-    public Decorator(INode parent, IBlackboard blackboard, INode child) : base(parent, blackboard)
+    public Decorator(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
     {
-        _child = child;
     }
 
     public override NodeState Evaluate(float deltaTime)
@@ -24,5 +23,11 @@ public class Decorator : Node
     public override void Abort()
     {
         _child.Abort();
+    }
+
+    public IParent Attach(INode node)
+    {
+        _child = node;
+        return this;
     }
 }

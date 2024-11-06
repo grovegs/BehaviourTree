@@ -4,13 +4,13 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Succeeder : Decorator
 {
-    public Succeeder(INode parent, INode child) : base(parent, child)
+    public Succeeder(INode parent, IBlackboard blackboard, INode child) : base(parent, blackboard, child)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
-        var status = base.Evaluate(blackboard, deltaTime);
+        var status = base.Evaluate(deltaTime);
 
         return status == NodeState.Running ? NodeState.Running : NodeState.Success;
     }

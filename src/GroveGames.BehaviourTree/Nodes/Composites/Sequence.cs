@@ -6,19 +6,17 @@ public sealed class Sequence : Composite
 {
     private int _processingChildIndex;
 
-    public Sequence(INode parent) : base(parent)
+    public Sequence(INode parent, IBlackboard blackboard) : base(parent, blackboard)
     {
         _processingChildIndex = 0;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
         if (_processingChildIndex < Children.Count)
         {
             var child = Children[_processingChildIndex];
-
-            child.BeforeEvaluate();
-            var state = child.Evaluate(blackboard, deltaTime);
+            var state = child.Evaluate(deltaTime);
 
             switch (state)
             {
@@ -33,8 +31,6 @@ public sealed class Sequence : Composite
                     _processingChildIndex++;
                     return _processingChildIndex == Children.Count ? NodeState.Success : NodeState.Running;
             }
-
-            child.AfterEvaluate();
         }
 
         Reset();
@@ -53,5 +49,7 @@ public sealed class Sequence : Composite
         {
             Children[_processingChildIndex].Abort();
         }
+
+        _processingChildIndex = 0;
     }
 }

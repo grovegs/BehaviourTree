@@ -6,20 +6,19 @@ public sealed class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 
-    public Parallel(INode parent, ParallelPolicy policy) : base(parent)
+    public Parallel(INode parent, IBlackboard blackboard, ParallelPolicy policy) : base(parent, blackboard)
     {
         _policy = policy;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
         var allSuccess = true;
         var anyChildRunning = false;
 
         foreach (var child in Children)
         {
-            child.BeforeEvaluate();
-            var status = child.Evaluate(blackboard, deltaTime);
+            var status = child.Evaluate(deltaTime);
 
             switch (status)
             {
@@ -45,8 +44,6 @@ public sealed class Parallel : Composite
                     }
                     break;
             }
-
-            child.AfterEvaluate();
         }
 
         if (allSuccess && _policy == ParallelPolicy.AllSuccess)

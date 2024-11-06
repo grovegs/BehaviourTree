@@ -1,12 +1,8 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes;
 
 public interface INode
 {
-    NodeState Evaluate(IBlackboard blackboard, float deltaTime);
-    void BeforeEvaluate();
-    void AfterEvaluate();
+    NodeState Evaluate(float deltaTime);
     void Reset();
     void Abort();
 }

@@ -4,13 +4,13 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Inverter : Decorator
 {
-    public Inverter(INode parent, INode child) : base(parent, child)
+    public Inverter(INode parent, IBlackboard blackboard, INode child) : base(parent, blackboard, child)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
-        var status = _child.Evaluate(blackboard, deltaTime);
+        var status = _child.Evaluate(deltaTime);
 
         return status switch
         {

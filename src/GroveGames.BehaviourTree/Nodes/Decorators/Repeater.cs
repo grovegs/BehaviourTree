@@ -9,14 +9,14 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
         private readonly int _maxCount;
         private int _currentCount;
 
-        public Repeater(INode parent, INode child, RepeatMode repeatMode, int maxCount = -1) : base(parent, child)
+        public Repeater(INode parent, IBlackboard blackboard, INode child, RepeatMode repeatMode, int maxCount = -1) : base(parent, blackboard, child)
         {
             _repeatMode = repeatMode;
             _maxCount = maxCount;
             _currentCount = 0;
         }
 
-        public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+        public override NodeState Evaluate(float deltaTime)
         {
             if (_repeatMode == RepeatMode.FixedCount && _currentCount >= _maxCount)
             {
@@ -24,7 +24,7 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
                 return NodeState.Success;
             }
 
-            var childStatus = base.Evaluate(blackboard, deltaTime);
+            var childStatus = base.Evaluate(deltaTime);
 
             switch (_repeatMode)
             {

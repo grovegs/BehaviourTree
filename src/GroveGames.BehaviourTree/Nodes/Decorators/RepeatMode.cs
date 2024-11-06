@@ -1,10 +1,9 @@
-namespace GroveGames.BehaviourTree.Nodes.Decorators
+namespace GroveGames.BehaviourTree.Nodes.Decorators;
+
+public enum RepeatMode
 {
-    public enum RepeatMode
-    {
-        FixedCount,
-        UntilSuccess,
-        UntilFailure,
-        Infinite
-    }
+    FixedCount,
+    UntilSuccess,
+    UntilFailure,
+    Infinite
 }

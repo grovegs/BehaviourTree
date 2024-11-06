@@ -7,13 +7,13 @@ public sealed class Cooldown : Decorator
     private readonly float _waitTime;
     private float _remainingTime;
 
-    public Cooldown(INode parent, INode child, float waitTime) : base(parent, child)
+    public Cooldown(INode parent, IBlackboard blackboard, INode child, float waitTime) : base(parent, blackboard, child)
     {
         _waitTime = waitTime;
         _remainingTime = 0;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
         if (_remainingTime > 0f)
         {
@@ -22,7 +22,7 @@ public sealed class Cooldown : Decorator
         }
 
         _remainingTime = _waitTime;
-        return base.Evaluate(blackboard, deltaTime);
+        return base.Evaluate(deltaTime);
     }
 
     public override void Reset()

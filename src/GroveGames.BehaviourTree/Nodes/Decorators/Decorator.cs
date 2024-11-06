@@ -6,24 +6,14 @@ public class Decorator : Node
 {
     protected readonly INode _child;
 
-    public Decorator(INode parent, INode child) : base(parent)
+    public Decorator(INode parent, IBlackboard blackboard, INode child) : base(parent, blackboard)
     {
         _child = child;
     }
 
-    public override void BeforeEvaluate()
+    public override NodeState Evaluate(float deltaTime)
     {
-        _child?.BeforeEvaluate();
-    }
-
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
-    {
-        return _child != null ? _child.Evaluate(blackboard, deltaTime) : NodeState.Failure;
-    }
-
-    public override void AfterEvaluate()
-    {
-        _child.AfterEvaluate();
+        return _child.Evaluate(deltaTime);
     }
 
     public override void Reset()

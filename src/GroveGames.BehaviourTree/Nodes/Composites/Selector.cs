@@ -6,20 +6,17 @@ public sealed class Selector : Composite
 {
     private int _processingChildIndex;
 
-    public Selector(INode parent) : base(parent)
+    public Selector(INode parent, IBlackboard blackboard) : base(parent, blackboard)
     {
         _processingChildIndex = 0;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, float deltaTime)
+    public override NodeState Evaluate(float deltaTime)
     {
         if (_processingChildIndex < Children.Count)
         {
             var child = Children[_processingChildIndex];
-
-            child.BeforeEvaluate();
-
-            var status = child.Evaluate(blackboard, deltaTime);
+            var status = child.Evaluate(deltaTime);
 
             switch (status)
             {
@@ -34,8 +31,6 @@ public sealed class Selector : Composite
                     Reset();
                     return NodeState.Success;
             }
-
-            child.AfterEvaluate();
         }
 
         Reset();
@@ -54,5 +49,7 @@ public sealed class Selector : Composite
         {
             Children[_processingChildIndex].Abort();
         }
+
+        _processingChildIndex = 0;
     }
 }

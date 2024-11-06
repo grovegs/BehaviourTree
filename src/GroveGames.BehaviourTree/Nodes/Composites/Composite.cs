@@ -1,42 +1,28 @@
-using System;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
-public class Composite : Node
+public abstract class Composite : Node, IParent
 {
-    protected readonly IList<Node> children;
-    protected int processingChildIndex;
+    private readonly List<INode> _children;
 
-    public Composite() : base()
+    protected IReadOnlyList<INode> Children => _children;
+
+    public Composite(IParent parent) : base(parent)
     {
-        children = [];
+        _children = [];
     }
 
-    public Composite AddChild(Node child)
+    public IParent Attach(INode node)
     {
-        child.SetParent(this);
-        children.Add(child);
-
+        _children.Add(node);
         return this;
     }
 
     public override void Reset()
     {
-        processingChildIndex = 0;
-
-        foreach (var child in children)
+        foreach (var child in _children)
         {
             child.Reset();
         }
     }
-
-    public override void Abort()
-    {
-        if (processingChildIndex < children.Count)
-        {
-            children[processingChildIndex].Abort();
-        }
-
-        Reset();
-    }
 }
+

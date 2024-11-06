@@ -1,19 +1,24 @@
-using System;
-
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Succeeder : Decorator
 {
-    public Succeeder(Node child) : base(child)
+    public Succeeder(IParent parent) : base(parent)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float deltaTime)
     {
-        var status = base.Evaluate(blackboard, delta);
+        var status = base.Evaluate(deltaTime);
 
-        return status == NodeState.RUNNING ? NodeState.RUNNING : NodeState.SUCCESS;
+        return status == NodeState.Running ? NodeState.Running : NodeState.Success;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static void Succeeder(this IParent parent)
+    {
+        var succeeder = new Succeeder(parent);
+        parent.Attach(succeeder);
     }
 }

@@ -1,37 +1,63 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public sealed class Selector : Composite
 {
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    private int _processingChildIndex;
+
+    public Selector(IParent parent) : base(parent)
     {
-        if (processingChildIndex < children.Count)
+        _processingChildIndex = 0;
+    }
+
+    public override NodeState Evaluate(float deltaTime)
+    {
+        if (_processingChildIndex < Children.Count)
         {
-            var child = children[processingChildIndex];
-
-            child.BeforeEvaluate();
-
-            var status = child.Evaluate(blackboard, delta);
+            var child = Children[_processingChildIndex];
+            var status = child.Evaluate(deltaTime);
 
             switch (status)
             {
-                case NodeState.FAILURE:
-                    processingChildIndex++;
-                    return NodeState.RUNNING;
+                case NodeState.Failure:
+                    _processingChildIndex++;
+                    return NodeState.Running;
 
-                case NodeState.RUNNING:
-                    return NodeState.RUNNING;
+                case NodeState.Running:
+                    return NodeState.Running;
 
-                case NodeState.SUCCESS:
+                case NodeState.Success:
                     Reset();
-                    return NodeState.SUCCESS;
+                    return NodeState.Success;
             }
-
-            child.AfterEvaluate();
         }
 
         Reset();
-        return NodeState.FAILURE;
+        return NodeState.Failure;
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        _processingChildIndex = 0;
+    }
+
+    public override void Abort()
+    {
+        if (_processingChildIndex < Children.Count)
+        {
+            Children[_processingChildIndex].Abort();
+        }
+
+        _processingChildIndex = 0;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent Selector(this IParent parent)
+    {
+        var selector = new Selector(parent);
+        parent.Attach(selector);
+        return selector;
     }
 }

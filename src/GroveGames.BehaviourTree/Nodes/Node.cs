@@ -2,28 +2,21 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
-public class Node
+public abstract class Node : INode
 {
-    protected Node parent;
+    private readonly IParent _parent;
 
-    public void SetParent(Node parent)
+    protected IParent Parent => _parent;
+    public IBlackboard Blackboard => _parent.Blackboard;
+
+    public Node(IParent parent)
     {
-        this.parent = parent;
+        _parent = parent;
     }
 
-    public virtual NodeState Evaluate(IBlackboard blackboard, double delta)
+    public virtual NodeState Evaluate(float deltaTime)
     {
-        return NodeState.FAILURE;
-    }
-
-    public virtual void BeforeEvaluate()
-    {
-
-    }
-
-    public virtual void AfterEvaluate()
-    {
-
+        return NodeState.Failure;
     }
 
     public virtual void Reset()

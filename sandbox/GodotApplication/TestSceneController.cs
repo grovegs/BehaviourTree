@@ -2,139 +2,139 @@ using Godot;
 
 using GroveGames.BehaviourTree;
 using GroveGames.BehaviourTree.Collections;
+using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
-using GroveGames.BehaviourTree.Tree;
 
 using System;
 
-public partial class TestSceneController : Node
-{
-	[Export] Node3D _enemy;
-	[Export] Node3D _entity;
+using Tree = GroveGames.BehaviourTree.Tree;
 
-	private CharacterBT _characterBT;
+public partial class TestSceneController : Godot.Node
+{
+    [Export] Node3D _enemy;
+    [Export] Node3D _entity;
+
+    private CharacterBT _characterBT;
     private readonly IBlackboard _blackboard = new Blackboard();
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-		_characterBT = new CharacterBT();
-		_characterBT.SetEntity(_entity, _enemy);
-		_characterBT.SetupTree();
-	}
+    // Called when the node enters the scene tree for the first time.
+    public override void _Ready()
+    {
+        _characterBT = new CharacterBT(new Root(new Blackboard()));
+        _characterBT.SetEntity(_entity, _enemy);
+        _characterBT.SetupTree();
+    }
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-		_characterBT.Tick(_blackboard, delta);
-	}
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _Process(double delta)
+    {
+        _characterBT.Tick((float)delta);
+    }
 
     public override void _Input(InputEvent @event)
     {
         if (@event.IsPressed())
         {
-            _characterBT.Interrupt();
+            _characterBT.Abort();
         }
     }
 }
 
-public class CharacterBT : BehaviourTree
+public class CharacterBT : Tree
 {
     private Node3D _entity;
-	private Node3D _enemy;
+    private Node3D _enemy;
 
-	public void SetEntity(Node3D entity, Node3D enemy)
-	{
-		_entity = entity;
+    public CharacterBT(GroveGames.BehaviourTree.Nodes.Root root) : base(root)
+    {
+    }
+
+    public void SetEntity(Node3D entity, Node3D enemy)
+    {
+        _entity = entity;
         _enemy = enemy;
-	}
+    }
 
     public override void SetupTree()
     {
-       var selector = new Selector();
+        var selector = Root.Selector();
 
-       var inputSequence = new Input(_entity);
-       var attackSequence = new Sequence()
-       .AddChild(new LookForEnemy(_enemy, _entity))
-       .AddChild(new MoveToTarget(_entity))
-       .AddChild(new Attack());
+        var inputSequence = new Input(_entity, selector);
+        selector.Attach(inputSequence);
 
-       var gatherSequnce = new Sequence()
-       .AddChild(new LookForGathering())
-       .AddChild(new MoveToTarget(_entity))
-       .AddChild(new Gather());
+         var attack = selector.Sequence();
 
-       selector
-       .AddChild(inputSequence)
-       .AddChild(attackSequence)
-       .AddChild(gatherSequnce);
+         attack
+        .Attach(new LookForEnemy(_enemy, _entity, attack))
+        .Attach(new MoveToTarget(attack, _entity))
+        .Attach(new Attack(selector));
 
-       root = selector;
-    }
+         var gather = selector.Sequence();
 
-    public override void Tick(IBlackboard blackboard, double delta)
-    {
-        root.BeforeEvaluate();
-        root.Evaluate(blackboard, delta);
-        root.AfterEvaluate();
+         gather
+        .Attach(new LookForGathering(gather))
+        .Attach(new MoveToTarget(gather,_entity))
+        .Attach(new Gather(gather));
     }
 }
 
 public class Idle : GroveGames.BehaviourTree.Nodes.Node
 {
-
+    public Idle(IParent parent) : base(parent)
+    {
+    }
 }
 
 public class MoveToTarget : GroveGames.BehaviourTree.Nodes.Node
 {
-    
+
     private readonly Node3D _entity;
 
     private readonly float _speed = 3f;
 
-    public MoveToTarget(Node3D entity) : base()
+    public MoveToTarget(IParent parent, Node3D entity) : base(parent)
     {
         _entity = entity;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float delta)
     {
-		var target = blackboard.GetValue<Node3D>("target_pos_enemey");
+        var target = Blackboard.GetValue<Node3D>("target_pos_enemey");
 
-		if (target == null)
-		{
-			return NodeState.FAILURE;
-		}
+        if (target == null)
+        {
+            return NodeState.Failure;
+        }
 
         var direction = (target.Position - _entity.Position).Normalized();
 
-        Vector3 newPosition = _entity.Position + direction * _speed  * (float)delta;
-		_entity.Position = newPosition;
+        Vector3 newPosition = _entity.Position + direction * _speed * (float)delta;
+        _entity.Position = newPosition;
         var distance = target.Position.DistanceTo(_entity.Position);
 
         GD.Print("Moving");
 
         if (distance <= 1f)
         {
-            blackboard.DeleteValue("target_pos_enemey");
-            return NodeState.SUCCESS;
+            Blackboard.DeleteValue("target_pos_enemey");
+            return NodeState.Success;
         }
 
-        return NodeState.RUNNING;
+        return NodeState.Running;
     }
 }
 
 public class Attack : GroveGames.BehaviourTree.Nodes.Node
 {
-    public Attack() : base()
+    public Attack(IParent parent) : base(parent)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float delta)
     {
         GD.Print("Attacking");
 
-        return NodeState.FAILURE;
+        return NodeState.Failure;
     }
 }
 
@@ -142,18 +142,17 @@ public class Input : GroveGames.BehaviourTree.Nodes.Node
 {
     private readonly Node3D _entity;
 
-    public Input(Node3D entity) : base()
+    public Input(Node3D entity, IParent parent) : base(parent)
     {
         _entity = entity;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float delta)
     {
-    
-          Vector3 direction = Vector3.Zero;
+        Vector3 direction = Vector3.Zero;
 
         if (Godot.Input.IsActionPressed("move_forward"))
-            {direction.Z -= 1;}
+        { direction.Z -= 1; }
         if (Godot.Input.IsActionPressed("move_backward"))
             direction.Z += 1;
         if (Godot.Input.IsActionPressed("move_left"))
@@ -164,59 +163,66 @@ public class Input : GroveGames.BehaviourTree.Nodes.Node
         direction = direction.Normalized();
         if (direction == Vector3.Zero)
         {
-            return NodeState.FAILURE;
+            return NodeState.Failure;
         }
         _entity.Position += direction * 5f * (float)delta;
-        return NodeState.RUNNING;
+        return NodeState.Running;
     }
 }
 
 public class Gather : GroveGames.BehaviourTree.Nodes.Node
 {
-
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public Gather(IParent parent) : base(parent)
     {
-        return NodeState.FAILURE;
+    }
+
+    public override NodeState Evaluate(float delta)
+    {
+        return NodeState.Failure;
     }
 }
 
 public class LookForGathering : GroveGames.BehaviourTree.Nodes.Node
 {
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public LookForGathering(IParent parent) : base(parent)
     {
-        return NodeState.FAILURE;
+    }
+
+    public override NodeState Evaluate(float delta)
+    {
+        return NodeState.Failure;
     }
 }
 
 public class LookForEnemy : GroveGames.BehaviourTree.Nodes.Node
 {
-	private readonly Node3D _enemy;
-	private readonly Node3D _entity;
+    private readonly Node3D _enemy;
+    private readonly Node3D _entity;
 
-    public LookForEnemy(Node3D enemy, Node3D entity) : base()
+    public LookForEnemy(Node3D enemy, Node3D entity, IParent parent) : base(parent)
     {
-		_enemy = enemy;
-		_entity = entity;
+        _enemy = enemy;
+        _entity = entity;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float delta)
     {
-		if (_enemy == null)
-		{
-			return NodeState.FAILURE;
-		}
+        if (_enemy == null)
+        {
+            return NodeState.Failure;
+        }
 
         var distance = _enemy.Position.DistanceTo(_entity.Position);
 
-		if (distance <= 10f)
-		{
+        if (distance <= 10f)
+        {
             GD.Print("In Range");
-			blackboard.SetValue("target_pos_enemey", _enemy);
-			return NodeState.SUCCESS;
-		}
-		
+            Blackboard.SetValue("target_pos_enemey", _enemy);
+            return NodeState.Success;
+        }
+
         GD.Print("Out Of Range");
-		return NodeState.FAILURE;
-		
+        return NodeState.Failure;
+
     }
 }

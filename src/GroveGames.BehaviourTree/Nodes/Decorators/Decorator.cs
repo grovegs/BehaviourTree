@@ -1,40 +1,31 @@
-using System;
-
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public class Decorator : Node
+public abstract class Decorator : Node, IParent
 {
-    protected readonly Node child;
+    private INode _child;
 
-    public Decorator(Node child)
+    public Decorator(IParent parent) : base(parent)
     {
-        this.child = child;
     }
 
-    public override void BeforeEvaluate()
+    public override NodeState Evaluate(float deltaTime)
     {
-        child?.BeforeEvaluate();
-    }
-
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
-    {
-        return child != null ? child.Evaluate(blackboard, delta) : NodeState.FAILURE;
-    }
-
-    public override void AfterEvaluate()
-    {
-        child?.AfterEvaluate();
+        return _child.Evaluate(deltaTime);
     }
 
     public override void Reset()
     {
-        child?.Reset();
+        _child.Reset();
     }
 
     public override void Abort()
     {
-        child?.Abort();
+        _child.Abort();
+    }
+
+    public IParent Attach(INode node)
+    {
+        _child = node;
+        return this;
     }
 }

@@ -1,25 +1,31 @@
-using System;
-
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Inverter : Decorator
 {
-    public Inverter(Node child) : base(child)
+    public Inverter(IParent parent) : base(parent)
     {
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float deltaTime)
     {
-        var status = child.Evaluate(blackboard, delta);
+        var status = base.Evaluate(deltaTime);
 
         return status switch
         {
-            NodeState.SUCCESS => NodeState.FAILURE,
-            NodeState.RUNNING => NodeState.RUNNING,
-            NodeState.FAILURE => NodeState.SUCCESS,
-            _ => NodeState.FAILURE,
+            NodeState.Success => NodeState.Failure,
+            NodeState.Running => NodeState.Running,
+            NodeState.Failure => NodeState.Success,
+            _ => NodeState.Failure,
         };
     }
 }
+
+public static partial class ParentExtensions
+{
+    public static void Inverter(this IParent parent)
+    {
+        var inverter = new Inverter(parent);
+        parent.Attach(inverter);
+    }
+}
+

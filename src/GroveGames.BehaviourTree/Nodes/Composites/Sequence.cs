@@ -1,38 +1,63 @@
-using System;
-
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public sealed class Sequence : Composite
 {
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
-    {
-        if (processingChildIndex < children.Count)
-        {
-            var child = children[processingChildIndex];
+    private int _processingChildIndex;
 
-            child.BeforeEvaluate();
-            var state = child.Evaluate(blackboard, delta);
+    public Sequence(IParent parent) : base(parent)
+    {
+        _processingChildIndex = 0;
+    }
+
+    public override NodeState Evaluate(float deltaTime)
+    {
+        if (_processingChildIndex < Children.Count)
+        {
+            var child = Children[_processingChildIndex];
+            var state = child.Evaluate(deltaTime);
 
             switch (state)
             {
-                case NodeState.RUNNING:
-                    return NodeState.RUNNING;
+                case NodeState.Running:
+                    return NodeState.Running;
 
-                case NodeState.FAILURE:
-                    processingChildIndex = 0;
-                    return NodeState.FAILURE;
+                case NodeState.Failure:
+                    _processingChildIndex = 0;
+                    return NodeState.Failure;
 
-                case NodeState.SUCCESS:
-                    processingChildIndex++;
-                    return processingChildIndex == children.Count ? NodeState.SUCCESS : NodeState.RUNNING;
+                case NodeState.Success:
+                    _processingChildIndex++;
+                    return _processingChildIndex == Children.Count ? NodeState.Success : NodeState.Running;
             }
-
-            child.AfterEvaluate();
         }
 
         Reset();
-        return NodeState.SUCCESS;
+        return NodeState.Success;
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        _processingChildIndex = 0;
+    }
+
+    public override void Abort()
+    {
+        if (_processingChildIndex < Children.Count)
+        {
+            Children[_processingChildIndex].Abort();
+        }
+
+        _processingChildIndex = 0;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent Sequence(this IParent parent)
+    {
+        var sequence = new Sequence(parent);
+        parent.Attach(sequence);
+        return sequence;
     }
 }

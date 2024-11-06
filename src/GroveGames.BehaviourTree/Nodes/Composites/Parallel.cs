@@ -1,66 +1,64 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
-
-public enum ParallelPolicy
-{
-    ANY_SUCCESS,
-    ALL_SUCCESS,
-    FIRST_FAILURE
-}
 
 public sealed class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 
-    public Parallel(ParallelPolicy policy) : base()
+    public Parallel(IParent parent, ParallelPolicy policy) : base(parent)
     {
         _policy = policy;
     }
 
-    public override NodeState Evaluate(IBlackboard blackboard, double delta)
+    public override NodeState Evaluate(float deltaTime)
     {
         var allSuccess = true;
         var anyChildRunning = false;
 
-        foreach (var child in children)
+        foreach (var child in Children)
         {
-            child.BeforeEvaluate();
-            var status = child.Evaluate(blackboard, delta);
+            var status = child.Evaluate(deltaTime);
 
             switch (status)
             {
-                case NodeState.SUCCESS:
-                    if (_policy == ParallelPolicy.ANY_SUCCESS)
+                case NodeState.Success:
+                    if (_policy == ParallelPolicy.AnySuccess)
                     {
-                        return NodeState.SUCCESS;
+                        return NodeState.Success;
                     }
 
                     break;
 
-                case NodeState.RUNNING:
+                case NodeState.Running:
                     allSuccess = false;
                     anyChildRunning = true;
                     break;
 
-                case NodeState.FAILURE:
+                case NodeState.Failure:
                     allSuccess = false;
 
-                    if (_policy == ParallelPolicy.FIRST_FAILURE)
+                    if (_policy == ParallelPolicy.FirstFailure)
                     {
-                        return NodeState.FAILURE;
+                        return NodeState.Failure;
                     }
                     break;
             }
-
-            child.AfterEvaluate();
         }
 
-        if (allSuccess && _policy == ParallelPolicy.ALL_SUCCESS)
+        if (allSuccess && _policy == ParallelPolicy.AllSuccess)
         {
-            return NodeState.SUCCESS;
+            return NodeState.Success;
         }
 
-        return anyChildRunning ? NodeState.RUNNING : NodeState.FAILURE;
+        return anyChildRunning ? NodeState.Running : NodeState.Failure;
+    }
+}
+
+public static partial class ParentExtensions
+{
+    public static IParent Parallel(this IParent parent, ParallelPolicy policy)
+    {
+        var parallel = new Parallel(parent, policy);
+        parent.Attach(parallel);
+        return parallel;
     }
 }

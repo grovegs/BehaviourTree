@@ -1,8 +1,8 @@
-namespace GroveGames.BehaviourTree;
+namespace GroveGames.BehaviourTree.Nodes;
 
 public enum NodeState
 {
-    SUCCESS,
-    RUNNING,
-    FAILURE
+    Success,
+    Running,
+    Failure,
 }

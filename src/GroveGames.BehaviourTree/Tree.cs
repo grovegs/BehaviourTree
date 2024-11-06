@@ -6,6 +6,8 @@ public abstract class Tree
 {
     private readonly Root _root;
 
+    protected Root Root => _root;
+
     public Tree(Root root)
     {
         _root = root;

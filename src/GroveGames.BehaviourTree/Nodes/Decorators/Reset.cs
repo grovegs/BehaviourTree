@@ -1,12 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public class Reset : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Reset(IParent parent, IBlackboard blackboard, Func<bool> condition) : base(parent, blackboard)
+    public Reset(IParent parent, Func<bool> condition) : base(parent)
     {
         _condition = condition;
     }
@@ -25,9 +23,9 @@ public class Reset : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachReset(this IParent parent, Func<bool> condition)
+    public static void Reset(this IParent parent, Func<bool> condition)
     {
-        var reset = new Reset(parent, parent.Blackboard, condition);
+        var reset = new Reset(parent, condition);
         parent.Attach(reset);
     }
 }

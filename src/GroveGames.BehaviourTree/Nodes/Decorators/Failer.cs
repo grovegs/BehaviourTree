@@ -1,10 +1,8 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Failer : Decorator
 {
-    public Failer(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Failer(IParent parent) : base(parent)
     {
     }
 
@@ -18,9 +16,9 @@ public sealed class Failer : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachFailer(this IParent parent)
+    public static void Failer(this IParent parent)
     {
-        var failer = new Failer(parent, parent.Blackboard);
+        var failer = new Failer(parent);
         parent.Attach(failer);
     }
 }

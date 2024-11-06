@@ -1,5 +1,3 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Cooldown : Decorator
@@ -7,7 +5,7 @@ public sealed class Cooldown : Decorator
     private readonly float _waitTime;
     private float _remainingTime;
 
-    public Cooldown(IParent parent, IBlackboard blackboard, float waitTime) : base(parent, blackboard)
+    public Cooldown(IParent parent, float waitTime) : base(parent)
     {
         _waitTime = waitTime;
         _remainingTime = 0;
@@ -40,9 +38,9 @@ public sealed class Cooldown : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachCooldown(this IParent parent, float waitTime)
+    public static void Cooldown(this IParent parent, float waitTime)
     {
-        var cooldown = new Cooldown(parent, parent.Blackboard, waitTime);
+        var cooldown = new Cooldown(parent, waitTime);
         parent.Attach(cooldown);
     }
 }

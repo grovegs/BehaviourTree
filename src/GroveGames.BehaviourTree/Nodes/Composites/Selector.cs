@@ -1,12 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public sealed class Selector : Composite
 {
     private int _processingChildIndex;
 
-    public Selector(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Selector(IParent parent) : base(parent)
     {
         _processingChildIndex = 0;
     }
@@ -56,10 +54,10 @@ public sealed class Selector : Composite
 
 public static partial class ParentExtensions
 {
-    public static IParent AttachSelector(this IParent parent)
+    public static IParent Selector(this IParent parent)
     {
-        var selector = new Selector(parent, parent.Blackboard);
+        var selector = new Selector(parent);
         parent.Attach(selector);
-        return parent;
+        return selector;
     }
 }

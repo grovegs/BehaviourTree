@@ -4,18 +4,14 @@ namespace GroveGames.BehaviourTree.Nodes;
 
 public abstract class Node : INode
 {
-    public static readonly NullNode Empty = new();
-
     private readonly IParent _parent;
-    private readonly IBlackboard _blackboard;
 
     protected IParent Parent => _parent;
-    public IBlackboard Blackboard => _blackboard;
+    public IBlackboard Blackboard => _parent.Blackboard;
 
-    public Node(IParent parent, IBlackboard blackboard)
+    public Node(IParent parent)
     {
         _parent = parent;
-        _blackboard = blackboard;
     }
 
     public virtual NodeState Evaluate(float deltaTime)

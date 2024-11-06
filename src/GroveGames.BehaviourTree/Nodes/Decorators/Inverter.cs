@@ -1,10 +1,8 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Inverter : Decorator
 {
-    public Inverter(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Inverter(IParent parent) : base(parent)
     {
     }
 
@@ -24,9 +22,9 @@ public sealed class Inverter : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachInverter(this IParent parent)
+    public static void Inverter(this IParent parent)
     {
-        var inverter = new Inverter(parent, parent.Blackboard);
+        var inverter = new Inverter(parent);
         parent.Attach(inverter);
     }
 }

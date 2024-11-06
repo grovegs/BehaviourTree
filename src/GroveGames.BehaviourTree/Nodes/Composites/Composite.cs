@@ -1,5 +1,3 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public abstract class Composite : Node, IParent
@@ -8,7 +6,7 @@ public abstract class Composite : Node, IParent
 
     protected IReadOnlyList<INode> Children => _children;
 
-    public Composite(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Composite(IParent parent) : base(parent)
     {
         _children = [];
     }

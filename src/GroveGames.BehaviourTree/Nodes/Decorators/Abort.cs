@@ -1,12 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public class Abort : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Abort(IParent parent, IBlackboard blackboard, Func<bool> condition) : base(parent, blackboard)
+    public Abort(IParent parent, Func<bool> condition) : base(parent)
     {
         _condition = condition;
     }
@@ -25,9 +23,9 @@ public class Abort : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachAbort(this IParent parent, Func<bool> condition)
+    public static void Abort(this IParent parent, Func<bool> condition)
     {
-        var abort = new Abort(parent, parent.Blackboard, condition);
+        var abort = new Abort(parent, condition);
         parent.Attach(abort);
     }
 }

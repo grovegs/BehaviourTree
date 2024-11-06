@@ -1,12 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public abstract class Decorator : Node, IParent
 {
     private INode _child;
 
-    public Decorator(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Decorator(IParent parent) : base(parent)
     {
     }
 

@@ -1,10 +1,8 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Succeeder : Decorator
 {
-    public Succeeder(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Succeeder(IParent parent) : base(parent)
     {
     }
 
@@ -18,9 +16,9 @@ public sealed class Succeeder : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void AttachSucceeder(this IParent parent)
+    public static void Succeeder(this IParent parent)
     {
-        var succeeder = new Succeeder(parent, parent.Blackboard);
+        var succeeder = new Succeeder(parent);
         parent.Attach(succeeder);
     }
 }

@@ -1,12 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
-
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public sealed class Sequence : Composite
 {
     private int _processingChildIndex;
 
-    public Sequence(IParent parent, IBlackboard blackboard) : base(parent, blackboard)
+    public Sequence(IParent parent) : base(parent)
     {
         _processingChildIndex = 0;
     }
@@ -56,10 +54,10 @@ public sealed class Sequence : Composite
 
 public static partial class ParentExtensions
 {
-    public static IParent AttachSequence(this IParent parent)
+    public static IParent Sequence(this IParent parent)
     {
-        var sequence = new Sequence(parent, parent.Blackboard);
+        var sequence = new Sequence(parent);
         parent.Attach(sequence);
-        return parent;
+        return sequence;
     }
 }

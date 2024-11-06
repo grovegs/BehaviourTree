@@ -6,6 +6,7 @@ public abstract class Decorator : Node, IParent
 
     public Decorator(IParent parent) : base(parent)
     {
+        _child = Empty;
     }
 
     public override NodeState Evaluate(float deltaTime)

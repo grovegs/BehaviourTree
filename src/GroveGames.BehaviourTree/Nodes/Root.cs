@@ -12,6 +12,7 @@ public sealed class Root : IParent
     public Root(IBlackboard blackboard)
     {
         _blackboard = blackboard;
+        _child = Node.Empty;
     }
 
     public NodeState Evaluate(float deltaTime)

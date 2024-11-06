@@ -4,7 +4,7 @@ namespace GroveGames.BehaviourTree.Nodes;
 
 public abstract class Node : INode
 {
-    public static readonly INode Empty = new NullNode();
+    public static readonly NullNode Empty = new();
 
     private readonly IParent _parent;
     private readonly IBlackboard _blackboard;

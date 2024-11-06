@@ -4,9 +4,9 @@ namespace GroveGames.BehaviourTree;
 
 public abstract class Tree
 {
-    private readonly INode _root;
+    private readonly Root _root;
 
-    public Tree(INode root)
+    public Tree(Root root)
     {
         _root = root;
     }

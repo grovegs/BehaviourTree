@@ -74,9 +74,10 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
 
 public static partial class ParentExtensions
 {
-    public static void Repeater(this IParent parent, RepeatMode repeatMode)
+    public static IParent Repeater(this IParent parent, RepeatMode repeatMode)
     {
         var repeater = new Repeater(parent, repeatMode);
         parent.Attach(repeater);
+        return repeater;
     }
 }

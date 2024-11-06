@@ -23,9 +23,10 @@ public class Reset : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Reset(this IParent parent, Func<bool> condition)
+    public static IParent Reset(this IParent parent, Func<bool> condition)
     {
         var reset = new Reset(parent, condition);
         parent.Attach(reset);
+        return reset;
     }
 }

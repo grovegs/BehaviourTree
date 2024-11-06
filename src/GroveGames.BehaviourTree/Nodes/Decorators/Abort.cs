@@ -23,10 +23,11 @@ public class Abort : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Abort(this IParent parent, Func<bool> condition)
+    public static IParent Abort(this IParent parent, Func<bool> condition)
     {
         var abort = new Abort(parent, condition);
         parent.Attach(abort);
+        return abort;
     }
 }
 

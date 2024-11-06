@@ -38,9 +38,10 @@ public sealed class Cooldown : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Cooldown(this IParent parent, float waitTime)
+    public static IParent Cooldown(this IParent parent, float waitTime)
     {
         var cooldown = new Cooldown(parent, waitTime);
         parent.Attach(cooldown);
+        return cooldown;
     }
 }

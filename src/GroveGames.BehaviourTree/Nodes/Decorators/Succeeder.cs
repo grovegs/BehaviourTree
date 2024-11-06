@@ -16,9 +16,10 @@ public sealed class Succeeder : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Succeeder(this IParent parent)
+    public static IParent Succeeder(this IParent parent)
     {
         var succeeder = new Succeeder(parent);
         parent.Attach(succeeder);
+        return succeeder;
     }
 }

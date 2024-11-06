@@ -25,7 +25,8 @@ public abstract class Decorator : Node, IParent
 
     public IParent Attach(INode node)
     {
-        _child = node;
+        _child ??= node;
+
         return this;
     }
 }

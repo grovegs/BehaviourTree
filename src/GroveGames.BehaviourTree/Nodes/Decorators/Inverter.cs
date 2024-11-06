@@ -22,10 +22,11 @@ public sealed class Inverter : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Inverter(this IParent parent)
+    public static IParent Inverter(this IParent parent)
     {
         var inverter = new Inverter(parent);
         parent.Attach(inverter);
+        return inverter;
     }
 }
 

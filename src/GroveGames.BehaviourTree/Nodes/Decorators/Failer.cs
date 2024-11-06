@@ -16,9 +16,10 @@ public sealed class Failer : Decorator
 
 public static partial class ParentExtensions
 {
-    public static void Failer(this IParent parent)
+    public static IParent Failer(this IParent parent)
     {
         var failer = new Failer(parent);
         parent.Attach(failer);
+        return failer;
     }
 }

@@ -4,7 +4,6 @@ using Godot;
 
 using GroveGames.BehaviourTree;
 using GroveGames.BehaviourTree.Nodes.Composites;
-using GroveGames.BehaviourTree.Tree;
 
 public partial class Main : Node2D
 {

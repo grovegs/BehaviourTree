@@ -63,7 +63,6 @@ public class CharacterBT : Tree
         attackSequence
         .Cooldown(1f)
         .Repeater(RepeatMode.UntilSuccess)
-        .Inverter()
         .Attach(new Attack(attackSequence));
 
         var defendSequence = selector.Sequence()
@@ -71,7 +70,6 @@ public class CharacterBT : Tree
         defendSequence
         .Cooldown(1f)
         .Repeater(RepeatMode.UntilSuccess)
-        .Inverter()
         .Attach(new Defend(defenceSequence));
     }
 }

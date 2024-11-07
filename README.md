@@ -9,7 +9,7 @@ A lightweight behaviour tree framework developed by Grove Games for .NET and God
 
 ## Installation
 
-Use nuget to add you project.
+Use nuget to add it to your project.
 
 ```bash
 dotnet add package GroveGames.BehaviourTree.Godot

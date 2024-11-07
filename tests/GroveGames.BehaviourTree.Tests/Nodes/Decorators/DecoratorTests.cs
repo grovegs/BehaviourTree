@@ -5,7 +5,6 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators
 {
     public class DecoratorTests
     {
-        // A concrete class to instantiate the abstract Decorator class
         private class TestDecorator : Decorator
         {
             public TestDecorator(IParent parent) : base(parent) { }

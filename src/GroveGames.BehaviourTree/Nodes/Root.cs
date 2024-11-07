@@ -12,6 +12,7 @@ public sealed class Root : IParent
     public Root(IBlackboard blackboard)
     {
         _blackboard = blackboard;
+        _child = Node.Empty;
     }
 
     public NodeState Evaluate(float deltaTime)
@@ -31,6 +32,11 @@ public sealed class Root : IParent
 
     public IParent Attach(INode node)
     {
+        if (_child != Node.Empty)
+        {
+            throw new ChildAlreadyAttachedException();
+        }
+
         _child = node;
         return this;
     }

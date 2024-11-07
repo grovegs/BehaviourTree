@@ -6,6 +6,7 @@ public abstract class Decorator : Node, IParent
 
     public Decorator(IParent parent) : base(parent)
     {
+        _child = Empty;
     }
 
     public override NodeState Evaluate(float deltaTime)
@@ -25,8 +26,12 @@ public abstract class Decorator : Node, IParent
 
     public IParent Attach(INode node)
     {
-        _child ??= node;
+        if (_child != Empty)
+        {
+            throw new ChildAlreadyAttachedException();
+        }
 
+        _child = node;
         return this;
     }
 }

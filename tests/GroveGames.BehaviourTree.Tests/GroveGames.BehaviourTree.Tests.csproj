@@ -22,8 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="../../src/GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
+    <ProjectReference Include="../../src/GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
   </ItemGroup>
 
 </Project>

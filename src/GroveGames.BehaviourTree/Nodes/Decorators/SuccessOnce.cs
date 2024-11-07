@@ -1,17 +1,20 @@
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public class ExecuteOnce : Decorator
+public class SuccessOnce : Decorator
 {
     private bool _hasSucceeded;
 
-    public ExecuteOnce(IParent parent) : base(parent)
+    public SuccessOnce(IParent parent) : base(parent)
     {
         _hasSucceeded = false;
     }
 
     public override NodeState Evaluate(float deltaTime)
     {
-        if (_hasSucceeded) return NodeState.Failure;
+        if (_hasSucceeded)
+        {
+            return NodeState.Failure;
+        }
 
         var result = base.Evaluate(deltaTime);
 
@@ -26,6 +29,12 @@ public class ExecuteOnce : Decorator
     public override void Reset()
     {
         base.Reset();
+        _hasSucceeded = false;
+    }
+
+    public override void Abort()
+    {
+        base.Abort();
         _hasSucceeded = false;
     }
 }

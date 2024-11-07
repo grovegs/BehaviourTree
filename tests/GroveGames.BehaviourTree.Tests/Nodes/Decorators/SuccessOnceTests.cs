@@ -3,7 +3,7 @@ using GroveGames.BehaviourTree.Nodes.Decorators;
 
 namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
-public class ExecuteOnceTests
+public class SuccessOnceTests
 {
     [Fact]
     public void Evaluate_ShouldReturnSuccessOnFirstEvaluation()
@@ -12,7 +12,7 @@ public class ExecuteOnceTests
         var mockParent = new Mock<IParent>();
         var mockChildNode = new Mock<INode>();
         mockChildNode.Setup(x => x.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        var executeOnceNode = new ExecuteOnce(mockParent.Object);
+        var executeOnceNode = new SuccessOnce(mockParent.Object);
         executeOnceNode.Attach(mockChildNode.Object);
 
         // Act
@@ -29,7 +29,7 @@ public class ExecuteOnceTests
         var mockParent = new Mock<IParent>();
         var mockChildNode = new Mock<INode>();
         mockChildNode.Setup(x => x.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        var executeOnceNode = new ExecuteOnce(mockParent.Object);
+        var executeOnceNode = new SuccessOnce(mockParent.Object);
         executeOnceNode.Attach(mockChildNode.Object);
 
         // Act
@@ -42,13 +42,13 @@ public class ExecuteOnceTests
     }
 
     [Fact]
-    public void Abort_ShouldNotResetExecutedState()
+    public void Abort_ShouldAllowReEvaluation()
     {
         // Arrange
         var mockParent = new Mock<IParent>();
         var mockChildNode = new Mock<INode>();
         mockChildNode.Setup(x => x.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        var executeOnceNode = new ExecuteOnce(mockParent.Object);
+        var executeOnceNode = new SuccessOnce(mockParent.Object);
         executeOnceNode.Attach(mockChildNode.Object);
 
         // Act
@@ -58,7 +58,7 @@ public class ExecuteOnceTests
 
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
-        Assert.Equal(NodeState.Failure, resultAfterAbort);
+        Assert.Equal(NodeState.Success, resultAfterAbort);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class ExecuteOnceTests
         var mockParent = new Mock<IParent>();
         var mockChildNode = new Mock<INode>();
         mockChildNode.Setup(x => x.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        var executeOnceNode = new ExecuteOnce(mockParent.Object);
+        var executeOnceNode = new SuccessOnce(mockParent.Object);
         executeOnceNode.Attach(mockChildNode.Object);
 
         // Act
@@ -78,29 +78,6 @@ public class ExecuteOnceTests
 
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
-        Assert.Equal(NodeState.Success, resultAfterReset);
-    }
-
-    [Fact]
-    public void Evaluate_ShouldNotExecuteAgainAfterAbortUntilReset()
-    {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChildNode = new Mock<INode>();
-        mockChildNode.Setup(x => x.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        var executeOnceNode = new ExecuteOnce(mockParent.Object);
-        executeOnceNode.Attach(mockChildNode.Object);
-
-        // Act
-        var resultFirst = executeOnceNode.Evaluate(1.0f);
-        executeOnceNode.Abort();
-        var resultAfterAbort = executeOnceNode.Evaluate(1.0f);
-        executeOnceNode.Reset();
-        var resultAfterReset = executeOnceNode.Evaluate(1.0f);
-
-        // Assert
-        Assert.Equal(NodeState.Success, resultFirst);
-        Assert.Equal(NodeState.Failure, resultAfterAbort);
         Assert.Equal(NodeState.Success, resultAfterReset);
     }
 }

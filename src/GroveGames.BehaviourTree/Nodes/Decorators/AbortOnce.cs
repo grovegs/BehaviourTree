@@ -1,6 +1,6 @@
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-[Obsolete("AbortOnce is obsolete and may be removed in future versions. Use ExecuteOnce and Abort instead.")]
+[Obsolete("AbortOnce is obsolete and may be removed in future versions.")]
 public class AbortOnce : Decorator
 {
     private readonly Func<bool> _condition;
@@ -30,7 +30,7 @@ public class AbortOnce : Decorator
 
 public static partial class ParentExtensions
 {
-    [Obsolete("AbortOnce is obsolete and may be removed in future versions. Use ExecuteOnce and Abort instead.")]
+    [Obsolete("AbortOnce is obsolete and may be removed in future versions.")]
     public static IParent AbortOnce(this IParent parent, Func<bool> condition)
     {
         var abort = new AbortOnce(parent, condition);

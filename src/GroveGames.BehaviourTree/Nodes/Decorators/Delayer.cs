@@ -42,8 +42,8 @@ public static partial class ParentExtensions
 {
     public static IParent Delayer(this IParent parent, float waitTime)
     {
-        var cooldown = new Delayer(parent, waitTime);
-        parent.Attach(cooldown);
-        return cooldown;
+        var delayer = new Delayer(parent, waitTime);
+        parent.Attach(delayer);
+        return delayer;
     }
 }

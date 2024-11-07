@@ -32,6 +32,11 @@ public sealed class Root : IParent
 
     public IParent Attach(INode node)
     {
+        if (_child != Node.Empty)
+        {
+            throw new ChildAlreadyAttachedException();
+        }
+
         _child = node;
         return this;
     }

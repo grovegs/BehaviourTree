@@ -26,8 +26,12 @@ public abstract class Decorator : Node, IParent
 
     public IParent Attach(INode node)
     {
-        _child ??= node;
+        if (_child != Empty)
+        {
+            throw new ChildAlreadyAttachedException();
+        }
 
+        _child = node;
         return this;
     }
 }

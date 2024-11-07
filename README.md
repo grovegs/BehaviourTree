@@ -1,6 +1,11 @@
 
 # GroveGames Behaviour Tree
 
+[![Build Status](https://github.com/grovegs/BehaviourTree/actions/workflows/release.yml/badge.svg)](https://github.com/grovegs/BehaviourTree/actions/workflows/release.yml)
+[![Tests](https://github.com/grovegs/BehaviourTree/actions/workflows/tests.yml/badge.svg)](https://github.com/grovegs/BehaviourTree/actions/workflows/tests.yml)
+[![Latest Release](https://img.shields.io/github/v/release/grovegs/BehaviourTree)](https://github.com/grovegs/BehaviourTree/releases/latest)
+[![NuGet](https://img.shields.io/nuget/v/GroveGames.BehaviourTree)](https://www.nuget.org/packages/GroveGames.BehaviourTree)
+
 A modular and extensible behavior tree framework for AI development in C# for the .NET and Godot Engine. This system allows for the creation of complex AI behaviors by combining various `Node`, `Composite`, and `Decorator` components.
 
 ## Table of Contents
@@ -209,9 +214,9 @@ This decorator only allows the child node to execute once the specified wait tim
 
 Contributions are welcome! To contribute:
 1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/YourFeature`).
+2. Create a new branch (`git checkout -b feature/your-feature`).
 3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push the branch (`git push origin feature/YourFeature`).
+4. Push the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
 
 ## License

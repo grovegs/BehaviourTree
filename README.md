@@ -95,7 +95,7 @@ public class Defend : Node
     }
 }
 ```
-Here's an example of a CharacterBT class that builds an AI behavior tree:
+Here's an example of a `CharacterBT` class that builds an AI behavior tree:
 ```csharp
 public class CharacterBT : Tree
 {
@@ -107,7 +107,6 @@ public class CharacterBT : Tree
         
         var attackSequence =  selector.Sequence();
         attackSequence.Attach(new Condition(() => IsEnemyVisible()));
-
         attackSequence
         .Cooldown(1f)
         .Repeater(RepeatMode.UntilSuccess)

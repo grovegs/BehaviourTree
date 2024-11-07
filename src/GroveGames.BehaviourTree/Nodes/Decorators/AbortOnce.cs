@@ -22,7 +22,7 @@ public class AbortOnce : Decorator
             base.Abort();
             return NodeState.Success;
         }
-        else
+        else if (!_condition())
         {
             _aborted = false;
         }

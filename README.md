@@ -15,6 +15,8 @@ A modular and extensible behavior tree framework for AI development in C# for th
 - [Getting Started](#getting-started)
   - [Creating a Behavior Tree](#creating-a-behavior-tree)
   - [Example Diagram](#example-diagram)
+  - [Example Nodes](#example-nodes)
+  - [Example Tree](#example-tree)
 - [Usage Example in Godot](#usage-example-in-godot)
 - [Customization](#customization)
 - [Contributing](#contributing)
@@ -100,6 +102,7 @@ public class Defend : Node
     }
 }
 ```
+### Example Tree
 Here's an example of a `CharacterBT` class that builds an AI behavior tree:
 ```csharp
 public class CharacterBT : Tree

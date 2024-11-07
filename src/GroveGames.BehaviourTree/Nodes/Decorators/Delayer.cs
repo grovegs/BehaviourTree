@@ -8,6 +8,7 @@ public class Delayer : Decorator
     public Delayer(IParent parent, float waitTime) : base(parent)
     {
         _waitTime = waitTime;
+        _interval = 0f;
     }
 
     public override NodeState Evaluate(float deltaTime)
@@ -19,10 +20,9 @@ public class Delayer : Decorator
             _interval = 0f;
             return base.Evaluate(deltaTime);
         }
-        else
-        {
-            return NodeState.Running;
-        }
+
+        return NodeState.Running;
+
     }
 
     public override void Abort()

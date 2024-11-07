@@ -59,22 +59,19 @@ public class CharacterBT : Tree
     {
         var selector = Root.Selector();
 
-        var inputSequence = new Input(_entity, selector);
-        selector.Attach(inputSequence);
+        var attack = selector.Sequence();
 
-         var attack = selector.Sequence();
+        attack
+       .Attach(new LookForEnemy(_enemy, _entity, attack))
+       .Attach(new MoveToTarget(attack, _entity))
+       .Attach(new Attack(selector));
 
-         attack
-        .Attach(new LookForEnemy(_enemy, _entity, attack))
-        .Attach(new MoveToTarget(attack, _entity))
-        .Attach(new Attack(selector));
+        var gather = selector.Sequence();
 
-         var gather = selector.Sequence();
-
-         gather
-        .Attach(new LookForGathering(gather))
-        .Attach(new MoveToTarget(gather,_entity))
-        .Attach(new Gather(gather));
+        gather
+       .Attach(new LookForGathering(gather))
+       .Attach(new MoveToTarget(gather, _entity))
+       .Attach(new Gather(gather));
     }
 }
 
@@ -132,8 +129,6 @@ public class Attack : GroveGames.BehaviourTree.Nodes.Node
 
     public override NodeState Evaluate(float delta)
     {
-        GD.Print("Attacking");
-
         return NodeState.Failure;
     }
 }
@@ -216,12 +211,10 @@ public class LookForEnemy : GroveGames.BehaviourTree.Nodes.Node
 
         if (distance <= 10f)
         {
-            GD.Print("In Range");
             Blackboard.SetValue("target_pos_enemey", _enemy);
             return NodeState.Success;
         }
 
-        GD.Print("Out Of Range");
         return NodeState.Failure;
 
     }

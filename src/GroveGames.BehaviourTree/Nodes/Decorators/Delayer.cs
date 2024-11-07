@@ -1,6 +1,6 @@
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public class Delayer : Decorator
+public sealed class Delayer : Decorator
 {
     private readonly float _waitTime;
     private float _interval;

@@ -49,8 +49,9 @@ To set up a behavior tree, create a class that inherits from `Tree` and override
 ### Example Diagram
 ```mermaid
 graph TD
-    Root(Selector) --> AttackSequence(Sequence: Attack Sequence)
-    Root --> DefendSequence(Sequence: Defend Sequence)
+    Root(Root) --> Selector
+    Selector --> AttackSequence(Sequence: Attack Sequence)
+    Selector --> DefendSequence(Sequence: Defend Sequence)
     
     AttackSequence --> Condition1[Condition: IsEnemyVisible == true]
     AttackSequence --> Cooldown1[Cooldown]

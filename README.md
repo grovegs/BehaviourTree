@@ -46,8 +46,55 @@ dotnet add package GroveGames.BehaviourTree.Godot
 
 To set up a behavior tree, create a class that inherits from `Tree` and override the `SetupTree` method to define the AI structure.
 
-Here's an example of a `CharacterBT` class that builds an AI behavior tree:
+### Example Diagram
+```mermaid
+graph TD
+    Root(Selector) --> AttackSequence(Sequence: Attack Sequence)
+    Root --> DefendSequence(Sequence: Defend Sequence)
+    
+    AttackSequence --> Condition1[Condition: IsEnemyVisible == true]
+    AttackSequence --> Cooldown1[Cooldown]
+    Cooldown1 --> Repeater1[Repeater]
+    Repeater1 --> Attack[Attack]
 
+    DefendSequence --> Condition2[Condition: IsUnderAttack == true]
+    DefendSequence --> Cooldown2[Cooldown]
+    Cooldown2 --> Repeater2[Repeater]
+    Repeater2 --> Defend[Defend]
+```
+
+### Example Nodes
+
+#### Attack
+
+```csharp
+public class Attack : Node
+{
+    public Attack(IParent parent) : base(parent) {}
+
+    public override NodeState Evaluate(float delta)
+    {
+        Console.WriteLine("Attacking");
+        return NodeState.Running;
+    }
+}
+```
+
+#### Defend
+
+```csharp
+public class Defend : Node
+{
+    public Defend(IParent parent) : base(parent) {}
+
+    public override NodeState Evaluate(float delta)
+    {
+        Console.WriteLine("Defending");
+        return NodeState.Running;
+    }
+}
+```
+Here's an example of a CharacterBT class that builds an AI behavior tree:
 ```csharp
 public class CharacterBT : Tree
 {
@@ -74,39 +121,18 @@ public class CharacterBT : Tree
     }
 }
 ```
-
-### Example Diagram
-```mermaid
-graph TD
-    Root(Selector) --> AttackSequence(Sequence: Attack Sequence)
-    Root --> DefendSequence(Sequence: Defend Sequence)
-    
-    AttackSequence --> Condition1[Condition: IsEnemyVisible == true]
-    AttackSequence --> Cooldown1[Cooldown]
-    Cooldown1 --> Repeater1[Repeater]
-    Repeater1 --> Attack[Attack]
-
-    DefendSequence --> Condition2[Condition: IsUnderAttack == true]
-    DefendSequence --> Cooldown2[Cooldown]
-    Cooldown2 --> Repeater2[Repeater]
-    Repeater2 --> Defend[Defend]
-```
 ## Usage Example in Godot
 
 Below is a full example of setting up and using the behavior tree in a Godot scene:
 
 ```csharp
-public partial class TestSceneController : Godot.Node
+public partial class Character : Godot.Node
 {
-    [Export] Node3D _enemy;
-    [Export] Node3D _entity;
-
     private CharacterBT _characterBT;
 
     public override void _Ready()
     {
         _characterBT = new CharacterBT(new Root(new Blackboard()));
-        _characterBT.SetEntity(_entity, _enemy);
         _characterBT.SetupTree();
     }
 

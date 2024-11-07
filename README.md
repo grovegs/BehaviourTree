@@ -1,57 +1,60 @@
-# GroveGames.BehaviourTree
 
-[![Build Status](https://github.com/grovegs/BehaviourTree/actions/workflows/release.yml/badge.svg)](https://github.com/grovegs/BehaviourTree/actions/workflows/release.yml)
-[![Tests](https://github.com/grovegs/BehaviourTree/actions/workflows/tests.yml/badge.svg)](https://github.com/grovegs/BehaviourTree/actions/workflows/tests.yml)
-[![Latest Release](https://img.shields.io/github/v/release/grovegs/BehaviourTree)](https://github.com/grovegs/BehaviourTree/releases/latest)
-[![NuGet](https://img.shields.io/nuget/v/GroveGames.BehaviourTree)](https://www.nuget.org/packages/GroveGames.BehaviourTree)
+# GroveGames Behaviour Tree
 
-A lightweight behaviour tree framework developed by Grove Games for .NET and Godot.
+A modular and extensible behavior tree framework for AI development in C# for the .NET and Godot Engine. This system allows for the creation of complex AI behaviors by combining various `Node`, `Composite`, and `Decorator` components.
+
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+  - [Creating a Behavior Tree](#creating-a-behavior-tree)
+  - [Example Diagram](#example-diagram)
+- [Usage Example in Godot](#usage-example-in-godot)
+- [Customization](#customization)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Overview
+
+This behavior tree framework enables AI agents to make decisions and perform actions based on conditions in a dynamic environment. Use this setup to build intelligent game characters with modular and reusable nodes.
+
+## Features
+
+- **Modular Nodes**: Includes `Selector`, `Sequence`, `Decorator`, and custom action nodes.
+- **Blackboard System**: A shared data space for AI agents to store and retrieve contextual information.
+- **Godot Integration**: Works seamlessly within Godot using the node structure.
+- **Extensibility**: Easily add new node types and custom behaviors.
 
 ## Installation
 
-Use nuget to add it to your project.
+Install the package via .NET CLI:
+
+```bash
+dotnet add package GroveGames.BehaviourTree
+```
+
+For Godot:
 
 ```bash
 dotnet add package GroveGames.BehaviourTree.Godot
 ```
 
-## Usage
+## Getting Started
 
-You can derive from the Node class to create a Custom Node.
+### Creating a Behavior Tree
 
-```csharp
-public class Attack : Node
-{
-    public Attack(IParent parent) : base(parent)
-    {
-    }
+To set up a behavior tree, create a class that inherits from `Tree` and override the `SetupTree` method to define the AI structure.
 
-    public override NodeState Evaluate(float delta)
-    {
-        Console.WriteLine("Attacking");
-        return NodeState.Success;
-    }
-}
-```
-Derive a class from the `Tree` class to create a tree structure.
+Here's an example of a `CharacterBT` class that builds an AI behavior tree:
 
 ```csharp
-public class CharacterBehaviourTree : Tree
+public class CharacterBT : Tree
 {
-    public CharacterBehaviourTree(Root root) : base(root)
-    {
-    }
+    public CharacterBT(GroveGames.BehaviourTree.Nodes.Root root) : base(root) { }
 
     public override void SetupTree()
-    {  
-    }
-}
-```
-There are extensions available to help you create nodes easily.
-
-```csharp
-    public override void SetupTree()
-    {  
+    {
         var selector = Root.Selector();
         
         var attackSequence =  selector.Sequence();
@@ -71,32 +74,121 @@ There are extensions available to help you create nodes easily.
         .Inverter()
         .Attach(new Defend(defenceSequence));
     }
+}
 ```
-Here how it looks like
+
+### Example Diagram
+```mermaid
+graph TD
+    Root(Selector) --> AttackSequence(Sequence: Attack Sequence)
+    Root --> DefendSequence(Sequence: Defend Sequence)
+    
+    AttackSequence --> Condition1[Condition: IsEnemyVisible == true]
+    AttackSequence --> Cooldown1[Cooldown]
+    Cooldown1 --> Repeater1[Repeater]
+    Repeater1 --> Attack[Attack]
+
+    DefendSequence --> Condition2[Condition: IsUnderAttack == true]
+    DefendSequence --> Cooldown2[Cooldown]
+    Cooldown2 --> Repeater2[Repeater]
+    Repeater2 --> Defend[Defend]
+```
+## Usage Example in Godot
+
+Below is a full example of setting up and using the behavior tree in a Godot scene:
+
 ```csharp
-Root (Selector)
-├── Sequence (Attack Sequence)
-│   ├── Condition (IsEnemyVisible == true)
-│   ├── Cooldown
-│   │   └── Repeater
-│   │       └── Inverter
-│   │           └── Attack
-│   
-└── Sequence (Defend Sequence)
-    ├── Condition (IsUnderAttack == true)
-    ├── Cooldown
-    │   └── Repeater
-    │       └── Inverter
-    │           └── Defend
+public partial class TestSceneController : Godot.Node
+{
+    [Export] Node3D _enemy;
+    [Export] Node3D _entity;
 
+    private CharacterBT _characterBT;
 
+    public override void _Ready()
+    {
+        _characterBT = new CharacterBT(new Root(new Blackboard()));
+        _characterBT.SetEntity(_entity, _enemy);
+        _characterBT.SetupTree();
+    }
+
+    public override void _Process(double delta)
+    {
+        _characterBT.Tick((float)delta);
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event.IsPressed())
+        {
+            _characterBT.Abort(); // Aborts the current tree
+        }
+    }
+}
 ```
+
+### Explanation
+
+- **Ready Method**: Initializes the behavior tree and assigns entities (e.g., player and enemy).
+- **Process Method**: Ticks the behavior tree every frame to update actions based on elapsed time.
+- **Input Method**: Allows manual interruption of the behavior tree, useful for testing or player-triggered events.
+
+## Customization
+
+Extend the framework with new functionality by creating custom nodes:
+
+- **Action Nodes**: Inherit from `Node` and implement specific behaviors in `Evaluate`.
+- **Decorator Nodes**: Inherit from `Decorator` and modify the behavior of a single child node.
+- **Composite Nodes**: Inherit from `Composite` and define logic for multiple child nodes.
+- **Blackboard**: Use the blackboard to share data between nodes. For example, store target information or flags.
+
+### Example: Custom Decorator (Delayer)
+
+This `Delayer` decorator delays the execution of a child node by a specified amount of time:
+
+```csharp
+public class Delayer : Decorator
+{
+    private readonly float _waitTime;
+    private float _interval;
+
+    public Delayer(IParent parent, float waitTime) : base(parent)
+    {
+        _waitTime = waitTime;
+    }
+
+    public override NodeState Evaluate(float deltaTime)
+    {
+        _interval += deltaTime;
+
+        if (_interval >= _waitTime)
+        {
+            _interval = 0f;
+            return base.Evaluate(deltaTime);
+        }
+        else
+        {
+            return NodeState.Running;
+        }
+    }
+
+    public override void Reset()
+    {
+        _interval = 0f;
+    }
+}
+```
+
+This decorator only allows the child node to execute once the specified wait time has passed.
+
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+Contributions are welcome! To contribute:
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Commit your changes (`git commit -am 'Add new feature'`).
+4. Push the branch (`git push origin feature/YourFeature`).
+5. Open a Pull Request.
 
 ## License
 

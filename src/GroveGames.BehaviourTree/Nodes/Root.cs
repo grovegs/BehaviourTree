@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
-public sealed class Root : IParent
+public sealed class Root : IRoot
 {
     private readonly IBlackboard _blackboard;
     private INode _child;

@@ -5,10 +5,10 @@ namespace GroveGames.BehaviourTree;
 public abstract class Tree
 {
     private bool _isEnabled;
-    private readonly Root _root;
-    protected Root Root => _root;
+    private readonly IRoot _root;
+    protected IRoot Root => _root;
 
-    public Tree(Root root)
+    public Tree(IRoot root)
     {
         _root = root;
         _isEnabled = false;

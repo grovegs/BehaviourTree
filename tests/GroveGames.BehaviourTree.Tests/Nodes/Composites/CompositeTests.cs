@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
@@ -8,18 +7,19 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class CompositeTests
 {
-    public class TestComposite : Composite
-    {
-        public TestComposite(IParent parent) : base(parent) { }
-    }
-
     public class CompositeAccessor
     {
-        [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "Children")]
         public static IReadOnlyList<INode> Children(Composite composite)
         {
             var fieldInfo = typeof(Selector).GetProperty("Children", BindingFlags.NonPublic | BindingFlags.Instance);
             return (IReadOnlyList<INode>)fieldInfo?.GetValue(composite)!;
+        }
+    }
+
+    public class TestComposite : Composite
+    {
+        public TestComposite(IParent parent) : base(parent)
+        {
         }
     }
 

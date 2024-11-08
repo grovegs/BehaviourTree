@@ -101,8 +101,8 @@ public class SequenceTests
         mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
         mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
 
-        sequence.Evaluate(1.0f); // First child
-        sequence.Evaluate(1.0f); // Second child
+        sequence.Evaluate(1.0f);
+        sequence.Evaluate(1.0f);
 
         // Act
         sequence.Reset();
@@ -126,7 +126,7 @@ public class SequenceTests
         mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
         mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
 
-        sequence.Evaluate(1.0f); // First child
+        sequence.Evaluate(1.0f);
 
         // Act
         sequence.Abort();

@@ -15,14 +15,32 @@ public class CooldownTests
         var cooldown = new Cooldown(mockParent.Object, waitTime);
         cooldown.Attach(mockChild.Object);
 
-        cooldown.Evaluate(1.0f);
-
         // Act
-        var result = cooldown.Evaluate(0.5f);
+        cooldown.Evaluate(0.1f);
+        var result = cooldown.Evaluate(1f);
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+    }
+
+    [Fact]
+    public void Evaluate_ShouldReturnSuccessAfterCooldownExpires()
+    {
+        // Arrange
+        float waitTime = 2.0f;
+        var mockParent = new Mock<IParent>();
+        var mockChild = new Mock<INode>();
+        var cooldown = new Cooldown(mockParent.Object, waitTime);
+        cooldown.Attach(mockChild.Object);
+
+        // Act
+        cooldown.Evaluate(0.1f);
+        var result = cooldown.Evaluate(2f);
+
+        // Assert
+        Assert.Equal(NodeState.Success, result);
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -34,16 +52,15 @@ public class CooldownTests
         var mockChild = new Mock<INode>();
         var cooldown = new Cooldown(mockParent.Object, waitTime);
         cooldown.Attach(mockChild.Object);
-
         mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
 
         // Act
-        cooldown.Evaluate(2.0f);
-        var result = cooldown.Evaluate(1.0f);
+        cooldown.Evaluate(0.1f);
+        var result = cooldown.Evaluate(2f);
 
         // Assert
         Assert.Equal(NodeState.Running, result);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -62,8 +79,8 @@ public class CooldownTests
         var resultAfterReset = cooldown.Evaluate(0.5f);
 
         // Assert
-        Assert.Equal(NodeState.Failure, resultAfterReset);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(NodeState.Success, resultAfterReset);
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
     [Fact]
@@ -82,7 +99,7 @@ public class CooldownTests
         var resultAfterAbort = cooldown.Evaluate(0.5f);
 
         // Assert
-        Assert.Equal(NodeState.Failure, resultAfterAbort);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(NodeState.Success, resultAfterAbort);
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 }

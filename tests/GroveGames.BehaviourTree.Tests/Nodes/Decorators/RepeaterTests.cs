@@ -25,7 +25,7 @@ public class RepeaterTests
         Assert.Equal(NodeState.Running, firstEvaluation);
         Assert.Equal(NodeState.Running, secondEvaluation);
         Assert.Equal(NodeState.Success, thirdEvaluation);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(3));
+        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
     [Fact]

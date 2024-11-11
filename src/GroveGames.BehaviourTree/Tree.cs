@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree;
 
-public abstract class Tree
+public abstract class Tree : ITree
 {
     private bool _isEnabled;
     private readonly IRoot _root;

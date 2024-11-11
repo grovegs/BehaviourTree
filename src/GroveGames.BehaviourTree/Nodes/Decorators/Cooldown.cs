@@ -13,9 +13,11 @@ public sealed class Cooldown : Decorator
 
     public override NodeState Evaluate(float deltaTime)
     {
-        if (_remainingTime > 0f)
+        var remainingTime = _remainingTime - deltaTime;
+
+        if (remainingTime > 0f)
         {
-            _remainingTime -= deltaTime;
+            _remainingTime = remainingTime;
             return NodeState.Failure;
         }
 

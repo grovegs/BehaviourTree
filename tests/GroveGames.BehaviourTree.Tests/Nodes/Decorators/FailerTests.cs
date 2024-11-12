@@ -21,6 +21,7 @@ public class FailerTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, failer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -40,6 +41,7 @@ public class FailerTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, failer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -59,6 +61,7 @@ public class FailerTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, failer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 }

@@ -22,7 +22,7 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
             if (_repeatMode == RepeatMode.FixedCount && _currentCount >= _maxCount)
             {
                 _currentCount = 0;
-                return NodeState.Success;
+                return _nodeState = NodeState.Success;
             }
 
             var childStatus = base.Evaluate(deltaTime);

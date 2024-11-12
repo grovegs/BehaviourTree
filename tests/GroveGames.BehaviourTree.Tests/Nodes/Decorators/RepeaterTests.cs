@@ -25,6 +25,7 @@ public class RepeaterTests
         Assert.Equal(NodeState.Running, firstEvaluation);
         Assert.Equal(NodeState.Running, secondEvaluation);
         Assert.Equal(NodeState.Success, thirdEvaluation);
+        Assert.Equal(NodeState.Success, repeater.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
@@ -44,6 +45,7 @@ public class RepeaterTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, repeater.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -84,6 +86,7 @@ public class RepeaterTests
         // Assert
         Assert.Equal(NodeState.Running, firstEvaluation);
         Assert.Equal(NodeState.Running, secondEvaluation);
+        Assert.Equal(NodeState.Running, repeater.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
@@ -107,6 +110,7 @@ public class RepeaterTests
 
         // Assert
         Assert.Equal(NodeState.Running, resultAfterReset);
+        Assert.Equal(NodeState.Running, repeater.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(3));
     }
 
@@ -130,6 +134,7 @@ public class RepeaterTests
 
         // Assert
         Assert.Equal(NodeState.Running, resultAfterAbort);
+        Assert.Equal(NodeState.Running, repeater.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(3));
     }
 }

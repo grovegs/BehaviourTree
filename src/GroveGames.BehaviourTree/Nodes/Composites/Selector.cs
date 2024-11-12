@@ -32,7 +32,7 @@ public sealed class Selector : Composite
         }
 
         Reset();
-        return NodeState.Failure;
+        return _nodeState = NodeState.Failure;
     }
 
     public override void Reset()

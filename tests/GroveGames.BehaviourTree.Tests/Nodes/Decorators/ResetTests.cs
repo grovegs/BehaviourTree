@@ -22,6 +22,7 @@ public class ResetTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, reset.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
         mockChild.Verify(child => child.Reset(), Times.Once);
     }
@@ -43,6 +44,7 @@ public class ResetTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, reset.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
         mockChild.Verify(child => child.Reset(), Times.Never);
     }
@@ -66,6 +68,7 @@ public class ResetTests
         // Assert
         Assert.Equal(NodeState.Success, firstEvaluation);
         Assert.Equal(NodeState.Success, secondEvaluation);
+        Assert.Equal(NodeState.Success, reset.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
         mockChild.Verify(child => child.Reset(), Times.Exactly(2));
     }
@@ -87,6 +90,7 @@ public class ResetTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, reset.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
         mockChild.Verify(child => child.Reset(), Times.Never);
     }

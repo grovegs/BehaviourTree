@@ -20,6 +20,7 @@ public class SuccessOnceTests
 
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
+        Assert.Equal(NodeState.Success, executeOnceNode.State);
     }
 
     [Fact]
@@ -39,6 +40,7 @@ public class SuccessOnceTests
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
         Assert.Equal(NodeState.Failure, resultSecond);
+        Assert.Equal(NodeState.Failure, executeOnceNode.State);
     }
 
     [Fact]
@@ -59,6 +61,7 @@ public class SuccessOnceTests
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
         Assert.Equal(NodeState.Success, resultAfterAbort);
+        Assert.Equal(NodeState.Success, executeOnceNode.State);
     }
 
     [Fact]
@@ -79,5 +82,6 @@ public class SuccessOnceTests
         // Assert
         Assert.Equal(NodeState.Success, resultFirst);
         Assert.Equal(NodeState.Success, resultAfterReset);
+        Assert.Equal(NodeState.Success, executeOnceNode.State);
     }
 }

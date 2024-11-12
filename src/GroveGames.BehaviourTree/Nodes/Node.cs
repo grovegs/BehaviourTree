@@ -7,9 +7,11 @@ public abstract class Node : INode
     public static readonly INode Empty = new EmptyNode();
 
     private readonly IParent _parent;
+    protected NodeState _nodeState;
 
     protected IParent Parent => _parent;
     public IBlackboard Blackboard => _parent.Blackboard;
+    public NodeState State => _nodeState;
 
     public Node(IParent parent)
     {

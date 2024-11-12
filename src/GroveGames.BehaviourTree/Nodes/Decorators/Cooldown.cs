@@ -18,11 +18,11 @@ public sealed class Cooldown : Decorator
         if (remainingTime > 0f)
         {
             _remainingTime = remainingTime;
-            return NodeState.Failure;
+            return _nodeState = NodeState.Failure;
         }
 
         _remainingTime = _waitTime;
-        return base.Evaluate(deltaTime);
+        return _nodeState = base.Evaluate(deltaTime);
     }
 
     public override void Reset()

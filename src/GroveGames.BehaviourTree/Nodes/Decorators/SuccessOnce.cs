@@ -13,17 +13,17 @@ public class SuccessOnce : Decorator
     {
         if (_hasSucceeded)
         {
-            return NodeState.Failure;
+            return _nodeState = NodeState.Failure;
         }
 
-        var result = base.Evaluate(deltaTime);
+        _nodeState = base.Evaluate(deltaTime);
 
-        if (result == NodeState.Success)
+        if (_nodeState == NodeState.Success)
         {
             _hasSucceeded = true;
         }
 
-        return result;
+        return _nodeState;
     }
 
     public override void Reset()

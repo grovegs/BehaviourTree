@@ -14,10 +14,10 @@ public class Reset : Decorator
         if (_condition())
         {
             base.Reset();
-            return NodeState.Success;
+            return _nodeState = NodeState.Success;
         }
 
-        return base.Evaluate(deltaTime);
+        return _nodeState = base.Evaluate(deltaTime);
     }
 }
 

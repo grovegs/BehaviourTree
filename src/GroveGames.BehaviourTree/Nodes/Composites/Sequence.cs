@@ -19,20 +19,20 @@ public sealed class Sequence : Composite
             switch (state)
             {
                 case NodeState.Running:
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
 
                 case NodeState.Failure:
                     _processingChildIndex = 0;
-                    return NodeState.Failure;
+                    return _nodeState = NodeState.Failure;
 
                 case NodeState.Success:
                     _processingChildIndex++;
-                    return _processingChildIndex == Children.Count ? NodeState.Success : NodeState.Running;
+                    return _processingChildIndex == Children.Count ? _nodeState = NodeState.Success : _nodeState = NodeState.Running;
             }
         }
 
         Reset();
-        return NodeState.Success;
+        return _nodeState = NodeState.Success;
     }
 
     public override void Reset()

@@ -21,6 +21,7 @@ public class CooldownTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, cooldown.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -40,6 +41,7 @@ public class CooldownTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, cooldown.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
@@ -60,6 +62,7 @@ public class CooldownTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, cooldown.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
@@ -80,6 +83,7 @@ public class CooldownTests
 
         // Assert
         Assert.Equal(NodeState.Success, resultAfterReset);
+        Assert.Equal(NodeState.Success, cooldown.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 
@@ -100,6 +104,7 @@ public class CooldownTests
 
         // Assert
         Assert.Equal(NodeState.Success, resultAfterAbort);
+        Assert.Equal(NodeState.Success, cooldown.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
     }
 }

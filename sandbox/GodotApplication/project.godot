@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 project/assembly_name="GodotApplication"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/GroveGames.BehaviourTree/plugin.cfg")
+
 [input]
 
 move_forward={

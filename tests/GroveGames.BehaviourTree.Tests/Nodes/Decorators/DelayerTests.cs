@@ -18,6 +18,7 @@ public class DelayerTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, delayer.State);
     }
 
     [Fact]
@@ -39,6 +40,7 @@ public class DelayerTests
         // Assert
         Assert.Equal(NodeState.Running, firstTickResult);
         Assert.Equal(NodeState.Success, secondTickResult);
+        Assert.Equal(NodeState.Success, delayer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -61,6 +63,7 @@ public class DelayerTests
 
         // Assert
         Assert.Equal(NodeState.Running, thirdTickResult);
+        Assert.Equal(NodeState.Running, delayer.State);
     }
 
     [Fact]
@@ -81,6 +84,7 @@ public class DelayerTests
 
         // Assert
         Assert.Equal(NodeState.Running, resultAfterAbort);
+        Assert.Equal(NodeState.Running, delayer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
     }
 
@@ -102,6 +106,7 @@ public class DelayerTests
 
         // Assert
         Assert.Equal(NodeState.Running, resultAfterReset);
+        Assert.Equal(NodeState.Running, delayer.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
     }
 }

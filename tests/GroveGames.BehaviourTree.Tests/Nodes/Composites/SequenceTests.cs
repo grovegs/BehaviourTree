@@ -21,6 +21,7 @@ public class SequenceTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, sequence.State);
     }
 
     [Fact]
@@ -39,6 +40,7 @@ public class SequenceTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, sequence.State);
     }
 
     [Fact]
@@ -62,6 +64,7 @@ public class SequenceTests
         // Assert
         Assert.Equal(NodeState.Running, firstTickResult);
         Assert.Equal(NodeState.Success, secondTickResult);
+        Assert.Equal(NodeState.Success, sequence.State);
     }
 
     [Fact]
@@ -85,6 +88,7 @@ public class SequenceTests
         // Assert
         Assert.Equal(NodeState.Running, firstTickResult);
         Assert.Equal(NodeState.Failure, secondTickResult);
+        Assert.Equal(NodeState.Failure, sequence.State);
     }
 
     [Fact]
@@ -110,6 +114,7 @@ public class SequenceTests
 
         // Assert
         Assert.Equal(NodeState.Running, resetResult);
+        Assert.Equal(NodeState.Running, sequence.State);
     }
 
     [Fact]
@@ -134,5 +139,6 @@ public class SequenceTests
 
         // Assert
         Assert.Equal(NodeState.Running, resultAfterAbort);
+        Assert.Equal(NodeState.Running, sequence.State);
     }
 }

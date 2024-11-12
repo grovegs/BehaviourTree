@@ -10,7 +10,7 @@ public sealed class Inverter : Decorator
     {
         var status = base.Evaluate(deltaTime);
 
-        return status switch
+        return _nodeState = status switch
         {
             NodeState.Success => NodeState.Failure,
             NodeState.Running => NodeState.Running,

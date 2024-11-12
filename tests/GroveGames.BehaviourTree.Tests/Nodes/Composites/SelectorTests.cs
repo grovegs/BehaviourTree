@@ -36,6 +36,7 @@ public class SelectorTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, selector.State);
         Assert.Equal(1, SelectorAccessor.GetProcessingChildIndex(selector));
     }
 
@@ -56,6 +57,7 @@ public class SelectorTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, selector.State);
         Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
     }
 
@@ -80,6 +82,7 @@ public class SelectorTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, selector.State);
         Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
     }
 
@@ -105,6 +108,7 @@ public class SelectorTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, selector.State);
         Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
     }
 

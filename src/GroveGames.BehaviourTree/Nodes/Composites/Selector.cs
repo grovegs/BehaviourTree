@@ -20,19 +20,19 @@ public sealed class Selector : Composite
             {
                 case NodeState.Failure:
                     _processingChildIndex++;
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
 
                 case NodeState.Running:
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
 
                 case NodeState.Success:
                     Reset();
-                    return NodeState.Success;
+                    return _nodeState = NodeState.Success;
             }
         }
 
         Reset();
-        return NodeState.Failure;
+        return _nodeState = NodeState.Failure;
     }
 
     public override void Reset()

@@ -22,7 +22,7 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
             if (_repeatMode == RepeatMode.FixedCount && _currentCount >= _maxCount)
             {
                 _currentCount = 0;
-                return NodeState.Success;
+                return _nodeState = NodeState.Success;
             }
 
             var childStatus = base.Evaluate(deltaTime);
@@ -33,29 +33,29 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators
                     if (childStatus == NodeState.Success || childStatus == NodeState.Failure)
                     {
                         _currentCount++;
-                        return NodeState.Running;
+                        return _nodeState = NodeState.Running;
                     }
                     break;
 
                 case RepeatMode.UntilSuccess:
                     if (childStatus == NodeState.Success)
                     {
-                        return NodeState.Success;
+                        return _nodeState = NodeState.Success;
                     }
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
 
                 case RepeatMode.UntilFailure:
                     if (childStatus == NodeState.Failure)
                     {
-                        return NodeState.Failure;
+                        return _nodeState = NodeState.Failure;
                     }
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
 
                 case RepeatMode.Infinite:
-                    return NodeState.Running;
+                    return _nodeState = NodeState.Running;
             }
 
-            return childStatus == NodeState.Running ? NodeState.Running : NodeState.Success;
+            return childStatus == NodeState.Running ? _nodeState = NodeState.Running : _nodeState = NodeState.Success;
         }
 
         public override void Reset()

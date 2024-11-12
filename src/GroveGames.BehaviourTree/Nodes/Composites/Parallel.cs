@@ -23,7 +23,7 @@ public sealed class Parallel : Composite
                 case NodeState.Success:
                     if (_policy == ParallelPolicy.AnySuccess)
                     {
-                        return NodeState.Success;
+                        return _nodeState = NodeState.Success;
                     }
 
                     break;
@@ -38,7 +38,7 @@ public sealed class Parallel : Composite
 
                     if (_policy == ParallelPolicy.FirstFailure)
                     {
-                        return NodeState.Failure;
+                        return _nodeState = NodeState.Failure;
                     }
                     break;
             }
@@ -49,7 +49,7 @@ public sealed class Parallel : Composite
             return NodeState.Success;
         }
 
-        return anyChildRunning ? NodeState.Running : NodeState.Failure;
+        return anyChildRunning ? _nodeState = NodeState.Running : _nodeState = NodeState.Failure;
     }
 }
 

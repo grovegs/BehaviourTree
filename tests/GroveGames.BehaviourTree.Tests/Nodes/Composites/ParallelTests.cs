@@ -27,6 +27,7 @@ public class ParallelTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, parallel.State);
     }
 
     [Fact]
@@ -49,6 +50,7 @@ public class ParallelTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, parallel.State);
     }
 
     [Fact]
@@ -71,6 +73,7 @@ public class ParallelTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, parallel.State);
     }
 
     [Fact]
@@ -93,6 +96,7 @@ public class ParallelTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, parallel.State);
     }
 
     [Fact]
@@ -115,5 +119,6 @@ public class ParallelTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, parallel.State);
     }
 }

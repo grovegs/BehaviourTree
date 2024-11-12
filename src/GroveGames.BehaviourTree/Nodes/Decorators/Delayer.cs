@@ -18,10 +18,10 @@ public sealed class Delayer : Decorator
         if (_interval >= _waitTime)
         {
             _interval = 0f;
-            return base.Evaluate(deltaTime);
+            return _nodeState = base.Evaluate(deltaTime);
         }
 
-        return NodeState.Running;
+        return _nodeState = NodeState.Running;
 
     }
 

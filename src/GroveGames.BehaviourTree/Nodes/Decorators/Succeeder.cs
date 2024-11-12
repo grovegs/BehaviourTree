@@ -10,7 +10,7 @@ public sealed class Succeeder : Decorator
     {
         var status = base.Evaluate(deltaTime);
 
-        return status == NodeState.Running ? NodeState.Running : NodeState.Success;
+        return status == NodeState.Running ? _nodeState = NodeState.Running : _nodeState = NodeState.Success;
     }
 }
 

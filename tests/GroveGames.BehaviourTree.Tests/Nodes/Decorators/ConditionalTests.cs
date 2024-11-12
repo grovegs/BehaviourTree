@@ -22,6 +22,7 @@ public class ConditionalTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, conditional.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
     }
 
@@ -44,6 +45,7 @@ public class ConditionalTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, conditional.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -64,6 +66,7 @@ public class ConditionalTests
 
         // Assert
         Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(NodeState.Failure, conditional.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
     }
 }

@@ -22,6 +22,7 @@ public class AbortTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, abort.State);
         mockChild.Verify(child => child.Abort(), Times.Once);
     }
 
@@ -44,6 +45,7 @@ public class AbortTests
 
         // Assert
         Assert.Equal(NodeState.Running, result);
+        Assert.Equal(NodeState.Running, abort.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
     }
 
@@ -64,6 +66,7 @@ public class AbortTests
 
         // Assert
         Assert.Equal(NodeState.Success, result);
+        Assert.Equal(NodeState.Success, abort.State);
         mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
     }
 

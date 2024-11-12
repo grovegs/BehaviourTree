@@ -6,8 +6,10 @@ public sealed class Root : IRoot
 {
     private readonly IBlackboard _blackboard;
     private INode _child;
+    private NodeState _nodeState;
 
     public IBlackboard Blackboard => _blackboard;
+    public NodeState State => _nodeState;
 
     public Root(IBlackboard blackboard)
     {
@@ -17,7 +19,7 @@ public sealed class Root : IRoot
 
     public NodeState Evaluate(float deltaTime)
     {
-        return _child.Evaluate(deltaTime);
+        return _nodeState = _child.Evaluate(deltaTime);
     }
 
     public void Abort()

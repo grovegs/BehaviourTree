@@ -156,7 +156,7 @@ To assist with testing and debugging behavior trees, GroveGames Behaviour Tree i
 #### Example Visual Tree
 Below is an example of how a behavior tree appears in the visual debugger, showing nodes and their states during runtime.
 
-![Example Visual Tree](path/to/example_visual_tree.png)
+![Example Visual Tree](docs/ExampleTree.png)
 
 ## Usage Example in Godot
 

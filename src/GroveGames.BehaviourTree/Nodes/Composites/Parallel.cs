@@ -46,7 +46,7 @@ public sealed class Parallel : Composite
 
         if (allSuccess && _policy == ParallelPolicy.AllSuccess)
         {
-            return NodeState.Success;
+            return _nodeState = NodeState.Success;
         }
 
         return anyChildRunning ? _nodeState = NodeState.Running : _nodeState = NodeState.Failure;

@@ -32,6 +32,7 @@ public class CooldownTests
         float waitTime = 2.0f;
         var mockParent = new Mock<IParent>();
         var mockChild = new Mock<INode>();
+        mockChild.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
         var cooldown = new Cooldown(mockParent.Object, waitTime);
         cooldown.Attach(mockChild.Object);
 
@@ -73,6 +74,7 @@ public class CooldownTests
         float waitTime = 2.0f;
         var mockParent = new Mock<IParent>();
         var mockChild = new Mock<INode>();
+        mockChild.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
         var cooldown = new Cooldown(mockParent.Object, waitTime);
         cooldown.Attach(mockChild.Object);
 
@@ -94,6 +96,7 @@ public class CooldownTests
         float waitTime = 2.0f;
         var mockParent = new Mock<IParent>();
         var mockChild = new Mock<INode>();
+        mockChild.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
         var cooldown = new Cooldown(mockParent.Object, waitTime);
         cooldown.Attach(mockChild.Object);
 

@@ -10,39 +10,6 @@ using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
-
-public class TestTree : GroveGames.BehaviourTree.Tree
-{
-    public TestTree(IRoot root) : base(root)
-    {
-    }
-
-    public override void SetupTree()
-    {
-        var selector = Root.Selector();
-        var seq1 = selector.Sequence();
-        seq1.Delayer(12f).Abort(() => true);
-        seq1.Failer().Succeeder();
-
-        var seq2 = selector.Sequence();
-        seq2.Repeater(RepeatMode.UntilSuccess);
-        seq2.Failer();
-
-        var seq3 = selector.Sequence();
-        seq3.Failer();
-        seq3.Succeeder();
-
-
-        var seq4 = selector.Sequence();
-        seq4.Failer();
-        seq4.Succeeder();
-
-        var seq5 = selector.Sequence();
-        seq5.Failer();
-        seq5.Succeeder();
-    }
-}
-
 [Tool]
 public partial class BehaviourTreeGraph : GraphEdit
 {

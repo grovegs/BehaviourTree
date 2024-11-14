@@ -4,6 +4,7 @@ using GroveGames.BehaviourTree;
 using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
+using GroveGames.BehaviourTree.Nodes.Decorators;
 
 using System;
 
@@ -15,39 +16,28 @@ public partial class TestSceneController : Godot.Node
     [Export] Node3D _entity;
 
     private CharacterBT _characterBT;
-    private readonly IBlackboard _blackboard = new Blackboard();
 
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        _characterBT = new CharacterBT(new Root(new Blackboard()));
+        _characterBT = new CharacterBT();
+        _characterBT.SetRoot(new Root(new Blackboard()));
         _characterBT.SetEntity(_entity, _enemy);
         _characterBT.SetupTree();
+        _characterBT.Enable();
+        AddChild(_characterBT);
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
         _characterBT.Tick((float)delta);
     }
-
-    public override void _Input(InputEvent @event)
-    {
-        if (@event.IsPressed())
-        {
-            _characterBT.Abort();
-        }
-    }
 }
 
-public class CharacterBT : Tree
+public partial class CharacterBT : GodotBehaviourTree
 {
     private Node3D _entity;
     private Node3D _enemy;
 
-    public CharacterBT(GroveGames.BehaviourTree.Nodes.Root root) : base(root)
-    {
-    }
 
     public void SetEntity(Node3D entity, Node3D enemy)
     {
@@ -62,16 +52,15 @@ public class CharacterBT : Tree
         var attack = selector.Sequence();
 
         attack
-       .Attach(new LookForEnemy(_enemy, _entity, attack))
-       .Attach(new MoveToTarget(attack, _entity))
-       .Attach(new Attack(selector));
+       .Attach(new HasEnemy(_enemy, _entity, attack));
+        var attackRepeat = attack.Cooldown(1f).Repeater(RepeatMode.UntilSuccess);
+        attackRepeat.Attach(new Attack(attackRepeat));
 
-        var gather = selector.Sequence();
-
-        gather
-       .Attach(new LookForGathering(gather))
-       .Attach(new MoveToTarget(gather, _entity))
-       .Attach(new Gather(gather));
+        var defend = selector.Sequence();
+        defend
+       .Attach(new HasAttacker(defend));
+        var repeat = defend.Cooldown(1f).Repeater(RepeatMode.UntilSuccess);
+        repeat.Attach(new Defend(repeat));
     }
 }
 
@@ -129,7 +118,7 @@ public class Attack : GroveGames.BehaviourTree.Nodes.Node
 
     public override NodeState Evaluate(float delta)
     {
-        return NodeState.Failure;
+        return _nodeState = NodeState.Success;
     }
 }
 
@@ -165,36 +154,36 @@ public class Input : GroveGames.BehaviourTree.Nodes.Node
     }
 }
 
-public class Gather : GroveGames.BehaviourTree.Nodes.Node
+public class Defend : GroveGames.BehaviourTree.Nodes.Node
 {
-    public Gather(IParent parent) : base(parent)
+    public Defend(IParent parent) : base(parent)
     {
     }
 
     public override NodeState Evaluate(float delta)
     {
-        return NodeState.Failure;
+        return _nodeState = NodeState.Success;
     }
 }
 
-public class LookForGathering : GroveGames.BehaviourTree.Nodes.Node
+public class HasAttacker : GroveGames.BehaviourTree.Nodes.Node
 {
-    public LookForGathering(IParent parent) : base(parent)
+    public HasAttacker(IParent parent) : base(parent)
     {
     }
 
     public override NodeState Evaluate(float delta)
     {
-        return NodeState.Failure;
+        return _nodeState = NodeState.Success;
     }
 }
 
-public class LookForEnemy : GroveGames.BehaviourTree.Nodes.Node
+public class HasEnemy : GroveGames.BehaviourTree.Nodes.Node
 {
     private readonly Node3D _enemy;
     private readonly Node3D _entity;
 
-    public LookForEnemy(Node3D enemy, Node3D entity, IParent parent) : base(parent)
+    public HasEnemy(Node3D enemy, Node3D entity, IParent parent) : base(parent)
     {
         _enemy = enemy;
         _entity = entity;
@@ -202,20 +191,6 @@ public class LookForEnemy : GroveGames.BehaviourTree.Nodes.Node
 
     public override NodeState Evaluate(float delta)
     {
-        if (_enemy == null)
-        {
-            return NodeState.Failure;
-        }
-
-        var distance = _enemy.Position.DistanceTo(_entity.Position);
-
-        if (distance <= 10f)
-        {
-            Blackboard.SetValue("target_pos_enemey", _enemy);
-            return NodeState.Success;
-        }
-
-        return NodeState.Failure;
-
+        return _nodeState = NodeState.Success;
     }
 }

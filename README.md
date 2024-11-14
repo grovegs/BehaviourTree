@@ -17,6 +17,7 @@ A modular and extensible behavior tree framework for AI development in C# for th
   - [Example Diagram](#example-diagram)
   - [Example Nodes](#example-nodes)
   - [Example Tree](#example-tree)
+  - [Debugging](#debugging)
 - [Usage Example in Godot](#usage-example-in-godot)
 - [Customization](#customization)
 - [Contributing](#contributing)
@@ -102,6 +103,7 @@ public class Defend : Node
     }
 }
 ```
+
 ### Example Tree
 Here's an example of a `CharacterBT` class that builds an AI behavior tree:
 ```csharp
@@ -113,7 +115,7 @@ public class CharacterBT : Tree
     {
         var selector = Root.Selector();
         
-        var attackSequence =  selector.Sequence();
+        var attackSequence = selector.Sequence();
         attackSequence.Attach(new Condition(() => IsEnemyVisible()));
         attackSequence
         .Cooldown(1f)
@@ -125,10 +127,37 @@ public class CharacterBT : Tree
         defendSequence
         .Cooldown(1f)
         .Repeater(RepeatMode.UntilSuccess)
-        .Attach(new Defend(defenceSequence));
+        .Attach(new Defend(defendSequence));
     }
 }
 ```
+
+### Debugging
+
+To assist with testing and debugging behavior trees, GroveGames Behaviour Tree includes a **Visual Debugger** that helps track the current state of each node in real-time.
+
+1. **Enable Visual Debugger**: To use the debugger, ensure your behavior tree class derives from `GodotBehaviourTree`. After instantiating your behavior tree, call the `SetRoot` method and pass in a new `Root` node to initialize the tree structure. Additionally, remember to call the `Enable` method to activate debugging. Here’s an example:
+
+    ```csharp
+    public override void _Ready()
+    {
+        _characterBT = new CharacterBT();
+        _characterBT.SetRoot(new Root(new Blackboard()));
+        _characterBT.SetupTree();
+        _characterBT.Enable();
+        AddChild(_characterBT);
+    }
+    ```
+
+2. **Node State Tracking**: Once enabled, you can observe states such as `Running`, `Success`, or `Failure` for each node. This is especially useful for visualizing sequences, conditions, and actions that may fail or succeed based on game conditions.
+
+3. **Godot Integration**: With debugging enabled, information about node states will be displayed under the **Debugger** tab, allowing you to track the AI behavior tree’s state updates frame-by-frame.
+
+#### Example Visual Tree
+Below is an example of how a behavior tree appears in the visual debugger, showing nodes and their states during runtime.
+
+![Example Visual Tree](docs/ExampleTree.png)
+
 ## Usage Example in Godot
 
 Below is a full example of setting up and using the behavior tree in a Godot scene:
@@ -158,12 +187,6 @@ public partial class Character : Godot.Node
     }
 }
 ```
-
-### Explanation
-
-- **Ready Method**: Initializes the behavior tree and assigns entities (e.g., player and enemy).
-- **Process Method**: Ticks the behavior tree every frame to update actions based on elapsed time.
-- **Input Method**: Allows manual interruption of the behavior tree, useful for testing or player-triggered events.
 
 ## Customization
 

@@ -1,9 +1,10 @@
+#if TOOLS
 using Godot;
 
 namespace GroveGames.BehaviourTree;
 
 [Tool]
-public partial class BehaviourTreeWindow : EditorDebuggerPlugin
+public sealed partial class BehaviourTreeWindow : EditorDebuggerPlugin
 {
     private BehaviourTreeGraph _behaviourTreeGraph = new();
     private Label _currentTreeLabel = new();
@@ -114,3 +115,4 @@ public partial class BehaviourTreeWindow : EditorDebuggerPlugin
         return null;
     }
 }
+#endif

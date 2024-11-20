@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Godot;
 
-using GroveGames.BehaviourTree;
-using GroveGames.BehaviourTree.Nodes;
-using GroveGames.BehaviourTree.Nodes.Composites;
-using GroveGames.BehaviourTree.Nodes.Decorators;
+namespace GroveGames.BehaviourTree;
 
-[Tool]
-public partial class BehaviourTreeGraph : GraphEdit
+public sealed partial class BehaviourTreeGraph : GraphEdit
 {
     private readonly Dictionary<int, Vector2> _nodePositions = [];
     private readonly List<BehviourTreeGraphNode> _nodes = [];

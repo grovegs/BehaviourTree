@@ -1,3 +1,4 @@
+#if TOOLS
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -11,8 +12,6 @@ namespace GroveGames.BehaviourTree;
 
 public abstract partial class GodotBehaviourTree
 {
-#if TOOLS
-
     private int _counter;
 
     private bool _debuggable;
@@ -173,6 +172,5 @@ public abstract partial class GodotBehaviourTree
 
         return children;
     }
-
-#endif
 }
+#endif

@@ -1,7 +1,7 @@
 #if TOOLS
 using Godot;
 
-using GroveGames.BehaviourTree;
+namespace GroveGames.BehaviourTree;
 
 [Tool]
 public partial class Plugin : EditorPlugin

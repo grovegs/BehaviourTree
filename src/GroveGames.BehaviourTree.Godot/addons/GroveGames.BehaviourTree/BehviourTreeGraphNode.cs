@@ -2,8 +2,9 @@ using Godot;
 
 using GroveGames.BehaviourTree.Nodes;
 
-[Tool]
-public partial class BehviourTreeGraphNode : GraphNode
+namespace GroveGames.BehaviourTree;
+
+public sealed partial class BehviourTreeGraphNode : GraphNode
 {
     private StyleBoxFlat _styleBoxFlat;
 
@@ -16,7 +17,6 @@ public partial class BehviourTreeGraphNode : GraphNode
     {
         _id = id;
         _hashCode = hashCode;
-        ;
         Draggable = false;
         Name = $"{name}_{_id}";
         Title = name;

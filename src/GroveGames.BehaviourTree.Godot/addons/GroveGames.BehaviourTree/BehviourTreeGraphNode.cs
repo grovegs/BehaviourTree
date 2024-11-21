@@ -4,6 +4,7 @@ using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree;
 
+[Tool]
 public sealed partial class BehviourTreeGraphNode : GraphNode
 {
     private StyleBoxFlat _styleBoxFlat;

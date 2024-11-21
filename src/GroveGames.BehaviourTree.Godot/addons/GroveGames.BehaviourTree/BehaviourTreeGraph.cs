@@ -6,6 +6,7 @@ using Godot;
 
 namespace GroveGames.BehaviourTree;
 
+[Tool]
 public sealed partial class BehaviourTreeGraph : GraphEdit
 {
     private readonly Dictionary<int, Vector2> _nodePositions = [];

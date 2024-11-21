@@ -50,7 +50,6 @@ public sealed partial class BehaviourTreeGraph : GraphEdit
     {
         ClearConnections();
         ClearNodes();
-        _nodes.Clear();
     }
 
     private void ClearNodes()

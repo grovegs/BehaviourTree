@@ -29,8 +29,7 @@ public sealed partial class BehaviourTreeGraph : GraphEdit
 
         FocusMode = FocusModeEnum.None;
 
-        ClearConnections();
-        ClearNodes();
+        ClearGraph();
         CalculateNodePositions(_nodeHierarchy.First().Key, 0f, 0f);
         DrawNode(_nodeHierarchy.First().Key);
     }
@@ -48,12 +47,20 @@ public sealed partial class BehaviourTreeGraph : GraphEdit
         }
     }
 
-
-    public void ClearNodes()
+    public void ClearGraph()
     {
-        foreach (var node in _nodes)
+        ClearConnections();
+        ClearNodes();
+    }
+
+    private void ClearNodes()
+    {
+        foreach (var child in GetChildren())
         {
-            node.QueueFree();
+            if (child is GraphNode graphNode)
+            {
+                child.QueueFree();
+            }
         }
 
         _nodes.Clear();

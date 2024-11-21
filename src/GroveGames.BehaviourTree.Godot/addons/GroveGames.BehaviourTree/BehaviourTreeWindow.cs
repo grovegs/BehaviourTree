@@ -80,9 +80,8 @@ public sealed partial class BehaviourTreeWindow : EditorDebuggerPlugin
 
         button.Pressed += () =>
         {
-            _behaviourTreeGraph.ClearConnections();
-            _behaviourTreeGraph.ClearNodes();
-            _currentTreeLabel.Text = "CurrentTree: None";
+            _behaviourTreeGraph.ClearGraph();
+            _currentTreeLabel.Text = "Current Tree: None";
         };
 
         button.SetAnchorsPreset(Control.LayoutPreset.TopLeft);

@@ -19,8 +19,7 @@ public abstract class Composite : Node, IParent
 
     public IParent Attach(IChildTree tree)
     {
-        tree.SetupTree();
-        _children.Add(tree);
+        _children.Add(tree.SetupTree(this));
         return this;
     }
 

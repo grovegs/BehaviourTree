@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree;
 
-public interface IChildTree : INode
+public interface IChildTree
 {
-    void SetupTree();
+    INode SetupTree(IParent parent);
 }

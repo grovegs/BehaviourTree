@@ -34,4 +34,11 @@ public abstract class Decorator : Node, IParent
         _child = node;
         return this;
     }
+
+    public IParent Attach(IChildTree tree)
+    {
+        tree.SetupTree();
+        Attach(tree);
+        return this;
+    }
 }

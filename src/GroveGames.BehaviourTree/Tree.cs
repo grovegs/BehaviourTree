@@ -6,7 +6,7 @@ public abstract class Tree : ITree
 {
     private bool _isEnabled;
     private readonly IRoot _root;
-    
+
     protected IRoot Root => _root;
 
     public Tree(IRoot root)

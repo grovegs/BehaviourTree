@@ -10,5 +10,4 @@ public interface ITree
     void Enable();
     void Disable();
     void Tick(float deltaTime);
-    IRoot Root { get; }
 }

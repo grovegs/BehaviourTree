@@ -17,6 +17,12 @@ public abstract class Composite : Node, IParent
         return this;
     }
 
+    public IParent Attach(ITree tree)
+    {
+        Attach(tree.Root);
+        return this;
+    }
+
     public override void Reset()
     {
         foreach (var child in _children)

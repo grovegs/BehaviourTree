@@ -42,4 +42,10 @@ public sealed class Root : IRoot
         _child = node;
         return this;
     }
+
+    public IParent Attach(ITree tree)
+    {
+        Attach(tree.Root);
+        return this;
+    }
 }

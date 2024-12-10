@@ -1,3 +1,5 @@
+using GroveGames.BehaviourTree.Nodes;
+
 namespace GroveGames.BehaviourTree;
 
 public interface ITree
@@ -8,4 +10,5 @@ public interface ITree
     void Enable();
     void Disable();
     void Tick(float deltaTime);
+    IRoot Root { get; }
 }

@@ -45,34 +45,4 @@ public abstract class Tree : ITree
     {
         _isEnabled = false;
     }
-
-    void ITree.SetupTree()
-    {
-        throw new NotImplementedException();
-    }
-
-    void ITree.Reset()
-    {
-        throw new NotImplementedException();
-    }
-
-    void ITree.Abort()
-    {
-        throw new NotImplementedException();
-    }
-
-    void ITree.Enable()
-    {
-        throw new NotImplementedException();
-    }
-
-    void ITree.Disable()
-    {
-        throw new NotImplementedException();
-    }
-
-    void ITree.Tick(float deltaTime)
-    {
-        throw new NotImplementedException();
-    }
 }

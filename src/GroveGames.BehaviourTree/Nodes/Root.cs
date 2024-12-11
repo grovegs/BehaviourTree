@@ -45,7 +45,7 @@ public sealed class Root : IRoot
 
     public IParent Attach(IChildTree tree)
     {
-        Attach(tree.SetupTree(this));
+        tree.SetupTree(this);
         return this;
     }
 }

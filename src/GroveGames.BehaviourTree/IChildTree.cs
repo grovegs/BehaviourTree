@@ -4,5 +4,5 @@ namespace GroveGames.BehaviourTree;
 
 public interface IChildTree
 {
-    INode SetupTree(IParent parent);
+    void SetupTree(IParent parent);
 }

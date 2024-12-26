@@ -11,7 +11,17 @@ public abstract class Decorator : Node, IParent
 
     public override NodeState Evaluate(float deltaTime)
     {
-        return _child.Evaluate(deltaTime);
+        return _child.Evaluate(deltaTime); ;
+    }
+
+    public override void StartEvaluate()
+    {
+        _child.StartEvaluate();
+    }
+
+    public override void EndEvaluate()
+    {
+        _child.EndEvaluate();
     }
 
     public override void Reset()

@@ -32,4 +32,14 @@ public abstract class Node : INode
     {
 
     }
+
+    public virtual void StartEvaluate()
+    {
+
+    }
+
+    public virtual void EndEvaluate()
+    {
+
+    }
 }

@@ -18,4 +18,14 @@ public sealed class EmptyNode : INode
     {
 
     }
+
+    public void StartEvaluate()
+    {
+
+    }
+
+    public void EndEvaluate()
+    {
+
+    }
 }

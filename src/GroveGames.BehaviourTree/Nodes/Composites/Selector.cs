@@ -19,13 +19,21 @@ public sealed class Selector : Composite
             switch (status)
             {
                 case NodeState.Failure:
+                    child.EndEvaluate();
                     _processingChildIndex++;
+
+                    if (_processingChildIndex < Children.Count)
+                    {
+                        Children[_processingChildIndex].StartEvaluate();
+                    }
+
                     return _nodeState = NodeState.Running;
 
                 case NodeState.Running:
                     return _nodeState = NodeState.Running;
 
                 case NodeState.Success:
+                    child.EndEvaluate();
                     Reset();
                     return _nodeState = NodeState.Success;
             }

@@ -48,4 +48,14 @@ public sealed class Root : IRoot
         tree.SetupTree(this);
         return this;
     }
+
+    public void StartEvaluate()
+    {
+
+    }
+
+    public void EndEvaluate()
+    {
+
+    }
 }

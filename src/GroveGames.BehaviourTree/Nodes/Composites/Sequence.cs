@@ -22,11 +22,19 @@ public sealed class Sequence : Composite
                     return _nodeState = NodeState.Running;
 
                 case NodeState.Failure:
+                    child.OnExit();
                     _processingChildIndex = 0;
                     return _nodeState = NodeState.Failure;
 
                 case NodeState.Success:
+                    child.OnExit();
                     _processingChildIndex++;
+
+                    if (_processingChildIndex < Children.Count)
+                    {
+                        Children[_processingChildIndex].OnEnter();
+                    }
+
                     return _processingChildIndex == Children.Count ? _nodeState = NodeState.Success : _nodeState = NodeState.Running;
             }
         }

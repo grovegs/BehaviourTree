@@ -32,4 +32,14 @@ public abstract class Node : INode
     {
 
     }
+
+    public virtual void OnEnter()
+    {
+
+    }
+
+    public virtual void OnExit()
+    {
+
+    }
 }

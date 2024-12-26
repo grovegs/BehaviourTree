@@ -14,14 +14,14 @@ public abstract class Decorator : Node, IParent
         return _child.Evaluate(deltaTime); ;
     }
 
-    public override void OnEnter()
+    public override void StartEvaluate()
     {
-        _child.OnEnter();
+        _child.StartEvaluate();
     }
 
-    public override void OnExit()
+    public override void EndEvaluate()
     {
-        _child.OnExit();
+        _child.EndEvaluate();
     }
 
     public override void Reset()

@@ -49,12 +49,12 @@ public sealed class Root : IRoot
         return this;
     }
 
-    public void OnEnter()
+    public void StartEvaluate()
     {
 
     }
 
-    public void OnExit()
+    public void EndEvaluate()
     {
 
     }

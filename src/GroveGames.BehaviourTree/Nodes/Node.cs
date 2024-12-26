@@ -33,12 +33,12 @@ public abstract class Node : INode
 
     }
 
-    public virtual void OnEnter()
+    public virtual void StartEvaluate()
     {
 
     }
 
-    public virtual void OnExit()
+    public virtual void EndEvaluate()
     {
 
     }

@@ -5,7 +5,7 @@ public interface INode
     NodeState Evaluate(float deltaTime);
     void Reset();
     void Abort();
-    void OnEnter();
-    void OnExit();
+    void StartEvaluate();
+    void EndEvaluate();
     NodeState State { get; }
 }

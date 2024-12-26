@@ -19,12 +19,12 @@ public sealed class EmptyNode : INode
 
     }
 
-    public void OnEnter()
+    public void StartEvaluate()
     {
 
     }
 
-    public void OnExit()
+    public void EndEvaluate()
     {
 
     }

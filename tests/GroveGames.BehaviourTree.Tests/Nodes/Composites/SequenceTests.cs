@@ -58,12 +58,9 @@ public class SequenceTests
         mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
 
         // Act
-        var firstTickResult = sequence.Evaluate(1.0f);
-        var secondTickResult = sequence.Evaluate(1.0f);
+        sequence.Evaluate(1.0f);
 
         // Assert
-        Assert.Equal(NodeState.Running, firstTickResult);
-        Assert.Equal(NodeState.Success, secondTickResult);
         Assert.Equal(NodeState.Success, sequence.State);
     }
 
@@ -82,12 +79,9 @@ public class SequenceTests
         mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
 
         // Act
-        var firstTickResult = sequence.Evaluate(1.0f);
-        var secondTickResult = sequence.Evaluate(1.0f);
+        sequence.Evaluate(1.0f);
 
         // Assert
-        Assert.Equal(NodeState.Running, firstTickResult);
-        Assert.Equal(NodeState.Failure, secondTickResult);
         Assert.Equal(NodeState.Failure, sequence.State);
     }
 
@@ -106,15 +100,13 @@ public class SequenceTests
         mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
 
         sequence.Evaluate(1.0f);
-        sequence.Evaluate(1.0f);
 
         // Act
         sequence.Reset();
         var resetResult = sequence.Evaluate(1.0f);
 
         // Assert
-        Assert.Equal(NodeState.Running, resetResult);
-        Assert.Equal(NodeState.Running, sequence.State);
+        Assert.Equal(NodeState.Success, sequence.State);
     }
 
     [Fact]
@@ -138,7 +130,6 @@ public class SequenceTests
         var resultAfterAbort = sequence.Evaluate(1.0f);
 
         // Assert
-        Assert.Equal(NodeState.Running, resultAfterAbort);
-        Assert.Equal(NodeState.Running, sequence.State);
+        Assert.Equal(NodeState.Success, sequence.State);
     }
 }

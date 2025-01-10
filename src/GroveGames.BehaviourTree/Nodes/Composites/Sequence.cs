@@ -11,7 +11,12 @@ public sealed class Sequence : Composite
 
     public override NodeState Evaluate(float deltaTime)
     {
-        if (_processingChildIndex < Children.Count)
+        if (Children.Count == 0)
+        {
+            return _nodeState = NodeState.Success;
+        }
+
+        while (_processingChildIndex < Children.Count)
         {
             var child = Children[_processingChildIndex];
             var state = child.Evaluate(deltaTime);
@@ -22,25 +27,22 @@ public sealed class Sequence : Composite
                     return _nodeState = NodeState.Running;
 
                 case NodeState.Failure:
-                    child.EndEvaluate();
                     _processingChildIndex = 0;
                     return _nodeState = NodeState.Failure;
 
                 case NodeState.Success:
-                    child.EndEvaluate();
                     _processingChildIndex++;
-
-                    if (_processingChildIndex < Children.Count)
-                    {
-                        Children[_processingChildIndex].StartEvaluate();
-                    }
-
-                    return _processingChildIndex == Children.Count ? _nodeState = NodeState.Success : _nodeState = NodeState.Running;
+                    break;
             }
         }
 
-        Reset();
-        return _nodeState = NodeState.Success;
+        if (_processingChildIndex >= Children.Count)
+        {
+            Reset();
+            return _nodeState = NodeState.Success;
+        }
+
+        return _nodeState = NodeState.Running;
     }
 
     public override void Reset()

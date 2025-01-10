@@ -11,31 +11,28 @@ public sealed class Selector : Composite
 
     public override NodeState Evaluate(float deltaTime)
     {
-        if (_processingChildIndex < Children.Count)
+        if (Children.Count == 0)
+        {
+            return _nodeState = NodeState.Failure;
+        }
+
+        while (_processingChildIndex < Children.Count)
         {
             var child = Children[_processingChildIndex];
             var status = child.Evaluate(deltaTime);
 
             switch (status)
             {
-                case NodeState.Failure:
-                    child.EndEvaluate();
-                    _processingChildIndex++;
-
-                    if (_processingChildIndex < Children.Count)
-                    {
-                        Children[_processingChildIndex].StartEvaluate();
-                    }
-
-                    return _nodeState = NodeState.Running;
-
                 case NodeState.Running:
                     return _nodeState = NodeState.Running;
 
                 case NodeState.Success:
-                    child.EndEvaluate();
-                    Reset();
+                    _processingChildIndex = 0;
                     return _nodeState = NodeState.Success;
+
+                case NodeState.Failure:
+                    _processingChildIndex++;
+                    break;
             }
         }
 

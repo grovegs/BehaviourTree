@@ -6,25 +6,30 @@ namespace GroveGames.BehaviourTree;
 
 public class VariantBlackboard : IBlackboard
 {
-    private readonly Dictionary<string, Variant> _dataBase;
+    private readonly Dictionary<string, Variant> _database;
 
     public VariantBlackboard()
     {
-        _dataBase = [];
+        _database = [];
+    }
+
+    public void Clear()
+    {
+        _database.Clear();
     }
 
     public void DeleteValue(string key)
     {
-        _dataBase.Remove(key);
+        _database.Remove(key);
     }
 
     public T? GetValue<T>(string key)
     {
-        return _dataBase.TryGetValue(key, out var value) ? value.As<T>() : default(T);
+        return _database.TryGetValue(key, out var value) ? value.As<T>() : default(T);
     }
 
     public void SetValue<T>(string key, T obj) where T : notnull
     {
-        _dataBase[key] = Variant.From(obj);
+        _database[key] = Variant.From(obj);
     }
 }

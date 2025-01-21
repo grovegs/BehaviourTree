@@ -9,6 +9,11 @@ public class Blackboard : IBlackboard
         _database = [];
     }
 
+    public void Clear()
+    {
+        _database.Clear();
+    }
+
     public void DeleteValue(string key)
     {
         _database.Remove(key);

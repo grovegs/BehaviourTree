@@ -33,15 +33,25 @@ public abstract partial class GodotBehaviourTree : Godot.Node, ITree
     public void Disable()
     {
         _isEnabled = false;
+        OnDisable();
     }
 
     public void Enable()
     {
         _isEnabled = true;
+        OnEnable();
     }
 
     public void Reset()
     {
         _root.Reset();
+    }
+
+    protected virtual void OnEnable()
+    {
+    }
+
+    protected virtual void OnDisable()
+    {
     }
 }

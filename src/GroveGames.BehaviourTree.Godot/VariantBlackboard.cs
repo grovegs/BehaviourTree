@@ -13,6 +13,11 @@ public class VariantBlackboard : IBlackboard
         _dataBase = [];
     }
 
+    public void Clear()
+    {
+        _dataBase.Clear();
+    }
+
     public void DeleteValue(string key)
     {
         _dataBase.Remove(key);

@@ -40,10 +40,20 @@ public abstract class Tree : ITree
     public void Enable()
     {
         _isEnabled = true;
+        OnEnable();
     }
 
     public void Disable()
     {
         _isEnabled = false;
+        OnDisable();
+    }
+
+    protected virtual void OnEnable()
+    {
+    }
+
+    protected virtual void OnDisable()
+    {
     }
 }

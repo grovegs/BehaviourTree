@@ -133,25 +133,23 @@ public abstract partial class GodotBehaviourTree
     {
         List<INode> children = [];
 
-        if (node is Composite comp)
+        if (node is Composite composite)
         {
             var childrenField = typeof(Composite).GetField("_children", BindingFlags.NonPublic | BindingFlags.Instance);
             if (childrenField != null)
             {
-                var childNodes = childrenField.GetValue(comp) as List<INode>;
-                if (childNodes != null)
+                if (childrenField.GetValue(composite) is List<INode> childNodes)
                 {
                     children.AddRange(childNodes);
                 }
             }
         }
-        else if (node is Decorator dec)
+        else if (node is Decorator decorator)
         {
             var childField = typeof(Decorator).GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
             if (childField != null)
             {
-                var singleChild = childField.GetValue(dec) as INode;
-                if (singleChild != null && singleChild != Nodes.Node.Empty)
+                if (childField.GetValue(decorator) is INode singleChild && singleChild != Nodes.Node.Empty)
                 {
                     children.Add(singleChild);
                 }
@@ -159,11 +157,10 @@ public abstract partial class GodotBehaviourTree
         }
         else if (node is Root root)
         {
-            FieldInfo childField = root.GetType().GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
+            var childField = typeof(Root).GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
             if (childField != null)
             {
-                var rootChild = childField.GetValue(root) as INode;
-                if (rootChild != null && rootChild != Nodes.Node.Empty)
+                if (childField.GetValue(root) is INode rootChild && rootChild != Nodes.Node.Empty)
                 {
                     children.Add(rootChild);
                 }

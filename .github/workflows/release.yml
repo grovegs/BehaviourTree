@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: 🔄 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🔧 Bump Version
         id: bump_version
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔄 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🏗️ Dotnet Build
         uses: grovegs/actions/.github/actions/build-dotnet@main
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔄 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🏗️ Dotnet Build
         uses: grovegs/actions/.github/actions/build-dotnet@main
@@ -124,7 +124,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🔄 Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🛠️ Release Github
         uses: grovegs/actions/.github/actions/release-github@main

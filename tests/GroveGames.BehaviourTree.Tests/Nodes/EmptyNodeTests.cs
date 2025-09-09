@@ -8,7 +8,7 @@ public class EmptyNodeTests
     public void Evaluate_ReturnsFailure()
     {
         // Arrange
-        var emptyNode = new EmptyNode();
+        var emptyNode = new EmptyBehaviourNode();
 
         // Act
         var result = emptyNode.Evaluate(0f);
@@ -21,7 +21,7 @@ public class EmptyNodeTests
     public void Reset_DoesNotThrow()
     {
         // Arrange
-        var emptyNode = new EmptyNode();
+        var emptyNode = new EmptyBehaviourNode();
 
         // Act & Assert
         emptyNode.Reset();
@@ -31,7 +31,7 @@ public class EmptyNodeTests
     public void Abort_DoesNotThrow()
     {
         // Arrange
-        var emptyNode = new EmptyNode();
+        var emptyNode = new EmptyBehaviourNode();
 
         // Act & Assert
         emptyNode.Abort();

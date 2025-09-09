@@ -1,6 +1,6 @@
 namespace GroveGames.BehaviourTree.Nodes.Composites;
 
-public abstract class Composite : Node, IParent
+public abstract class Composite : BehaviourNode, IParent
 {
     private readonly List<INode> _children;
 

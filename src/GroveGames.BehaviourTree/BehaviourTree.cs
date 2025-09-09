@@ -2,14 +2,14 @@ using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree;
 
-public abstract class Tree : ITree
+public abstract class BehaviourTree : ITree
 {
     private bool _isEnabled;
     private readonly IRoot _root;
 
     protected IRoot Root => _root;
 
-    public Tree(IRoot root)
+    public BehaviourTree(IRoot root)
     {
         _root = root;
         _isEnabled = false;

@@ -1,6 +1,6 @@
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public abstract class Decorator : Node, IParent
+public abstract class Decorator : BehaviourNode, IParent
 {
     private INode _child;
 

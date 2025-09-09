@@ -2,9 +2,9 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
-public abstract class Node : INode
+public abstract class BehaviourNode : INode
 {
-    public static readonly INode Empty = new EmptyNode();
+    public static readonly INode Empty = new EmptyBehaviourNode();
 
     private readonly IParent _parent;
     protected NodeState _nodeState;
@@ -13,7 +13,7 @@ public abstract class Node : INode
     public IBlackboard Blackboard => _parent.Blackboard;
     public NodeState State => _nodeState;
 
-    public Node(IParent parent)
+    public BehaviourNode(IParent parent)
     {
         _parent = parent;
     }

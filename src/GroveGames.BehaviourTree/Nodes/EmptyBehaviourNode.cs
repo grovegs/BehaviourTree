@@ -1,6 +1,6 @@
 namespace GroveGames.BehaviourTree.Nodes;
 
-public sealed class EmptyNode : INode
+public sealed class EmptyBehaviourNode : INode
 {
     public NodeState State => NodeState.Failure;
 

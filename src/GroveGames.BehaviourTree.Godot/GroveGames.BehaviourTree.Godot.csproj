@@ -5,13 +5,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="../GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
+    <ProjectReference Include="../GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="addons/**" />
     <Compile Remove="addons/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="addons\GroveGames.BehaviourTree\BehaviourTreeGraph.cs" />
+    <Compile Include="addons\GroveGames.BehaviourTree\BehaviourTreeWindow.cs" />
+    <Compile Include="addons\GroveGames.BehaviourTree\BehviourTreeGraphNode.cs" />
+    <Compile Include="addons\GroveGames.BehaviourTree\GodotBehaviourTree.cs" />
+    <Compile Include="addons\GroveGames.BehaviourTree\GodotBehaviourTree.Debug.cs" />
+    <Compile Include="addons\GroveGames.BehaviourTree\Plugin.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="addons\GroveGames.BehaviourTree\plugin.cfg" />
   </ItemGroup>
 
 </Project>

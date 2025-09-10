@@ -4,59 +4,18 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
-
-env:
-  NAME: ${{ vars.PROJECT_NAME }}
-  AUTHOR: ${{ vars.PROJECT_AUTHOR }}
+      - develop
 
 jobs:
-  format_core:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🔍 Format Dotnet
-        uses: grovegs/actions/.github/actions/format-dotnet@main
-        with:
-          project: src/$AUTHOR.$NAME/$AUTHOR.$NAME.csproj
-
-  format_godot:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🔍 Format Dotnet
-        uses: grovegs/actions/.github/actions/format-dotnet@main
-        with:
-          project: src/$AUTHOR.$NAME.Godot/$AUTHOR.$NAME.Godot.csproj
-
-  format_core_tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🔍 Format Dotnet
-        uses: grovegs/actions/.github/actions/format-dotnet@main
-        with:
-          project: tests/$AUTHOR.$NAME.Tests/$AUTHOR.$NAME.Tests.csproj
-
-  format_godot_tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🔍 Format Dotnet
-        uses: grovegs/actions/.github/actions/format-dotnet@main
-        with:
-          project: tests/$AUTHOR.$NAME.Godot.Tests/$AUTHOR.$NAME.Godot.Tests.csproj
+  release:
+    uses: grovegs/workflows/.github/workflows/godot-package-format.yml@main
+    with:
+      core-project: src/GroveGames.BehaviourTree
+      godot-project: src/GroveGames.BehaviourTree.Godot
+      core-test-project: tests/GroveGames.BehaviourTree.Tests
+      godot-test-project: tests/GroveGames.BehaviourTree.Godot.Tests
+      global-json-file: global.json

@@ -3,133 +3,26 @@ name: 🚀 Release
 on:
   workflow_dispatch:
     inputs:
-      version_type:
-        description: "Select the version to increment (major, minor, patch)"
+      version-type:
+        description: "Select the version to increment (major, minor, patch)."
         required: true
-        default: patch
+        default: "patch"
         type: choice
         options:
           - major
           - minor
           - patch
 
-env:
-  NAME: ${{ vars.PROJECT_NAME }}
-  AUTHOR: ${{ vars.PROJECT_AUTHOR }}
-
 jobs:
-  set_metadata:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.bump_version.outputs.next-version }}
-      latest_version: ${{ steps.bump_version.outputs.latest-version }}
-      artifact: ${{ steps.generate_artifact.outputs.artifact }}
-      title: ${{ steps.generate_title.outputs.title }}
-
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🔧 Bump Version
-        id: bump_version
-        uses: grovegs/actions/.github/actions/bump-version@main
-        with:
-          version-type: ${{ inputs.version_type }}
-
-      - name: 📦 Generate Artifact
-        id: generate_artifact
-        run: |
-          artifact=$(echo $NAME | sed -E 's/([a-z])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')-${{ steps.bump_version.outputs.next-version }}
-          echo artifact=$artifact >> $GITHUB_OUTPUT
-
-      - name: 📝 Generate Title
-        id: generate_title
-        run: |
-          title="$(echo $NAME | sed -E 's/([a-z])([A-Z])/\1 \2/g') ${{ steps.bump_version.outputs.next-version }}"
-          echo title=$title >> $GITHUB_OUTPUT
-
-  build_core:
-    needs: set_metadata
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🏗️ Dotnet Build
-        uses: grovegs/actions/.github/actions/build-dotnet@main
-        with:
-          project: src/$AUTHOR.$NAME/$AUTHOR.$NAME.csproj
-          version: ${{ needs.set_metadata.outputs.version }}
-          configuration: Release
-
-      - name: 📦 Pack Nuget
-        uses: grovegs/actions/.github/actions/pack-nuget@main
-        with:
-          project: src/$AUTHOR.$NAME/$AUTHOR.$NAME.csproj
-          version: ${{ needs.set_metadata.outputs.version }}
-          configuration: Release
-          artifact: ${{ needs.set_metadata.outputs.artifact }}
-
-  build_godot:
-    needs: set_metadata
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🏗️ Dotnet Build
-        uses: grovegs/actions/.github/actions/build-dotnet@main
-        with:
-          project: src/$AUTHOR.$NAME.Godot/$AUTHOR.$NAME.Godot.csproj
-          version: ${{ needs.set_metadata.outputs.version }}
-          configuration: Release
-
-      - name: 📦 Pack Nuget
-        uses: grovegs/actions/.github/actions/pack-nuget@main
-        with:
-          project: src/$AUTHOR.$NAME.Godot/$AUTHOR.$NAME.Godot.csproj
-          version: ${{ needs.set_metadata.outputs.version }}
-          configuration: Release
-          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot
-
-      - name: 🎮 Pack Godot
-        uses: grovegs/actions/.github/actions/pack-godot@main
-        with:
-          addon: src/$AUTHOR.$NAME.Godot/addons/$AUTHOR.$NAME
-          version: ${{ needs.set_metadata.outputs.version }}
-          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot-addon
-
-  release_core:
-    needs: [set_metadata, build_core]
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📦 Release Nuget
-        uses: grovegs/actions/.github/actions/release-nuget@main
-        with:
-          artifact: ${{ needs.set_metadata.outputs.artifact }}
-          api-key: ${{ secrets.NUGET_API_KEY }}
-
-  release_godot:
-    needs: [set_metadata, build_godot]
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📦 Release Nuget
-        uses: grovegs/actions/.github/actions/release-nuget@main
-        with:
-          artifact: ${{ needs.set_metadata.outputs.artifact }}-godot
-          api-key: ${{ secrets.NUGET_API_KEY }}
-
-  release_github:
-    needs: [set_metadata, build_core, build_godot]
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🔄 Checkout Code
-        uses: actions/checkout@v5
-
-      - name: 🛠️ Release Github
-        uses: grovegs/actions/.github/actions/release-github@main
-        with:
-          title: ${{ needs.set_metadata.outputs.title }}
-          version: ${{ needs.set_metadata.outputs.version }}
-          latest-version: ${{ needs.set_metadata.outputs.latest_version }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    uses: grovegs/workflows/.github/workflows/godot-package-release.yml@main
+    with:
+      name: "Behaviour Tree"
+      core-project: src/GroveGames.BehaviourTree
+      godot-project: src/GroveGames.BehaviourTree.Godot
+      godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
+      global-json-file: global.json
+      version-type: ${{ inputs.version-type }}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+      nuget-api-key: ${{ secrets.NUGET_API_KEY }}

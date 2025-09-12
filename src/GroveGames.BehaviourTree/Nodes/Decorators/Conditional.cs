@@ -1,10 +1,10 @@
 namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
-public sealed class Conditonal : Decorator
+public sealed class Conditional : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Conditonal(IParent parent, Func<bool> condition) : base(parent)
+    public Conditional(IParent parent, Func<bool> condition) : base(parent)
     {
         _condition = condition;
     }
@@ -19,7 +19,7 @@ public static partial class ParentExtensions
 {
     public static IParent Conditional(this IParent parent, Func<bool> condition)
     {
-        var conditional = new Conditonal(parent, condition);
+        var conditional = new Conditional(parent, condition);
         parent.Attach(conditional);
         return conditional;
     }

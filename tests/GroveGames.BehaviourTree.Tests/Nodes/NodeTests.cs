@@ -9,9 +9,9 @@ public class NodeTests
 {
     public class NodeAccessor
     {
-        public static IParent Parent(Node node)
+        public static IParent Parent(BehaviourNode node)
         {
-            var fieldInfo = typeof(Node).GetProperty("Parent", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = typeof(BehaviourNode).GetProperty("Parent", BindingFlags.NonPublic | BindingFlags.Instance);
             return (IParent)fieldInfo?.GetValue(node)!;
         }
     }
@@ -21,7 +21,7 @@ public class NodeTests
     {
         // Arrange
         var mockParent = new Mock<IParent>();
-        var node = new Mock<Node>(mockParent.Object) { CallBase = true };
+        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
 
         // Act
         var result = node.Object.Evaluate(1.0f);
@@ -35,7 +35,7 @@ public class NodeTests
     {
         // Arrange
         var mockParent = new Mock<IParent>();
-        var node = new Mock<Node>(mockParent.Object) { CallBase = true };
+        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
 
         // Act & Assert
         var exception = Record.Exception(node.Object.Reset);
@@ -47,7 +47,7 @@ public class NodeTests
     {
         // Arrange
         var mockParent = new Mock<IParent>();
-        var node = new Mock<Node>(mockParent.Object) { CallBase = true };
+        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
 
         // Act & Assert
         var exception = Record.Exception(node.Object.Abort);
@@ -59,7 +59,7 @@ public class NodeTests
     {
         // Arrange
         var mockParent = new Mock<IParent>();
-        var node = new Mock<Node>(mockParent.Object) { CallBase = true };
+        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
 
         // Act
         var result = NodeAccessor.Parent(node.Object);
@@ -76,7 +76,7 @@ public class NodeTests
         var mockBlackboard = new Mock<IBlackboard>();
         mockParent.Setup(parent => parent.Blackboard).Returns(mockBlackboard.Object);
 
-        var node = new Mock<Node>(mockParent.Object) { CallBase = true };
+        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
 
         // Act
         var result = node.Object.Blackboard;

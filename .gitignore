@@ -83,3 +83,5 @@ mono_crash.*.json
 ### NuGet ###
 # Ignore NuGet package files
 *.nupkg
+/.vs/
+/sandbox/GodotApplication/.vs/

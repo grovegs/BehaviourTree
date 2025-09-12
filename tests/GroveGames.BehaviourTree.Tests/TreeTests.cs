@@ -8,14 +8,14 @@ public class TreeTests
 {
     public class TreeAccessor
     {
-        public static bool IsEnabled(Tree tree)
+        public static bool IsEnabled(BehaviourTree tree)
         {
-            var fieldInfo = typeof(Tree).GetField("_isEnabled", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = typeof(BehaviourTree).GetField("_isEnabled", BindingFlags.NonPublic | BindingFlags.Instance);
             return (bool)fieldInfo?.GetValue(tree)!;
         }
     }
 
-    public class TestTree : Tree
+    public class TestTree : BehaviourTree
     {
         public TestTree(IRoot root) : base(root)
         {

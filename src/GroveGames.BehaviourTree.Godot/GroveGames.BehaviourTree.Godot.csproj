@@ -5,8 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="../GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
+    <ProjectReference Include="../GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
   </ItemGroup>
 
   <ItemGroup>

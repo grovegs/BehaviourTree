@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
-public sealed class Root : IRoot
+public sealed class BehaviourRoot : IRoot
 {
     private readonly IBlackboard _blackboard;
     private INode _child;
@@ -11,10 +11,10 @@ public sealed class Root : IRoot
     public IBlackboard Blackboard => _blackboard;
     public NodeState State => _nodeState;
 
-    public Root(IBlackboard blackboard)
+    public BehaviourRoot(IBlackboard blackboard)
     {
         _blackboard = blackboard;
-        _child = Node.Empty;
+        _child = BehaviourNode.Empty;
     }
 
     public NodeState Evaluate(float deltaTime)
@@ -34,7 +34,7 @@ public sealed class Root : IRoot
 
     public IParent Attach(INode node)
     {
-        if (_child != Node.Empty)
+        if (_child != BehaviourNode.Empty)
         {
             throw new ChildAlreadyAttachedException();
         }

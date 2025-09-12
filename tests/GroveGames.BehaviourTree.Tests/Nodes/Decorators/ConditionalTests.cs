@@ -14,7 +14,7 @@ public class ConditionalTests
         var condition = new Mock<Func<bool>>();
         condition.Setup(c => c()).Returns(false);
 
-        var conditional = new Conditonal(mockParent.Object, condition.Object);
+        var conditional = new Conditional(mockParent.Object, condition.Object);
         conditional.Attach(mockChild.Object);
 
         // Act
@@ -35,7 +35,7 @@ public class ConditionalTests
         var condition = new Mock<Func<bool>>();
         condition.Setup(c => c()).Returns(true);
 
-        var conditional = new Conditonal(mockParent.Object, condition.Object);
+        var conditional = new Conditional(mockParent.Object, condition.Object);
         conditional.Attach(mockChild.Object);
 
         mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
@@ -58,7 +58,7 @@ public class ConditionalTests
         var condition = new Mock<Func<bool>>();
         condition.Setup(c => c()).Returns(false);
 
-        var conditional = new Conditonal(mockParent.Object, condition.Object);
+        var conditional = new Conditional(mockParent.Object, condition.Object);
         conditional.Attach(mockChild.Object);
 
         // Act

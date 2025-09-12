@@ -12,7 +12,7 @@ public class RootTests
         var mockBlackboard = new Mock<IBlackboard>();
 
         // Act
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
 
         // Assert
         Assert.Equal(mockBlackboard.Object, root.Blackboard);
@@ -23,7 +23,7 @@ public class RootTests
     {
         // Arrange
         var mockBlackboard = new Mock<IBlackboard>();
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
         var mockNode = new Mock<INode>();
 
         // Act
@@ -38,7 +38,7 @@ public class RootTests
     {
         // Arrange
         var mockBlackboard = new Mock<IBlackboard>();
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
         var mockNode = new Mock<INode>();
         var secondNode = new Mock<INode>();
 
@@ -54,7 +54,7 @@ public class RootTests
     {
         // Arrange
         var mockBlackboard = new Mock<IBlackboard>();
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
         var mockNode = new Mock<INode>();
         root.Attach(mockNode.Object);
 
@@ -70,7 +70,7 @@ public class RootTests
     {
         // Arrange
         var mockBlackboard = new Mock<IBlackboard>();
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
         var mockNode = new Mock<INode>();
         root.Attach(mockNode.Object);
 
@@ -86,7 +86,7 @@ public class RootTests
     {
         // Arrange
         var mockBlackboard = new Mock<IBlackboard>();
-        var root = new Root(mockBlackboard.Object);
+        var root = new BehaviourRoot(mockBlackboard.Object);
         var mockNode = new Mock<INode>();
         root.Attach(mockNode.Object);
 

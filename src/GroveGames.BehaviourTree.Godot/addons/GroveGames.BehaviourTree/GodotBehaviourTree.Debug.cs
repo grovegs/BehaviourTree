@@ -149,18 +149,18 @@ public abstract partial class GodotBehaviourTree
             var childField = typeof(Decorator).GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
             if (childField != null)
             {
-                if (childField.GetValue(decorator) is INode singleChild && singleChild != Nodes.Node.Empty)
+                if (childField.GetValue(decorator) is INode singleChild && singleChild != Nodes.BehaviourNode.Empty)
                 {
                     children.Add(singleChild);
                 }
             }
         }
-        else if (node is Root root)
+        else if (node is BehaviourRoot root)
         {
-            var childField = typeof(Root).GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
+            var childField = typeof(BehaviourRoot).GetField("_child", BindingFlags.NonPublic | BindingFlags.Instance);
             if (childField != null)
             {
-                if (childField.GetValue(root) is INode rootChild && rootChild != Nodes.Node.Empty)
+                if (childField.GetValue(root) is INode rootChild && rootChild != Nodes.BehaviourNode.Empty)
                 {
                     children.Add(rootChild);
                 }

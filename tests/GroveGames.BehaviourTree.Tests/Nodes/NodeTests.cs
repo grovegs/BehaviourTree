@@ -42,16 +42,12 @@ public class NodeTests
 
     private sealed class TestNode : BehaviourNode
     {
-        public TestNode(IParent parent) : base(parent)
-        {
-        }
     }
 
     [Fact]
     public void Evaluate_ShouldReturnFailure_ByDefault()
     {
-        var parent = new TestParent();
-        var node = new TestNode(parent);
+        var node = new TestNode();
 
         var result = node.Evaluate(1.0f);
 
@@ -61,8 +57,7 @@ public class NodeTests
     [Fact]
     public void Reset_ShouldNotThrowException()
     {
-        var parent = new TestParent();
-        var node = new TestNode(parent);
+        var node = new TestNode();
 
         var exception = Record.Exception(node.Reset);
         Assert.Null(exception);
@@ -71,8 +66,7 @@ public class NodeTests
     [Fact]
     public void Abort_ShouldNotThrowException()
     {
-        var parent = new TestParent();
-        var node = new TestNode(parent);
+        var node = new TestNode();
 
         var exception = Record.Exception(node.Abort);
         Assert.Null(exception);
@@ -82,7 +76,8 @@ public class NodeTests
     public void Parent_ShouldReturnParent()
     {
         var parent = new TestParent();
-        var node = new TestNode(parent);
+        var node = new TestNode();
+        node.SetParent(parent);
 
         var result = NodeAccessor.Parent(node);
 
@@ -94,7 +89,8 @@ public class NodeTests
     {
         var blackboard = new TestBlackboard();
         var parent = new TestParent { Blackboard = blackboard };
-        var node = new TestNode(parent);
+        var node = new TestNode();
+        node.SetParent(parent);
 
         var result = node.Blackboard;
 

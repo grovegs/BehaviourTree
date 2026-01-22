@@ -52,33 +52,30 @@ public partial class CharacterBT : GodotBehaviourTree
         var attack = selector.Sequence();
 
         attack
-       .Attach(new HasEnemy(_enemy, _entity, attack));
+       .Attach(new HasEnemy(_enemy, _entity));
         var attackRepeat = attack.Cooldown(1f).Repeater(RepeatMode.UntilSuccess);
-        attackRepeat.Attach(new Attack(attackRepeat));
+        attackRepeat.Attach(new Attack());
 
         var defend = selector.Sequence();
         defend
-       .Attach(new HasAttacker(defend));
+       .Attach(new HasAttacker());
         var repeat = defend.Cooldown(1f).Repeater(RepeatMode.UntilSuccess);
-        repeat.Attach(new Defend(repeat));
+        repeat.Attach(new Defend());
     }
 }
 
-public class Idle : GroveGames.BehaviourTree.Nodes.Node
+public class Idle : BehaviourNode
 {
-    public Idle(IParent parent) : base(parent)
-    {
-    }
 }
 
-public class MoveToTarget : GroveGames.BehaviourTree.Nodes.Node
+public class MoveToTarget : BehaviourNode
 {
 
     private readonly Node3D _entity;
 
     private readonly float _speed = 3f;
 
-    public MoveToTarget(IParent parent, Node3D entity) : base(parent)
+    public MoveToTarget(Node3D entity)
     {
         _entity = entity;
     }
@@ -110,23 +107,19 @@ public class MoveToTarget : GroveGames.BehaviourTree.Nodes.Node
     }
 }
 
-public class Attack : GroveGames.BehaviourTree.Nodes.Node
+public class Attack : BehaviourNode
 {
-    public Attack(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float delta)
     {
         return _nodeState = NodeState.Success;
     }
 }
 
-public class Input : GroveGames.BehaviourTree.Nodes.Node
+public class Input : BehaviourNode
 {
     private readonly Node3D _entity;
 
-    public Input(Node3D entity, IParent parent) : base(parent)
+    public Input(Node3D entity)
     {
         _entity = entity;
     }
@@ -154,36 +147,28 @@ public class Input : GroveGames.BehaviourTree.Nodes.Node
     }
 }
 
-public class Defend : GroveGames.BehaviourTree.Nodes.Node
+public class Defend : BehaviourNode
 {
-    public Defend(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float delta)
     {
         return _nodeState = NodeState.Success;
     }
 }
 
-public class HasAttacker : GroveGames.BehaviourTree.Nodes.Node
+public class HasAttacker : BehaviourNode
 {
-    public HasAttacker(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float delta)
     {
         return _nodeState = NodeState.Success;
     }
 }
 
-public class HasEnemy : GroveGames.BehaviourTree.Nodes.Node
+public class HasEnemy : BehaviourNode
 {
     private readonly Node3D _enemy;
     private readonly Node3D _entity;
 
-    public HasEnemy(Node3D enemy, Node3D entity, IParent parent) : base(parent)
+    public HasEnemy(Node3D enemy, Node3D entity)
     {
         _enemy = enemy;
         _entity = entity;

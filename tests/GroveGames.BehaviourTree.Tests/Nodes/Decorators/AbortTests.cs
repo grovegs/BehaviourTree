@@ -31,6 +31,7 @@ public class AbortTests
         public void Abort() => AbortCount++;
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -45,7 +46,7 @@ public class AbortTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var abortDecorator = new Abort(parent, () => true);
+        var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
         var result = abortDecorator.Evaluate(1.0f);
@@ -60,7 +61,7 @@ public class AbortTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var abortDecorator = new Abort(parent, () => false);
+        var abortDecorator = new Abort(() => false);
         abortDecorator.Attach(child);
 
         var result = abortDecorator.Evaluate(1.0f);
@@ -75,7 +76,7 @@ public class AbortTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var abortDecorator = new Abort(parent, () => true);
+        var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
         abortDecorator.Evaluate(1.0f);
@@ -88,7 +89,7 @@ public class AbortTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var abortDecorator = new Abort(parent, () => true);
+        var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
         abortDecorator.Evaluate(1.0f);
@@ -101,7 +102,7 @@ public class AbortTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var abortDecorator = new Abort(parent, () => false);
+        var abortDecorator = new Abort(() => false);
         abortDecorator.Attach(child);
 
         abortDecorator.Evaluate(1.0f);

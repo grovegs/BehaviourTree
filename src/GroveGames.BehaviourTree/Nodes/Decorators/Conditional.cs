@@ -4,7 +4,7 @@ public sealed class Conditional : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Conditional(IParent parent, Func<bool> condition) : base(parent)
+    public Conditional(Func<bool> condition)
     {
         _condition = condition;
     }
@@ -19,7 +19,7 @@ public static partial class ParentExtensions
 {
     public static IParent Conditional(this IParent parent, Func<bool> condition)
     {
-        var conditional = new Conditional(parent, condition);
+        var conditional = new Conditional(condition);
         parent.Attach(conditional);
         return conditional;
     }

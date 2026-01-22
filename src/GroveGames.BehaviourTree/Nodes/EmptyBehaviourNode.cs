@@ -28,4 +28,9 @@ public sealed class EmptyBehaviourNode : INode
     {
 
     }
+
+    public void SetParent(IParent parent)
+    {
+
+    }
 }

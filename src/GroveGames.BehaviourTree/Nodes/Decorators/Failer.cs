@@ -2,10 +2,6 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Failer : Decorator
 {
-    public Failer(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float deltaTime)
     {
         var status = base.Evaluate(deltaTime);
@@ -18,7 +14,7 @@ public static partial class ParentExtensions
 {
     public static IParent Failer(this IParent parent)
     {
-        var failer = new Failer(parent);
+        var failer = new Failer();
         parent.Attach(failer);
         return failer;
     }

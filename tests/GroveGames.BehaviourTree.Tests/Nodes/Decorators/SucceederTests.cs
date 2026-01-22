@@ -30,6 +30,7 @@ public class SucceederTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class SucceederTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var succeeder = new Succeeder(parent);
+        var succeeder = new Succeeder();
         succeeder.Attach(child);
 
         var result = succeeder.Evaluate(1.0f);
@@ -59,7 +60,7 @@ public class SucceederTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var succeeder = new Succeeder(parent);
+        var succeeder = new Succeeder();
         succeeder.Attach(child);
 
         var result = succeeder.Evaluate(1.0f);
@@ -74,7 +75,7 @@ public class SucceederTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var succeeder = new Succeeder(parent);
+        var succeeder = new Succeeder();
         succeeder.Attach(child);
 
         var result = succeeder.Evaluate(1.0f);
@@ -89,7 +90,7 @@ public class SucceederTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var succeeder = new Succeeder(parent);
+        var succeeder = new Succeeder();
         succeeder.Attach(child);
 
         succeeder.Evaluate(1.0f);

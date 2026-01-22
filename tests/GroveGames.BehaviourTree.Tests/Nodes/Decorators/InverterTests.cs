@@ -30,6 +30,7 @@ public class InverterTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class InverterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var inverter = new Inverter(parent);
+        var inverter = new Inverter();
         inverter.Attach(child);
 
         var result = inverter.Evaluate(1.0f);
@@ -59,7 +60,7 @@ public class InverterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var inverter = new Inverter(parent);
+        var inverter = new Inverter();
         inverter.Attach(child);
 
         var result = inverter.Evaluate(1.0f);
@@ -74,7 +75,7 @@ public class InverterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var inverter = new Inverter(parent);
+        var inverter = new Inverter();
         inverter.Attach(child);
 
         var result = inverter.Evaluate(1.0f);

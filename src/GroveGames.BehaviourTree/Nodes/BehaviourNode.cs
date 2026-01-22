@@ -6,14 +6,14 @@ public abstract class BehaviourNode : INode
 {
     public static readonly INode Empty = new EmptyBehaviourNode();
 
-    private readonly IParent _parent;
+    private IParent _parent = null!;
     protected NodeState _nodeState;
 
     protected IParent Parent => _parent;
     public IBlackboard Blackboard => _parent.Blackboard;
     public NodeState State => _nodeState;
 
-    public BehaviourNode(IParent parent)
+    public virtual void SetParent(IParent parent)
     {
         _parent = parent;
     }

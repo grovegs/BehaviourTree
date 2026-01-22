@@ -7,5 +7,6 @@ public interface INode
     void Abort();
     void StartEvaluate();
     void EndEvaluate();
+    void SetParent(IParent parent);
     NodeState State { get; }
 }

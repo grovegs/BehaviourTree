@@ -2,10 +2,6 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Succeeder : Decorator
 {
-    public Succeeder(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float deltaTime)
     {
         var status = base.Evaluate(deltaTime);
@@ -18,7 +14,7 @@ public static partial class ParentExtensions
 {
     public static IParent Succeeder(this IParent parent)
     {
-        var succeeder = new Succeeder(parent);
+        var succeeder = new Succeeder();
         parent.Attach(succeeder);
         return succeeder;
     }

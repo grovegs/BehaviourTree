@@ -31,6 +31,7 @@ public class ResetTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -45,7 +46,7 @@ public class ResetTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var resetDecorator = new Reset(parent, () => true);
+        var resetDecorator = new Reset(() => true);
         resetDecorator.Attach(child);
 
         var result = resetDecorator.Evaluate(1.0f);
@@ -61,7 +62,7 @@ public class ResetTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var resetDecorator = new Reset(parent, () => false);
+        var resetDecorator = new Reset(() => false);
         resetDecorator.Attach(child);
 
         var result = resetDecorator.Evaluate(1.0f);
@@ -77,7 +78,7 @@ public class ResetTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var resetDecorator = new Reset(parent, () => true);
+        var resetDecorator = new Reset(() => true);
         resetDecorator.Attach(child);
 
         resetDecorator.Evaluate(1.0f);
@@ -93,7 +94,7 @@ public class ResetTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var resetDecorator = new Reset(parent, () => false);
+        var resetDecorator = new Reset(() => false);
         resetDecorator.Attach(child);
 
         resetDecorator.Evaluate(1.0f);

@@ -5,7 +5,7 @@ public sealed class Delayer : Decorator
     private readonly float _waitTime;
     private float _interval;
 
-    public Delayer(IParent parent, float waitTime) : base(parent)
+    public Delayer(float waitTime)
     {
         _waitTime = waitTime;
         _interval = 0f;
@@ -42,7 +42,7 @@ public static partial class ParentExtensions
 {
     public static IParent Delayer(this IParent parent, float waitTime)
     {
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
         parent.Attach(delayer);
         return delayer;
     }

@@ -39,6 +39,7 @@ public sealed class BehaviourRoot : IRoot
             throw new ChildAlreadyAttachedException();
         }
 
+        node.SetParent(this);
         _child = node;
         return this;
     }
@@ -55,6 +56,11 @@ public sealed class BehaviourRoot : IRoot
     }
 
     public void EndEvaluate()
+    {
+
+    }
+
+    public void SetParent(IParent parent)
     {
 
     }

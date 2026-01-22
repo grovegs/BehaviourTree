@@ -30,6 +30,7 @@ public class CooldownTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class CooldownTests
     {
         var parent = new TestParent();
         var child = new TestNode();
-        var cooldown = new Cooldown(parent, 2.0f);
+        var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
         cooldown.Evaluate(0.1f);
@@ -60,7 +61,7 @@ public class CooldownTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var cooldown = new Cooldown(parent, 2.0f);
+        var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
         cooldown.Evaluate(0.1f);
@@ -76,7 +77,7 @@ public class CooldownTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var cooldown = new Cooldown(parent, 2.0f);
+        var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
         cooldown.Evaluate(0.1f);
@@ -92,7 +93,7 @@ public class CooldownTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var cooldown = new Cooldown(parent, 2.0f);
+        var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
         cooldown.Evaluate(1.0f);
@@ -109,7 +110,7 @@ public class CooldownTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var cooldown = new Cooldown(parent, 2.0f);
+        var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
         cooldown.Evaluate(1.0f);

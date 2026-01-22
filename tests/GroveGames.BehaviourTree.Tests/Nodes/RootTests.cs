@@ -46,6 +46,10 @@ public class RootTests
         public void EndEvaluate()
         {
         }
+
+        public void SetParent(IParent parent)
+        {
+        }
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,93 +6,99 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class ResetTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public int ResetCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() => ResetCount++;
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_WithConditionTrue_ShouldCallResetAndReturnSuccess()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        bool condition = true;
-        var reset = new Reset(mockParent.Object, () => condition);
-        reset.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var resetDecorator = new Reset(parent, () => true);
+        resetDecorator.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        var result = resetDecorator.Evaluate(1.0f);
 
-        // Act
-        var result = reset.Evaluate(1.0f);
-
-        // Assert
         Assert.Equal(NodeState.Success, result);
-        Assert.Equal(NodeState.Success, reset.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
-        mockChild.Verify(child => child.Reset(), Times.Once);
+        Assert.Equal(NodeState.Success, resetDecorator.State);
+        Assert.Equal(0, child.EvaluateCount);
+        Assert.Equal(1, child.ResetCount);
     }
 
     [Fact]
     public void Evaluate_WithConditionFalse_ShouldNotCallResetAndReturnChildState()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        bool condition = false;
-        var reset = new Reset(mockParent.Object, () => condition);
-        reset.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var resetDecorator = new Reset(parent, () => false);
+        resetDecorator.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
+        var result = resetDecorator.Evaluate(1.0f);
 
-        // Act
-        var result = reset.Evaluate(1.0f);
-
-        // Assert
         Assert.Equal(NodeState.Running, result);
-        Assert.Equal(NodeState.Running, reset.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
-        mockChild.Verify(child => child.Reset(), Times.Never);
+        Assert.Equal(NodeState.Running, resetDecorator.State);
+        Assert.Equal(1, child.EvaluateCount);
+        Assert.Equal(0, child.ResetCount);
     }
 
     [Fact]
     public void Evaluate_WithConditionTrue_ShouldResetChildWhenCalledMultipleTimes()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        bool condition = true;
-        var reset = new Reset(mockParent.Object, () => condition);
-        reset.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var resetDecorator = new Reset(parent, () => true);
+        resetDecorator.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        resetDecorator.Evaluate(1.0f);
+        resetDecorator.Evaluate(1.0f);
 
-        // Act
-        var firstEvaluation = reset.Evaluate(1.0f);
-        var secondEvaluation = reset.Evaluate(1.0f);
-
-        // Assert
-        Assert.Equal(NodeState.Success, firstEvaluation);
-        Assert.Equal(NodeState.Success, secondEvaluation);
-        Assert.Equal(NodeState.Success, reset.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
-        mockChild.Verify(child => child.Reset(), Times.Exactly(2));
+        Assert.Equal(NodeState.Success, resetDecorator.State);
+        Assert.Equal(0, child.EvaluateCount);
+        Assert.Equal(2, child.ResetCount);
     }
 
     [Fact]
     public void Reset_ShouldNotCallChildResetWhenConditionIsFalse()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        bool condition = false;
-        var reset = new Reset(mockParent.Object, () => condition);
-        reset.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var resetDecorator = new Reset(parent, () => false);
+        resetDecorator.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
+        resetDecorator.Evaluate(1.0f);
 
-        // Act
-        var result = reset.Evaluate(1.0f);
-
-        // Assert
-        Assert.Equal(NodeState.Running, result);
-        Assert.Equal(NodeState.Running, reset.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
-        mockChild.Verify(child => child.Reset(), Times.Never);
+        Assert.Equal(1, child.EvaluateCount);
+        Assert.Equal(0, child.ResetCount);
     }
 }

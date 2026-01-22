@@ -5,95 +5,121 @@ namespace GroveGames.BehaviourTree.Tests.Nodes;
 
 public class RootTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T GetValue<T>(string key) => default!;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public bool ContainsKey(string key) => false;
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCallCount { get; private set; }
+        public int ResetCallCount { get; private set; }
+        public int AbortCallCount { get; private set; }
+        public float LastDeltaTime { get; private set; }
+        public NodeState State { get; set; } = NodeState.Success;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCallCount++;
+            LastDeltaTime = deltaTime;
+            return State;
+        }
+
+        public void Reset()
+        {
+            ResetCallCount++;
+        }
+
+        public void Abort()
+        {
+            AbortCallCount++;
+        }
+
+        public void StartEvaluate()
+        {
+        }
+
+        public void EndEvaluate()
+        {
+        }
+    }
+
     [Fact]
     public void Constructor_ShouldInitializeBlackboard()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
+        var blackboard = new TestBlackboard();
 
-        // Act
-        var root = new BehaviourRoot(mockBlackboard.Object);
+        var root = new BehaviourRoot(blackboard);
 
-        // Assert
-        Assert.Equal(mockBlackboard.Object, root.Blackboard);
+        Assert.Equal(blackboard, root.Blackboard);
     }
 
     [Fact]
     public void Attach_ShouldSetChild_WhenChildIsEmpty()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
-        var root = new BehaviourRoot(mockBlackboard.Object);
-        var mockNode = new Mock<INode>();
+        var blackboard = new TestBlackboard();
+        var root = new BehaviourRoot(blackboard);
+        var node = new TestNode();
 
-        // Act
-        root.Attach(mockNode.Object);
+        root.Attach(node);
 
-        // Assert
-        Assert.Throws<ChildAlreadyAttachedException>(() => root.Attach(mockNode.Object));
+        Assert.Throws<ChildAlreadyAttachedException>(() => root.Attach(node));
     }
 
     [Fact]
     public void Attach_ShouldThrowException_WhenChildAlreadyAttached()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
-        var root = new BehaviourRoot(mockBlackboard.Object);
-        var mockNode = new Mock<INode>();
-        var secondNode = new Mock<INode>();
+        var blackboard = new TestBlackboard();
+        var root = new BehaviourRoot(blackboard);
+        var node = new TestNode();
+        var secondNode = new TestNode();
 
-        // Act
-        root.Attach(mockNode.Object);
+        root.Attach(node);
 
-        // Assert
-        Assert.Throws<ChildAlreadyAttachedException>(() => root.Attach(secondNode.Object));
+        Assert.Throws<ChildAlreadyAttachedException>(() => root.Attach(secondNode));
     }
 
     [Fact]
     public void Evaluate_ShouldCallEvaluateOnChild()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
-        var root = new BehaviourRoot(mockBlackboard.Object);
-        var mockNode = new Mock<INode>();
-        root.Attach(mockNode.Object);
+        var blackboard = new TestBlackboard();
+        var root = new BehaviourRoot(blackboard);
+        var node = new TestNode();
+        root.Attach(node);
 
-        // Act
         root.Evaluate(0.5f);
 
-        // Assert
-        mockNode.Verify(n => n.Evaluate(0.5f), Times.Once);
+        Assert.Equal(1, node.EvaluateCallCount);
+        Assert.Equal(0.5f, node.LastDeltaTime);
     }
 
     [Fact]
     public void Abort_ShouldCallAbortOnChild()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
-        var root = new BehaviourRoot(mockBlackboard.Object);
-        var mockNode = new Mock<INode>();
-        root.Attach(mockNode.Object);
+        var blackboard = new TestBlackboard();
+        var root = new BehaviourRoot(blackboard);
+        var node = new TestNode();
+        root.Attach(node);
 
-        // Act
         root.Abort();
 
-        // Assert
-        mockNode.Verify(n => n.Abort(), Times.Once);
+        Assert.Equal(1, node.AbortCallCount);
     }
 
     [Fact]
     public void Reset_ShouldCallResetOnChild()
     {
-        // Arrange
-        var mockBlackboard = new Mock<IBlackboard>();
-        var root = new BehaviourRoot(mockBlackboard.Object);
-        var mockNode = new Mock<INode>();
-        root.Attach(mockNode.Object);
+        var blackboard = new TestBlackboard();
+        var root = new BehaviourRoot(blackboard);
+        var node = new TestNode();
+        root.Attach(node);
 
-        // Act
         root.Reset();
 
-        // Assert
-        mockNode.Verify(n => n.Reset(), Times.Once);
+        Assert.Equal(1, node.ResetCallCount);
     }
 }

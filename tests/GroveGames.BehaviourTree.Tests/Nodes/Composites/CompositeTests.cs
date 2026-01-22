@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -7,7 +8,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class CompositeTests
 {
-    public class CompositeAccessor
+    private sealed class CompositeAccessor
     {
         public static IReadOnlyList<INode> Children(Composite composite)
         {
@@ -16,45 +17,80 @@ public class CompositeTests
         }
     }
 
-    public class TestComposite : Composite
+    private sealed class TestComposite : Composite
     {
         public TestComposite(IParent parent) : base(parent)
         {
         }
     }
 
-    [Fact]
-    public static void Attach_AddsNodeToChildren()
+    private sealed class TestParent : IParent
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockNode = new Mock<INode>();
-        var composite = new TestComposite(mockParent.Object);
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
 
-        // Act
-        composite.Attach(mockNode.Object);
+        public IParent Attach(INode node)
+        {
+            return this;
+        }
 
-        // Assert
-        Assert.Contains(mockNode.Object, CompositeAccessor.Children(composite));
+        public IParent Attach(IChildTree tree)
+        {
+            return this;
+        }
+    }
+
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T GetValue<T>(string key) => default!;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public bool ContainsKey(string key) => false;
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int ResetCallCount { get; private set; }
+        public NodeState State { get; set; } = NodeState.Success;
+
+        public NodeState Evaluate(float deltaTime) => State;
+
+        public void Reset()
+        {
+            ResetCallCount++;
+        }
+
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
     }
 
     [Fact]
-    public static void Reset_CallsResetOnAllChildren()
+    public void Attach_AddsNodeToChildren()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild1 = new Mock<INode>();
-        var mockChild2 = new Mock<INode>();
-        var composite = new TestComposite(mockParent.Object);
+        var parent = new TestParent();
+        var node = new TestNode();
+        var composite = new TestComposite(parent);
 
-        composite.Attach(mockChild1.Object);
-        composite.Attach(mockChild2.Object);
+        composite.Attach(node);
 
-        // Act
+        Assert.Contains(node, CompositeAccessor.Children(composite));
+    }
+
+    [Fact]
+    public void Reset_CallsResetOnAllChildren()
+    {
+        var parent = new TestParent();
+        var child1 = new TestNode();
+        var child2 = new TestNode();
+        var composite = new TestComposite(parent);
+
+        composite.Attach(child1);
+        composite.Attach(child2);
+
         composite.Reset();
 
-        // Assert
-        mockChild1.Verify(child => child.Reset(), Times.Once);
-        mockChild2.Verify(child => child.Reset(), Times.Once);
+        Assert.Equal(1, child1.ResetCallCount);
+        Assert.Equal(1, child2.ResetCallCount);
     }
 }

@@ -1,35 +1,45 @@
 <Project>
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <NoWarn>1591;1573</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <Version>0.0.0</Version>
+    <FileVersion>$(Version)</FileVersion>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
 
     <RootNamespace>GroveGames.BehaviourTree</RootNamespace>
     <Title>GroveGames.BehaviourTree</Title>
     <Description>A lightweight behaviour tree framework developed by Grove Games for .NET and Godot</Description>
     <Company>Grove Games</Company>
     <Authors>Grove Games</Authors>
-    <Copyright>© Grove Games</Copyright>
-
     <PackageId>$(AssemblyName)</PackageId>
     <PackageVersion>$(Version)</PackageVersion>
     <PackageTags>godot; behaviour-tree</PackageTags>
+    <Copyright>© $(CurrentYear) Grove Games</Copyright>
     <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>Icon.png</PackageIcon>
-
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/grovegs/BehaviourTree</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="/" />
-    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
-    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)Icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

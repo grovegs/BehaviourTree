@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -5,131 +6,132 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class SequenceTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() { }
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_ShouldReturnRunningWhenFirstChildIsRunning()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        // Act
         var result = sequence.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, sequence.State);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldReturnFailureWhenChildFails()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Failure };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        // Act
         var result = sequence.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
         Assert.Equal(NodeState.Failure, sequence.State);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldReturnSuccessWhenAllChildrenSucceed()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild1 = new Mock<INode>();
-        var mockChild2 = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild1.Object);
-        sequence.Attach(mockChild2.Object);
+        var parent = new TestParent();
+        var child1 = new TestNode { ReturnState = NodeState.Success };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child1).Attach(child2);
 
-        mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         sequence.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Success, sequence.State);
+        Assert.Equal(1, child1.EvaluateCount);
+        Assert.Equal(1, child2.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldResetOnFailureAfterSuccess()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild1 = new Mock<INode>();
-        var mockChild2 = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild1.Object);
-        sequence.Attach(mockChild2.Object);
+        var parent = new TestParent();
+        var child1 = new TestNode { ReturnState = NodeState.Success };
+        var child2 = new TestNode { ReturnState = NodeState.Failure };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child1).Attach(child2);
 
-        mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        // Act
         sequence.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, sequence.State);
+        Assert.Equal(1, child1.EvaluateCount);
+        Assert.Equal(1, child2.EvaluateCount);
     }
 
     [Fact]
     public void Reset_ShouldResetProcessingChildIndex()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild1 = new Mock<INode>();
-        var mockChild2 = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild1.Object);
-        sequence.Attach(mockChild2.Object);
-
-        mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        var parent = new TestParent();
+        var child1 = new TestNode { ReturnState = NodeState.Success };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);
-
-        // Act
         sequence.Reset();
         var resetResult = sequence.Evaluate(1.0f);
 
-        // Assert
-        Assert.Equal(NodeState.Success, sequence.State);
+        Assert.Equal(NodeState.Success, resetResult);
+        Assert.Equal(2, child1.EvaluateCount);
     }
 
     [Fact]
     public void Abort_ShouldResetProcessingChildIndex()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild1 = new Mock<INode>();
-        var mockChild2 = new Mock<INode>();
-        var sequence = new Sequence(mockParent.Object);
-        sequence.Attach(mockChild1.Object);
-        sequence.Attach(mockChild2.Object);
-
-        mockChild1.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-        mockChild2.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        var parent = new TestParent();
+        var child1 = new TestNode { ReturnState = NodeState.Success };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var sequence = new Sequence(parent);
+        sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);
-
-        // Act
         sequence.Abort();
         var resultAfterAbort = sequence.Evaluate(1.0f);
 
-        // Assert
-        Assert.Equal(NodeState.Success, sequence.State);
+        Assert.Equal(NodeState.Success, resultAfterAbort);
+        Assert.Equal(2, child1.EvaluateCount);
     }
 }

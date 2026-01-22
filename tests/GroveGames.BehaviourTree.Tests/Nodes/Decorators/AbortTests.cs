@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,106 +6,106 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class AbortTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public int AbortCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() { }
+        public void Abort() => AbortCount++;
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_ShouldReturnSuccessWhenConditionIsTrue()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var abortCondition = new Mock<Func<bool>>();
-        abortCondition.Setup(c => c()).Returns(true);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var abortDecorator = new Abort(parent, () => true);
+        abortDecorator.Attach(child);
 
-        var abort = new Abort(mockParent.Object, abortCondition.Object);
-        abort.Attach(mockChild.Object);
+        var result = abortDecorator.Evaluate(1.0f);
 
-        // Act
-        var result = abort.Evaluate(1.0f);
-
-        // Assert
         Assert.Equal(NodeState.Success, result);
-        Assert.Equal(NodeState.Success, abort.State);
-        mockChild.Verify(child => child.Abort(), Times.Once);
+        Assert.Equal(NodeState.Success, abortDecorator.State);
+        Assert.Equal(1, child.AbortCount);
     }
 
     [Fact]
     public void Evaluate_ShouldCallChildEvaluateWhenConditionIsFalse()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var abortCondition = new Mock<Func<bool>>();
-        abortCondition.Setup(c => c()).Returns(false);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var abortDecorator = new Abort(parent, () => false);
+        abortDecorator.Attach(child);
 
-        var abort = new Abort(mockParent.Object, abortCondition.Object);
-        abort.Attach(mockChild.Object);
+        var result = abortDecorator.Evaluate(1.0f);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        // Act
-        var result = abort.Evaluate(1.0f);
-
-        // Assert
         Assert.Equal(NodeState.Running, result);
-        Assert.Equal(NodeState.Running, abort.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(NodeState.Running, abortDecorator.State);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldNotCallChildEvaluateWhenConditionIsTrue()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var abortCondition = new Mock<Func<bool>>();
-        abortCondition.Setup(c => c()).Returns(true);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var abortDecorator = new Abort(parent, () => true);
+        abortDecorator.Attach(child);
 
-        var abort = new Abort(mockParent.Object, abortCondition.Object);
-        abort.Attach(mockChild.Object);
+        abortDecorator.Evaluate(1.0f);
 
-        // Act
-        var result = abort.Evaluate(1.0f);
-
-        // Assert
-        Assert.Equal(NodeState.Success, result);
-        Assert.Equal(NodeState.Success, abort.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(0, child.EvaluateCount);
     }
 
     [Fact]
     public void Abort_ShouldCallChildAbortWhenConditionIsTrue()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var abortCondition = new Mock<Func<bool>>();
-        abortCondition.Setup(c => c()).Returns(true);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var abortDecorator = new Abort(parent, () => true);
+        abortDecorator.Attach(child);
 
-        var abort = new Abort(mockParent.Object, abortCondition.Object);
-        abort.Attach(mockChild.Object);
+        abortDecorator.Evaluate(1.0f);
 
-        // Act
-        abort.Evaluate(1.0f);
-
-        // Assert
-        mockChild.Verify(child => child.Abort(), Times.Once);
+        Assert.Equal(1, child.AbortCount);
     }
 
     [Fact]
     public void Abort_ShouldNotCallChildAbortWhenConditionIsFalse()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var abortCondition = new Mock<Func<bool>>();
-        abortCondition.Setup(c => c()).Returns(false);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var abortDecorator = new Abort(parent, () => false);
+        abortDecorator.Attach(child);
 
-        var abort = new Abort(mockParent.Object, abortCondition.Object);
-        abort.Attach(mockChild.Object);
+        abortDecorator.Evaluate(1.0f);
 
-        // Act
-        abort.Evaluate(1.0f);
-
-        // Assert
-        mockChild.Verify(child => child.Abort(), Times.Never);
+        Assert.Equal(0, child.AbortCount);
     }
 }

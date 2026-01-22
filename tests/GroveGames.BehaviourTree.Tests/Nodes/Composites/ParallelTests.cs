@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -7,25 +8,45 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class ParallelTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime) => ReturnState;
+        public void Reset() { }
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_AnySuccessPolicy_ShouldReturnSuccessIfAnyChildSucceeds()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var parallel = new Parallel(mockParent.Object, ParallelPolicy.AnySuccess);
+        var parent = new TestParent();
+        var parallel = new Parallel(parent, ParallelPolicy.AnySuccess);
+        var child1 = new TestNode { ReturnState = NodeState.Failure };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
+        parallel.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        parallel.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = parallel.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, parallel.State);
     }
@@ -33,22 +54,15 @@ public class ParallelTests
     [Fact]
     public void Evaluate_FirstFailurePolicy_ShouldReturnFailureIfAnyChildFails()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var parallel = new Parallel(mockParent.Object, ParallelPolicy.FirstFailure);
+        var parent = new TestParent();
+        var parallel = new Parallel(parent, ParallelPolicy.FirstFailure);
+        var child1 = new TestNode { ReturnState = NodeState.Running };
+        var child2 = new TestNode { ReturnState = NodeState.Failure };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
+        parallel.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        parallel.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = parallel.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
         Assert.Equal(NodeState.Failure, parallel.State);
     }
@@ -56,22 +70,15 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnSuccessIfAllChildrenSucceed()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var parallel = new Parallel(mockParent.Object, ParallelPolicy.AllSuccess);
+        var parent = new TestParent();
+        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var child1 = new TestNode { ReturnState = NodeState.Success };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        parallel.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        parallel.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = parallel.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, parallel.State);
     }
@@ -79,22 +86,15 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnRunningIfAnyChildIsRunning()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var parallel = new Parallel(mockParent.Object, ParallelPolicy.AllSuccess);
+        var parent = new TestParent();
+        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var child1 = new TestNode { ReturnState = NodeState.Running };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
+        parallel.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        parallel.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = parallel.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, parallel.State);
     }
@@ -102,22 +102,15 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnFailureIfAllChildrenFail()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var parallel = new Parallel(mockParent.Object, ParallelPolicy.AllSuccess);
+        var parent = new TestParent();
+        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var child1 = new TestNode { ReturnState = NodeState.Failure };
+        var child2 = new TestNode { ReturnState = NodeState.Failure };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
+        parallel.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        parallel.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = parallel.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
         Assert.Equal(NodeState.Failure, parallel.State);
     }

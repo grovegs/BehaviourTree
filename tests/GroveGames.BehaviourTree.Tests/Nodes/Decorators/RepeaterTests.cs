@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,136 +6,139 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class RepeaterTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() { }
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_WithFixedCount_ShouldReturnRunningUntilMaxCountReached()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.FixedCount, 2);
-        repeater.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        repeater.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         var firstEvaluation = repeater.Evaluate(1.0f);
         var secondEvaluation = repeater.Evaluate(1.0f);
         var thirdEvaluation = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, firstEvaluation);
         Assert.Equal(NodeState.Running, secondEvaluation);
         Assert.Equal(NodeState.Success, thirdEvaluation);
         Assert.Equal(NodeState.Success, repeater.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
+        Assert.Equal(2, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithUntilSuccess_ShouldReturnSuccessWhenChildSucceeds()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.UntilSuccess);
-        repeater.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var repeater = new Repeater(parent, RepeatMode.UntilSuccess);
+        repeater.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         var result = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, repeater.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithUntilFailure_ShouldReturnFailureWhenChildFails()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.UntilFailure);
-        repeater.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Failure };
+        var repeater = new Repeater(parent, RepeatMode.UntilFailure);
+        repeater.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        // Act
         var result = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithInfiniteRepeat_ShouldAlwaysReturnRunning()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.Infinite);
-        repeater.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var repeater = new Repeater(parent, RepeatMode.Infinite);
+        repeater.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        // Act
         var firstEvaluation = repeater.Evaluate(1.0f);
         var secondEvaluation = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, firstEvaluation);
         Assert.Equal(NodeState.Running, secondEvaluation);
         Assert.Equal(NodeState.Running, repeater.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(2));
+        Assert.Equal(2, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithReset_ShouldResetCurrentCount()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.FixedCount, 2);
-        repeater.Attach(mockChild.Object);
-
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        repeater.Attach(child);
 
         repeater.Evaluate(1.0f);
         repeater.Evaluate(1.0f);
 
-        // Act
         repeater.Reset();
         var resultAfterReset = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, resultAfterReset);
         Assert.Equal(NodeState.Running, repeater.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(3));
+        Assert.Equal(3, child.EvaluateCount);
     }
 
     [Fact]
     public void Abort_ShouldResetCurrentCount()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var repeater = new Repeater(mockParent.Object, RepeatMode.FixedCount, 2);
-        repeater.Attach(mockChild.Object);
-
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        repeater.Attach(child);
 
         repeater.Evaluate(1.0f);
         repeater.Evaluate(1.0f);
 
-        // Act
         repeater.Abort();
         var resultAfterAbort = repeater.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, resultAfterAbort);
         Assert.Equal(NodeState.Running, repeater.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Exactly(3));
+        Assert.Equal(3, child.EvaluateCount);
     }
 }

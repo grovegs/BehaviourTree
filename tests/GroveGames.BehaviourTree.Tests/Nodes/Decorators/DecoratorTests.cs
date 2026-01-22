@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,6 +6,42 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class DecoratorTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public int ResetCount { get; private set; }
+        public int AbortCount { get; private set; }
+        public float LastDeltaTime { get; private set; }
+        public NodeState State => NodeState.Success;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            LastDeltaTime = deltaTime;
+            return NodeState.Success;
+        }
+
+        public void Reset() => ResetCount++;
+        public void Abort() => AbortCount++;
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     private class TestDecorator : Decorator
     {
         public TestDecorator(IParent parent) : base(parent) { }
@@ -13,79 +50,65 @@ public class DecoratorTests
     [Fact]
     public void Attach_ShouldSetChild_WhenChildIsEmpty()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var decorator = new TestDecorator(mockParent.Object);
-        var mockNode = new Mock<INode>();
+        var parent = new TestParent();
+        var decorator = new TestDecorator(parent);
+        var node = new TestNode();
 
-        // Act
-        decorator.Attach(mockNode.Object);
+        decorator.Attach(node);
 
-        // Assert
-        Assert.Throws<ChildAlreadyAttachedException>(() => decorator.Attach(mockNode.Object));
+        Assert.Throws<ChildAlreadyAttachedException>(() => decorator.Attach(node));
     }
 
     [Fact]
     public void Attach_ShouldThrowException_WhenChildAlreadyAttached()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var decorator = new TestDecorator(mockParent.Object);
-        var mockNode = new Mock<INode>();
-        var secondNode = new Mock<INode>();
+        var parent = new TestParent();
+        var decorator = new TestDecorator(parent);
+        var node1 = new TestNode();
+        var node2 = new TestNode();
 
-        // Act
-        decorator.Attach(mockNode.Object);
+        decorator.Attach(node1);
 
-        // Assert
-        Assert.Throws<ChildAlreadyAttachedException>(() => decorator.Attach(secondNode.Object));
+        Assert.Throws<ChildAlreadyAttachedException>(() => decorator.Attach(node2));
     }
 
     [Fact]
     public void Evaluate_ShouldCallEvaluateOnChild()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var decorator = new TestDecorator(mockParent.Object);
-        var mockNode = new Mock<INode>();
-        decorator.Attach(mockNode.Object);
+        var parent = new TestParent();
+        var decorator = new TestDecorator(parent);
+        var node = new TestNode();
+        decorator.Attach(node);
 
-        // Act
         decorator.Evaluate(0.5f);
 
-        // Assert
-        mockNode.Verify(n => n.Evaluate(0.5f), Times.Once);
+        Assert.Equal(1, node.EvaluateCount);
+        Assert.Equal(0.5f, node.LastDeltaTime);
     }
 
     [Fact]
     public void Abort_ShouldCallAbortOnChild()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var decorator = new TestDecorator(mockParent.Object);
-        var mockNode = new Mock<INode>();
-        decorator.Attach(mockNode.Object);
+        var parent = new TestParent();
+        var decorator = new TestDecorator(parent);
+        var node = new TestNode();
+        decorator.Attach(node);
 
-        // Act
         decorator.Abort();
 
-        // Assert
-        mockNode.Verify(n => n.Abort(), Times.Once);
+        Assert.Equal(1, node.AbortCount);
     }
 
     [Fact]
     public void Reset_ShouldCallResetOnChild()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var decorator = new TestDecorator(mockParent.Object);
-        var mockNode = new Mock<INode>();
-        decorator.Attach(mockNode.Object);
+        var parent = new TestParent();
+        var decorator = new TestDecorator(parent);
+        var node = new TestNode();
+        decorator.Attach(node);
 
-        // Act
         decorator.Reset();
 
-        // Assert
-        mockNode.Verify(n => n.Reset(), Times.Once);
+        Assert.Equal(1, node.ResetCount);
     }
 }

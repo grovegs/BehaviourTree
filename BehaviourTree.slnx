@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GroveGames.BehaviourTree/GroveGames.BehaviourTree.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GroveGames.BehaviourTree.Tests/GroveGames.BehaviourTree.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,21 @@
+{
+    "name": "GroveGames.ObjectPool.Unity.Editor.Tests",
+    "rootNamespace": "GroveGames.ObjectPool.Unity.Editor.Tests",
+    "references": [
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:dea41e7a19cf34cbd9538887b672eed4"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

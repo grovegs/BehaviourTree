@@ -30,6 +30,7 @@ public class RepeaterTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 
         var firstEvaluation = repeater.Evaluate(1.0f);
@@ -63,7 +64,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var repeater = new Repeater(parent, RepeatMode.UntilSuccess);
+        var repeater = new Repeater(RepeatMode.UntilSuccess);
         repeater.Attach(child);
 
         var result = repeater.Evaluate(1.0f);
@@ -78,7 +79,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var repeater = new Repeater(parent, RepeatMode.UntilFailure);
+        var repeater = new Repeater(RepeatMode.UntilFailure);
         repeater.Attach(child);
 
         var result = repeater.Evaluate(1.0f);
@@ -92,7 +93,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var repeater = new Repeater(parent, RepeatMode.Infinite);
+        var repeater = new Repeater(RepeatMode.Infinite);
         repeater.Attach(child);
 
         var firstEvaluation = repeater.Evaluate(1.0f);
@@ -109,7 +110,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 
         repeater.Evaluate(1.0f);
@@ -128,7 +129,7 @@ public class RepeaterTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var repeater = new Repeater(parent, RepeatMode.FixedCount, 2);
+        var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 
         repeater.Evaluate(1.0f);

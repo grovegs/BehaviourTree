@@ -6,13 +6,14 @@ public abstract class Composite : BehaviourNode, IParent
 
     protected IReadOnlyList<INode> Children => _children;
 
-    public Composite(IParent parent) : base(parent)
+    public Composite()
     {
         _children = [];
     }
 
     public IParent Attach(INode node)
     {
+        node.SetParent(this);
         _children.Add(node);
         return this;
     }

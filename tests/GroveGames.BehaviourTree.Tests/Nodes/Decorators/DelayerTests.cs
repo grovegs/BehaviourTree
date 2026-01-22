@@ -30,6 +30,7 @@ public class DelayerTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class DelayerTests
     {
         float waitTime = 2.0f;
         var parent = new TestParent();
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
 
         var result = delayer.Evaluate(1.0f);
 
@@ -58,7 +59,7 @@ public class DelayerTests
         float waitTime = 2.0f;
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
         var firstTickResult = delayer.Evaluate(1.0f);
@@ -76,7 +77,7 @@ public class DelayerTests
         float waitTime = 2.0f;
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
         delayer.Evaluate(1.0f);
@@ -93,7 +94,7 @@ public class DelayerTests
         float waitTime = 2.0f;
         var parent = new TestParent();
         var child = new TestNode();
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
         delayer.Evaluate(1.5f);
@@ -111,7 +112,7 @@ public class DelayerTests
         float waitTime = 2.0f;
         var parent = new TestParent();
         var child = new TestNode();
-        var delayer = new Delayer(parent, waitTime);
+        var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
         delayer.Evaluate(1.5f);

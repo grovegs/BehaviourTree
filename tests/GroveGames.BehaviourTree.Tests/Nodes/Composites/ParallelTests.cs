@@ -26,6 +26,7 @@ public class ParallelTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -39,7 +40,7 @@ public class ParallelTests
     public void Evaluate_AnySuccessPolicy_ShouldReturnSuccessIfAnyChildSucceeds()
     {
         var parent = new TestParent();
-        var parallel = new Parallel(parent, ParallelPolicy.AnySuccess);
+        var parallel = new Parallel(ParallelPolicy.AnySuccess);
         var child1 = new TestNode { ReturnState = NodeState.Failure };
         var child2 = new TestNode { ReturnState = NodeState.Success };
 
@@ -55,7 +56,7 @@ public class ParallelTests
     public void Evaluate_FirstFailurePolicy_ShouldReturnFailureIfAnyChildFails()
     {
         var parent = new TestParent();
-        var parallel = new Parallel(parent, ParallelPolicy.FirstFailure);
+        var parallel = new Parallel(ParallelPolicy.FirstFailure);
         var child1 = new TestNode { ReturnState = NodeState.Running };
         var child2 = new TestNode { ReturnState = NodeState.Failure };
 
@@ -71,7 +72,7 @@ public class ParallelTests
     public void Evaluate_AllSuccessPolicy_ShouldReturnSuccessIfAllChildrenSucceed()
     {
         var parent = new TestParent();
-        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var parallel = new Parallel(ParallelPolicy.AllSuccess);
         var child1 = new TestNode { ReturnState = NodeState.Success };
         var child2 = new TestNode { ReturnState = NodeState.Success };
 
@@ -87,7 +88,7 @@ public class ParallelTests
     public void Evaluate_AllSuccessPolicy_ShouldReturnRunningIfAnyChildIsRunning()
     {
         var parent = new TestParent();
-        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var parallel = new Parallel(ParallelPolicy.AllSuccess);
         var child1 = new TestNode { ReturnState = NodeState.Running };
         var child2 = new TestNode { ReturnState = NodeState.Success };
 
@@ -103,7 +104,7 @@ public class ParallelTests
     public void Evaluate_AllSuccessPolicy_ShouldReturnFailureIfAllChildrenFail()
     {
         var parent = new TestParent();
-        var parallel = new Parallel(parent, ParallelPolicy.AllSuccess);
+        var parallel = new Parallel(ParallelPolicy.AllSuccess);
         var child1 = new TestNode { ReturnState = NodeState.Failure };
         var child2 = new TestNode { ReturnState = NodeState.Failure };
 

@@ -68,6 +68,10 @@ public class TreeTests
         {
             return this;
         }
+
+        public void SetParent(IParent parent)
+        {
+        }
     }
 
     [Fact]

@@ -4,7 +4,7 @@ public class Abort : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Abort(IParent parent, Func<bool> condition) : base(parent)
+    public Abort(Func<bool> condition)
     {
         _condition = condition;
     }
@@ -25,7 +25,7 @@ public static partial class ParentExtensions
 {
     public static IParent Abort(this IParent parent, Func<bool> condition)
     {
-        var abort = new Abort(parent, condition);
+        var abort = new Abort(condition);
         parent.Attach(abort);
         return abort;
     }

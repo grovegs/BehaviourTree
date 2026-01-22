@@ -33,6 +33,7 @@ public class SelectorTests
         public void Abort() => AbortCount++;
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -52,7 +53,7 @@ public class SelectorTests
     public void Evaluate_ReturnsRunningAndMovesToNextChildOnFailure()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child1 = new TestNode { ReturnState = NodeState.Failure };
         var child2 = new TestNode { ReturnState = NodeState.Running };
 
@@ -69,7 +70,7 @@ public class SelectorTests
     public void Evaluate_ReturnsRunningIfCurrentChildIsRunning()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child = new TestNode { ReturnState = NodeState.Running };
 
         selector.Attach(child);
@@ -85,7 +86,7 @@ public class SelectorTests
     public void Evaluate_ReturnsSuccessAndResetsIfAnyChildSucceeds()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child1 = new TestNode { ReturnState = NodeState.Failure };
         var child2 = new TestNode { ReturnState = NodeState.Success };
 
@@ -103,7 +104,7 @@ public class SelectorTests
     public void Evaluate_ReturnsFailureIfAllChildrenFail()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child1 = new TestNode { ReturnState = NodeState.Failure };
         var child2 = new TestNode { ReturnState = NodeState.Failure };
 
@@ -122,7 +123,7 @@ public class SelectorTests
     public void Reset_ResetsProcessingChildIndex()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child = new TestNode { ReturnState = NodeState.Failure };
 
         selector.Attach(child);
@@ -137,7 +138,7 @@ public class SelectorTests
     public void Abort_CallsAbortOnCurrentChildAndResetsProcessingChildIndex()
     {
         var parent = new TestParent();
-        var selector = new Selector(parent);
+        var selector = new Selector();
         var child = new TestNode { ReturnState = NodeState.Running };
 
         selector.Attach(child);

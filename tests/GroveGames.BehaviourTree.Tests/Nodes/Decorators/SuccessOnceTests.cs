@@ -30,6 +30,7 @@ public class SuccessOnceTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class SuccessOnceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var successOnce = new SuccessOnce(parent);
+        var successOnce = new SuccessOnce();
         successOnce.Attach(child);
 
         var result = successOnce.Evaluate(1.0f);
@@ -58,7 +59,7 @@ public class SuccessOnceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var successOnce = new SuccessOnce(parent);
+        var successOnce = new SuccessOnce();
         successOnce.Attach(child);
 
         var resultFirst = successOnce.Evaluate(1.0f);
@@ -74,7 +75,7 @@ public class SuccessOnceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var successOnce = new SuccessOnce(parent);
+        var successOnce = new SuccessOnce();
         successOnce.Attach(child);
 
         var resultFirst = successOnce.Evaluate(1.0f);
@@ -91,7 +92,7 @@ public class SuccessOnceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var successOnce = new SuccessOnce(parent);
+        var successOnce = new SuccessOnce();
         successOnce.Attach(child);
 
         var resultFirst = successOnce.Evaluate(1.0f);

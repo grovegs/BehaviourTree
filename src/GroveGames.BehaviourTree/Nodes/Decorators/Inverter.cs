@@ -2,10 +2,6 @@ namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public sealed class Inverter : Decorator
 {
-    public Inverter(IParent parent) : base(parent)
-    {
-    }
-
     public override NodeState Evaluate(float deltaTime)
     {
         var status = base.Evaluate(deltaTime);
@@ -24,7 +20,7 @@ public static partial class ParentExtensions
 {
     public static IParent Inverter(this IParent parent)
     {
-        var inverter = new Inverter(parent);
+        var inverter = new Inverter();
         parent.Attach(inverter);
         return inverter;
     }

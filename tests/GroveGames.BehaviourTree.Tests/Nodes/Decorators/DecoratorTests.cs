@@ -33,6 +33,7 @@ public class DecoratorTests
         public void Abort() => AbortCount++;
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,14 +45,13 @@ public class DecoratorTests
 
     private class TestDecorator : Decorator
     {
-        public TestDecorator(IParent parent) : base(parent) { }
     }
 
     [Fact]
     public void Attach_ShouldSetChild_WhenChildIsEmpty()
     {
         var parent = new TestParent();
-        var decorator = new TestDecorator(parent);
+        var decorator = new TestDecorator();
         var node = new TestNode();
 
         decorator.Attach(node);
@@ -63,7 +63,7 @@ public class DecoratorTests
     public void Attach_ShouldThrowException_WhenChildAlreadyAttached()
     {
         var parent = new TestParent();
-        var decorator = new TestDecorator(parent);
+        var decorator = new TestDecorator();
         var node1 = new TestNode();
         var node2 = new TestNode();
 
@@ -76,7 +76,7 @@ public class DecoratorTests
     public void Evaluate_ShouldCallEvaluateOnChild()
     {
         var parent = new TestParent();
-        var decorator = new TestDecorator(parent);
+        var decorator = new TestDecorator();
         var node = new TestNode();
         decorator.Attach(node);
 
@@ -90,7 +90,7 @@ public class DecoratorTests
     public void Abort_ShouldCallAbortOnChild()
     {
         var parent = new TestParent();
-        var decorator = new TestDecorator(parent);
+        var decorator = new TestDecorator();
         var node = new TestNode();
         decorator.Attach(node);
 
@@ -103,7 +103,7 @@ public class DecoratorTests
     public void Reset_ShouldCallResetOnChild()
     {
         var parent = new TestParent();
-        var decorator = new TestDecorator(parent);
+        var decorator = new TestDecorator();
         var node = new TestNode();
         decorator.Attach(node);
 

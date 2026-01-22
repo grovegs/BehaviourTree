@@ -30,6 +30,7 @@ public class SequenceTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class SequenceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child);
 
         var result = sequence.Evaluate(1.0f);
@@ -59,7 +60,7 @@ public class SequenceTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child);
 
         var result = sequence.Evaluate(1.0f);
@@ -75,7 +76,7 @@ public class SequenceTests
         var parent = new TestParent();
         var child1 = new TestNode { ReturnState = NodeState.Success };
         var child2 = new TestNode { ReturnState = NodeState.Success };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);
@@ -91,7 +92,7 @@ public class SequenceTests
         var parent = new TestParent();
         var child1 = new TestNode { ReturnState = NodeState.Success };
         var child2 = new TestNode { ReturnState = NodeState.Failure };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);
@@ -107,7 +108,7 @@ public class SequenceTests
         var parent = new TestParent();
         var child1 = new TestNode { ReturnState = NodeState.Success };
         var child2 = new TestNode { ReturnState = NodeState.Success };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);
@@ -124,7 +125,7 @@ public class SequenceTests
         var parent = new TestParent();
         var child1 = new TestNode { ReturnState = NodeState.Success };
         var child2 = new TestNode { ReturnState = NodeState.Success };
-        var sequence = new Sequence(parent);
+        var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
         sequence.Evaluate(1.0f);

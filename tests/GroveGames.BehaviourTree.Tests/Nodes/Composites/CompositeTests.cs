@@ -19,9 +19,6 @@ public class CompositeTests
 
     private sealed class TestComposite : Composite
     {
-        public TestComposite(IParent parent) : base(parent)
-        {
-        }
     }
 
     private sealed class TestParent : IParent
@@ -63,6 +60,7 @@ public class CompositeTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     [Fact]
@@ -70,7 +68,7 @@ public class CompositeTests
     {
         var parent = new TestParent();
         var node = new TestNode();
-        var composite = new TestComposite(parent);
+        var composite = new TestComposite();
 
         composite.Attach(node);
 
@@ -83,7 +81,7 @@ public class CompositeTests
         var parent = new TestParent();
         var child1 = new TestNode();
         var child2 = new TestNode();
-        var composite = new TestComposite(parent);
+        var composite = new TestComposite();
 
         composite.Attach(child1);
         composite.Attach(child2);

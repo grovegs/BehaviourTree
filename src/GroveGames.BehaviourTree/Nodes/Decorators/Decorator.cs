@@ -4,7 +4,7 @@ public abstract class Decorator : BehaviourNode, IParent
 {
     private INode _child;
 
-    public Decorator(IParent parent) : base(parent)
+    public Decorator()
     {
         _child = Empty;
     }
@@ -41,6 +41,7 @@ public abstract class Decorator : BehaviourNode, IParent
             throw new ChildAlreadyAttachedException();
         }
 
+        node.SetParent(this);
         _child = node;
         return this;
     }

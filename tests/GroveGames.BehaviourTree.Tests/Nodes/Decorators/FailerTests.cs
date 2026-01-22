@@ -30,6 +30,7 @@ public class FailerTests
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
+        public void SetParent(IParent parent) { }
     }
 
     private sealed class TestParent : IParent
@@ -44,7 +45,7 @@ public class FailerTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Success };
-        var failer = new Failer(parent);
+        var failer = new Failer();
         failer.Attach(child);
 
         var result = failer.Evaluate(1.0f);
@@ -59,7 +60,7 @@ public class FailerTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Failure };
-        var failer = new Failer(parent);
+        var failer = new Failer();
         failer.Attach(child);
 
         var result = failer.Evaluate(1.0f);
@@ -74,7 +75,7 @@ public class FailerTests
     {
         var parent = new TestParent();
         var child = new TestNode { ReturnState = NodeState.Running };
-        var failer = new Failer(parent);
+        var failer = new Failer();
         failer.Attach(child);
 
         var result = failer.Evaluate(1.0f);

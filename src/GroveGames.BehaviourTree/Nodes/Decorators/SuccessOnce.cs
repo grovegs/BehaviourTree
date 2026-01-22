@@ -4,7 +4,7 @@ public class SuccessOnce : Decorator
 {
     private bool _hasSucceeded;
 
-    public SuccessOnce(IParent parent) : base(parent)
+    public SuccessOnce()
     {
         _hasSucceeded = false;
     }

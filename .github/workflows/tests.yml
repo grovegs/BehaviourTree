@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   release:
-    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.0.33
+    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.1.0
     with:
       dotnet-project: tests/GroveGames.BehaviourTree.Tests
       global-json-file: global.json

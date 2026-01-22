@@ -1,0 +1,3 @@
+[submodule "src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree"]
+	path = src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
+	url = https://github.com/grovegs/com.grovegames.behaviourtree

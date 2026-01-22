@@ -1,12 +1,13 @@
 using System.Reflection;
 
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree.Tests;
 
 public class TreeTests
 {
-    public class TreeAccessor
+    private sealed class TreeAccessor
     {
         public static bool IsEnabled(BehaviourTree tree)
         {
@@ -15,7 +16,7 @@ public class TreeTests
         }
     }
 
-    public class TestTree : BehaviourTree
+    private sealed class TestTree : BehaviourTree
     {
         public TestTree(IRoot root) : base(root)
         {
@@ -23,92 +24,116 @@ public class TreeTests
 
         public override void SetupTree()
         {
+        }
+    }
 
+    private sealed class TestRoot : IRoot
+    {
+        public int EvaluateCallCount { get; private set; }
+        public int ResetCallCount { get; private set; }
+        public int AbortCallCount { get; private set; }
+        public NodeState State { get; private set; } = NodeState.None;
+        public IBlackboard Blackboard => throw new NotImplementedException();
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCallCount++;
+            return State;
+        }
+
+        public void Reset()
+        {
+            ResetCallCount++;
+        }
+
+        public void Abort()
+        {
+            AbortCallCount++;
+        }
+
+        public void StartEvaluate()
+        {
+        }
+
+        public void EndEvaluate()
+        {
+        }
+
+        public IParent Attach(INode node)
+        {
+            return this;
+        }
+
+        public IParent Attach(IChildTree tree)
+        {
+            return this;
         }
     }
 
     [Fact]
     public void Tick_ShouldNotEvaluate_WhenTreeIsDisabled()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
 
-        // Act
         tree.Tick(1.0f);
 
-        // Assert
-        mockRoot.Verify(root => root.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(0, root.EvaluateCallCount);
     }
 
     [Fact]
     public void Tick_ShouldEvaluate_WhenTreeIsEnabled()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
         tree.Enable();
 
-        // Act
         tree.Tick(1.0f);
 
-        // Assert
-        mockRoot.Verify(root => root.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, root.EvaluateCallCount);
     }
 
     [Fact]
     public void Reset_ShouldCallResetOnRoot()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
 
-        // Act
         tree.Reset();
 
-        // Assert
-        mockRoot.Verify(root => root.Reset(), Times.Once);
+        Assert.Equal(1, root.ResetCallCount);
     }
 
     [Fact]
     public void Abort_ShouldCallAbortOnRoot()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
 
-        // Act
         tree.Abort();
 
-        // Assert
-        mockRoot.Verify(root => root.Abort(), Times.Once);
+        Assert.Equal(1, root.AbortCallCount);
     }
 
     [Fact]
     public void Enable_ShouldSetIsEnabledToTrue()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
 
-        // Act
         tree.Enable();
 
-        // Assert
         Assert.True(TreeAccessor.IsEnabled(tree));
     }
 
     [Fact]
     public void Disable_ShouldSetIsEnabledToFalse()
     {
-        // Arrange
-        var mockRoot = new Mock<IRoot>();
-        var tree = new TestTree(mockRoot.Object);
+        var root = new TestRoot();
+        var tree = new TestTree(root);
 
-        // Act
         tree.Disable();
 
-        // Assert
         Assert.False(TreeAccessor.IsEnabled(tree));
     }
 }

@@ -4,25 +4,39 @@ on:
   workflow_dispatch:
     inputs:
       version-type:
-        description: "Select the version to increment (major, minor, patch)."
+        description: Select the version to increment such as major, minor, or patch
         required: true
-        default: "patch"
+        default: patch
         type: choice
         options:
           - major
           - minor
           - patch
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   release:
-    uses: grovegs/workflows/.github/workflows/godot-package-release.yml@main
+    name: Release Package
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.0.33
     with:
-      name: "Behaviour Tree"
-      core-project: src/GroveGames.BehaviourTree
-      godot-project: src/GroveGames.BehaviourTree.Godot
-      godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
-      global-json-file: global.json
+      package-name: Behaviour Tree
       version-type: ${{ inputs.version-type }}
+      runs-on: ubuntu-latest
+      dotnet-project: src/GroveGames.BehaviourTree
+      global-json-file: global.json
+      directory-build-props: Directory.Build.props
+      godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
+      unity-package: src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
+      create-tag: true
+      publish-github: true
+      publish-nuget: true
+      publish-discord: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
+      app-id: ${{ secrets.APP_ID }}
+      app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
       nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+      discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}

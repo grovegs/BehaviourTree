@@ -7,7 +7,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes;
 
 public class NodeTests
 {
-    public class NodeAccessor
+    private sealed class NodeAccessor
     {
         public static IParent Parent(BehaviourNode node)
         {
@@ -16,72 +16,88 @@ public class NodeTests
         }
     }
 
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; set; } = new TestBlackboard();
+
+        public IParent Attach(INode node)
+        {
+            return this;
+        }
+
+        public IParent Attach(IChildTree tree)
+        {
+            return this;
+        }
+    }
+
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T GetValue<T>(string key) => default!;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public bool ContainsKey(string key) => false;
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : BehaviourNode
+    {
+        public TestNode(IParent parent) : base(parent)
+        {
+        }
+    }
+
     [Fact]
     public void Evaluate_ShouldReturnFailure_ByDefault()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
+        var parent = new TestParent();
+        var node = new TestNode(parent);
 
-        // Act
-        var result = node.Object.Evaluate(1.0f);
+        var result = node.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
     }
 
     [Fact]
     public void Reset_ShouldNotThrowException()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
+        var parent = new TestParent();
+        var node = new TestNode(parent);
 
-        // Act & Assert
-        var exception = Record.Exception(node.Object.Reset);
+        var exception = Record.Exception(node.Reset);
         Assert.Null(exception);
     }
 
     [Fact]
     public void Abort_ShouldNotThrowException()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
+        var parent = new TestParent();
+        var node = new TestNode(parent);
 
-        // Act & Assert
-        var exception = Record.Exception(node.Object.Abort);
+        var exception = Record.Exception(node.Abort);
         Assert.Null(exception);
     }
 
     [Fact]
     public void Parent_ShouldReturnParent()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
+        var parent = new TestParent();
+        var node = new TestNode(parent);
 
-        // Act
-        var result = NodeAccessor.Parent(node.Object);
+        var result = NodeAccessor.Parent(node);
 
-        // Assert
-        Assert.Equal(mockParent.Object, result);
+        Assert.Equal(parent, result);
     }
 
     [Fact]
     public void Blackboard_ShouldReturnBlackboardFromParent()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockBlackboard = new Mock<IBlackboard>();
-        mockParent.Setup(parent => parent.Blackboard).Returns(mockBlackboard.Object);
+        var blackboard = new TestBlackboard();
+        var parent = new TestParent { Blackboard = blackboard };
+        var node = new TestNode(parent);
 
-        var node = new Mock<BehaviourNode>(mockParent.Object) { CallBase = true };
+        var result = node.Blackboard;
 
-        // Act
-        var result = node.Object.Blackboard;
-
-        // Assert
-        Assert.Equal(mockBlackboard.Object, result);
+        Assert.Equal(blackboard, result);
     }
 }

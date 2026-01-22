@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,81 +6,94 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class SucceederTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() { }
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_WithChildRunning_ShouldReturnRunning()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var succeeder = new Succeeder(mockParent.Object);
-        succeeder.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Running };
+        var succeeder = new Succeeder(parent);
+        succeeder.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        // Act
         var result = succeeder.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, succeeder.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithChildSuccess_ShouldReturnSuccess()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var succeeder = new Succeeder(mockParent.Object);
-        succeeder.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var succeeder = new Succeeder(parent);
+        succeeder.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         var result = succeeder.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, succeeder.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_WithChildFailure_ShouldReturnSuccess()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var succeeder = new Succeeder(mockParent.Object);
-        succeeder.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Failure };
+        var succeeder = new Succeeder(parent);
+        succeeder.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        // Act
         var result = succeeder.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, succeeder.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldCallChildEvaluateOnce()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var succeeder = new Succeeder(mockParent.Object);
-        succeeder.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Failure };
+        var succeeder = new Succeeder(parent);
+        succeeder.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        // Act
         succeeder.Evaluate(1.0f);
 
-        // Assert
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 }

@@ -1,3 +1,4 @@
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Decorators;
 
@@ -5,18 +6,48 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class DelayerTests
 {
+    private sealed class TestBlackboard : IBlackboard
+    {
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
+        {
+            EvaluateCount++;
+            return ReturnState;
+        }
+
+        public void Reset() { }
+        public void Abort() { }
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
     [Fact]
     public void Evaluate_ShouldReturnRunningWhenIntervalIsLessThanWaitTime()
     {
-        // Arrange
         float waitTime = 2.0f;
-        var mockParent = new Mock<IParent>();
-        var delayer = new Delayer(mockParent.Object, waitTime);
+        var parent = new TestParent();
+        var delayer = new Delayer(parent, waitTime);
 
-        // Act
         var result = delayer.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, delayer.State);
     }
@@ -24,44 +55,34 @@ public class DelayerTests
     [Fact]
     public void Evaluate_ShouldExecuteChildWhenIntervalReachesWaitTime()
     {
-        // Arrange
         float waitTime = 2.0f;
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var delayer = new Delayer(mockParent.Object, waitTime);
-        delayer.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var delayer = new Delayer(parent, waitTime);
+        delayer.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         var firstTickResult = delayer.Evaluate(1.0f);
         var secondTickResult = delayer.Evaluate(1.0f);
 
-        // Assert
         Assert.Equal(NodeState.Running, firstTickResult);
         Assert.Equal(NodeState.Success, secondTickResult);
         Assert.Equal(NodeState.Success, delayer.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Once);
+        Assert.Equal(1, child.EvaluateCount);
     }
 
     [Fact]
     public void Evaluate_ShouldResetIntervalWhenChildCompletes()
     {
-        // Arrange
         float waitTime = 2.0f;
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var delayer = new Delayer(mockParent.Object, waitTime);
-        delayer.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode { ReturnState = NodeState.Success };
+        var delayer = new Delayer(parent, waitTime);
+        delayer.Attach(child);
 
-        mockChild.Setup(child => child.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        // Act
         delayer.Evaluate(1.0f);
         delayer.Evaluate(1.0f);
         var thirdTickResult = delayer.Evaluate(0.5f);
 
-        // Assert
         Assert.Equal(NodeState.Running, thirdTickResult);
         Assert.Equal(NodeState.Running, delayer.State);
     }
@@ -69,44 +90,36 @@ public class DelayerTests
     [Fact]
     public void Abort_ShouldResetIntervalWhenAbortIsCalled()
     {
-        // Arrange
         float waitTime = 2.0f;
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var delayer = new Delayer(mockParent.Object, waitTime);
-        delayer.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var delayer = new Delayer(parent, waitTime);
+        delayer.Attach(child);
 
         delayer.Evaluate(1.5f);
-
-        // Act
         delayer.Abort();
         var resultAfterAbort = delayer.Evaluate(0.5f);
 
-        // Assert
         Assert.Equal(NodeState.Running, resultAfterAbort);
         Assert.Equal(NodeState.Running, delayer.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(0, child.EvaluateCount);
     }
 
     [Fact]
     public void Reset_ShouldResetIntervalWhenResetIsCalled()
     {
-        // Arrange
         float waitTime = 2.0f;
-        var mockParent = new Mock<IParent>();
-        var mockChild = new Mock<INode>();
-        var delayer = new Delayer(mockParent.Object, waitTime);
-        delayer.Attach(mockChild.Object);
+        var parent = new TestParent();
+        var child = new TestNode();
+        var delayer = new Delayer(parent, waitTime);
+        delayer.Attach(child);
 
         delayer.Evaluate(1.5f);
-
-        // Act
         delayer.Reset();
         var resultAfterReset = delayer.Evaluate(0.5f);
 
-        // Assert
         Assert.Equal(NodeState.Running, resultAfterReset);
         Assert.Equal(NodeState.Running, delayer.State);
-        mockChild.Verify(child => child.Evaluate(It.IsAny<float>()), Times.Never);
+        Assert.Equal(0, child.EvaluateCount);
     }
 }

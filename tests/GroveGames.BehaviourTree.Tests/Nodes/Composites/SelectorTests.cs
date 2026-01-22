@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 
@@ -7,149 +8,144 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class SelectorTests
 {
-    public class SelectorAccessor
+    private sealed class TestBlackboard : IBlackboard
     {
-        public static int GetProcessingChildIndex(Selector selector)
+        public T? GetValue<T>(string key) => default;
+        public void SetValue<T>(string key, T value) where T : notnull { }
+        public void DeleteValue(string key) { }
+        public void Clear() { }
+    }
+
+    private sealed class TestNode : INode
+    {
+        public int EvaluateCount { get; private set; }
+        public int AbortCount { get; private set; }
+        public NodeState ReturnState { get; set; } = NodeState.Success;
+        public NodeState State => ReturnState;
+
+        public NodeState Evaluate(float deltaTime)
         {
-            var fieldInfo = typeof(Selector).GetField("_processingChildIndex", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (int)fieldInfo?.GetValue(selector)!;
+            EvaluateCount++;
+            return ReturnState;
         }
+
+        public void Reset() { }
+        public void Abort() => AbortCount++;
+        public void StartEvaluate() { }
+        public void EndEvaluate() { }
+    }
+
+    private sealed class TestParent : IParent
+    {
+        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IParent Attach(INode node) => this;
+        public IParent Attach(IChildTree tree) => this;
+    }
+
+    private static int GetProcessingChildIndex(Selector selector)
+    {
+        var fieldInfo = typeof(Selector).GetField("_processingChildIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+        return (int)fieldInfo?.GetValue(selector)!;
     }
 
     [Fact]
-    public static void Evaluate_ReturnsRunningAndMovesToNextChildOnFailure()
+    public void Evaluate_ReturnsRunningAndMovesToNextChildOnFailure()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child1 = new TestNode { ReturnState = NodeState.Failure };
+        var child2 = new TestNode { ReturnState = NodeState.Running };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
+        selector.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        selector.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         var result = selector.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, selector.State);
-        Assert.Equal(1, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(1, GetProcessingChildIndex(selector));
     }
 
     [Fact]
-    public static void Evaluate_ReturnsRunningIfCurrentChildIsRunning()
+    public void Evaluate_ReturnsRunningIfCurrentChildIsRunning()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child = new TestNode { ReturnState = NodeState.Running };
 
-        var child = new Mock<INode>();
-        child.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
+        selector.Attach(child);
 
-        selector.Attach(child.Object);
-
-        // Act
         var result = selector.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Running, result);
         Assert.Equal(NodeState.Running, selector.State);
-        Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(0, GetProcessingChildIndex(selector));
     }
 
     [Fact]
-    public static void Evaluate_ReturnsSuccessAndResetsIfAnyChildSucceeds()
+    public void Evaluate_ReturnsSuccessAndResetsIfAnyChildSucceeds()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child1 = new TestNode { ReturnState = NodeState.Failure };
+        var child2 = new TestNode { ReturnState = NodeState.Success };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
+        selector.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Success);
-
-        selector.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         selector.Evaluate(0.1f);
         var result = selector.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Success, result);
         Assert.Equal(NodeState.Success, selector.State);
-        Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(0, GetProcessingChildIndex(selector));
     }
 
     [Fact]
-    public static void Evaluate_ReturnsFailureIfAllChildrenFail()
+    public void Evaluate_ReturnsFailureIfAllChildrenFail()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child1 = new TestNode { ReturnState = NodeState.Failure };
+        var child2 = new TestNode { ReturnState = NodeState.Failure };
 
-        var child1 = new Mock<INode>();
-        child1.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
+        selector.Attach(child1).Attach(child2);
 
-        var child2 = new Mock<INode>();
-        child2.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        selector.Attach(child1.Object).Attach(child2.Object);
-
-        // Act
         selector.Evaluate(0.1f);
         selector.Evaluate(0.1f);
         var result = selector.Evaluate(0.1f);
 
-        // Assert
         Assert.Equal(NodeState.Failure, result);
         Assert.Equal(NodeState.Failure, selector.State);
-        Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(0, GetProcessingChildIndex(selector));
     }
 
     [Fact]
-    public static void Reset_ResetsProcessingChildIndex()
+    public void Reset_ResetsProcessingChildIndex()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child = new TestNode { ReturnState = NodeState.Failure };
 
-        var child = new Mock<INode>();
-        child.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Failure);
-
-        selector.Attach(child.Object);
+        selector.Attach(child);
         selector.Evaluate(0.1f);
 
-        // Act
         selector.Reset();
 
-        // Assert
-        Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(0, GetProcessingChildIndex(selector));
     }
 
     [Fact]
-    public static void Abort_CallsAbortOnCurrentChildAndResetsProcessingChildIndex()
+    public void Abort_CallsAbortOnCurrentChildAndResetsProcessingChildIndex()
     {
-        // Arrange
-        var mockParent = new Mock<IParent>();
-        var selector = new Selector(mockParent.Object);
+        var parent = new TestParent();
+        var selector = new Selector(parent);
+        var child = new TestNode { ReturnState = NodeState.Running };
 
-        var child = new Mock<INode>();
-        child.Setup(c => c.Evaluate(It.IsAny<float>())).Returns(NodeState.Running);
-
-        selector.Attach(child.Object);
+        selector.Attach(child);
         selector.Evaluate(0.1f);
 
-        // Act
         selector.Abort();
 
-        // Assert
-        child.Verify(c => c.Abort(), Times.Once);
-        Assert.Equal(0, SelectorAccessor.GetProcessingChildIndex(selector));
+        Assert.Equal(1, child.AbortCount);
+        Assert.Equal(0, GetProcessingChildIndex(selector));
     }
 }

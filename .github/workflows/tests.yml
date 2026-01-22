@@ -10,10 +10,12 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   release:
-    uses: grovegs/workflows/.github/workflows/godot-package-tests.yml@main
+    uses: grovegs/workflows/.github/workflows/package-tests.yml@v1.0.33
     with:
-      core-test-project: tests/GroveGames.BehaviourTree.Tests
-      godot-test-project: tests/GroveGames.BehaviourTree.Godot.Tests
+      dotnet-project: tests/GroveGames.BehaviourTree.Tests
       global-json-file: global.json

@@ -10,12 +10,13 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   release:
-    uses: grovegs/workflows/.github/workflows/godot-package-format.yml@main
+    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.0.33
     with:
-      core-project: src/GroveGames.BehaviourTree
-      godot-project: src/GroveGames.BehaviourTree.Godot
-      core-test-project: tests/GroveGames.BehaviourTree.Tests
-      godot-test-project: tests/GroveGames.BehaviourTree.Godot.Tests
+      files: "**/*.{json,md}"
+      dotnet-project: .
       global-json-file: global.json

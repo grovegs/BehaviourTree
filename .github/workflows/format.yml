@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   release:
-    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.1.2
+    uses: grovegs/workflows/.github/workflows/package-format.yml@v1.1.3
     with:
       files: "**/*.{json,md}"
       dotnet-project: .

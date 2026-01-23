@@ -1,0 +1,5 @@
+﻿<Solution>
+  <Project Path="GroveGames.BehaviourTree.Unity.csproj" />
+  <Project Path="PluginBuilder.Editor.csproj" />
+  <Project Path="GroveGames.BehaviourTree.Unity.Editor.csproj" />
+</Solution>

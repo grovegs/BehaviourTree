@@ -1,0 +1,18 @@
+{
+  "name": "com.grovegames.behaviourtree",
+  "version": "0.0.0",
+  "displayName": "GroveGames.BehaviourTree",
+  "description": "A modular and extensible behavior tree framework.",
+  "unity": "2021.3",
+  "documentationUrl": "https://github.com/grovegs/BehaviourTree",
+  "changelogUrl": "https://github.com/grovegs/BehaviourTree/releases",
+  "licensesUrl": "https://github.com/grovegs/BehaviourTree/blob/main/LICENSE",
+  "keywords": [
+    "behaviour-tree",
+    "ai"
+  ],
+  "author": {
+    "name": "Grove Games",
+    "url": "https://github.com/grovegs"
+  }
+}

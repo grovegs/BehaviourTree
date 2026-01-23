@@ -1,0 +1,21 @@
+{
+    "name": "GroveGames.BehaviourTree.Unity.Tests",
+    "rootNamespace": "GroveGames.BehaviourTree.Unity.Tests",
+    "references": [
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:1579a5f688ce34f3c8114af27c43213d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

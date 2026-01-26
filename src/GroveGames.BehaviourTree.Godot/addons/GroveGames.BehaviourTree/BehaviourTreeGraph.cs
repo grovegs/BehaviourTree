@@ -9,8 +9,12 @@ namespace GroveGames.BehaviourTree;
 [Tool]
 public sealed partial class BehaviourTreeGraph : GraphEdit
 {
-    private readonly Dictionary<int, Vector2> _nodePositions = [];
-    private readonly List<BehviourTreeGraphNode> _nodes = [];
+    private const int HorizontalSpacing = 400;
+    private const int SubtreeSpacing = 250;
+    private const int VerticalSpacing = 200;
+
+    private readonly Dictionary<int, Vector2> _nodePositions;
+    private readonly List<BehviourTreeGraphNode> _nodes;
 
     private Godot.Collections.Dictionary<int, Godot.Collections.Array<int>> _nodeHierarchy;
     private Godot.Collections.Dictionary<int, string> _names;
@@ -19,9 +23,11 @@ public sealed partial class BehaviourTreeGraph : GraphEdit
 
     private int _currentId;
 
-    private const int HorizontalSpacing = 400;
-    private const int SubtreeSpacing = 250;
-    private const int VerticalSpacing = 200;
+    public BehaviourTreeGraph()
+    {
+        _nodePositions = [];
+        _nodes = [];
+    }
 
     public void Initialize(Godot.Collections.Dictionary<int, Godot.Collections.Array<int>> nodeHierarchy)
     {

@@ -69,9 +69,10 @@ dotnet pack -c Release
 
 **Godot Settings:**
 
-- Default: Use ProjectSettings for project-wide configuration (Godot-native)
-- Wrap with GodotSetting\<T\> for type-safe access
-- Static readonly holders for settings values
-- Optional: Use Resource-based settings for asset-based configuration ([GlobalClass] partial class)
-- Factory supports both: CreateLogger() uses ProjectSettings, CreateLogger(resource) uses Resource
-- No singletons - settings accessed via [Export] reference in nodes for DI
+- Use Resource for project-wide settings (stored at res://addons/)
+- Resource path registered in ProjectSettings for runtime access
+- [GlobalClass] partial class inheriting from Resource
+- No singletons - settings accessed via GetOrCreate()
+- ResourceLoader.Load() for runtime (path from ProjectSettings)
+- Factory accepts settings instance for DI-friendly architecture
+- Optional: Reference same resource via [Export] in nodes for DI

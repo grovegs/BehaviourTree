@@ -4,7 +4,12 @@ namespace System.Threading;
 
 internal sealed class Lock
 {
-    private readonly object _lock = new();
+    private readonly object _lock;
+
+    public Lock()
+    {
+        _lock = new object();
+    }
 
     public void Enter()
     {

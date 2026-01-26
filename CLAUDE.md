@@ -11,7 +11,7 @@ dotnet pack -c Release
 
 ## Code Rules
 
-- Use initializers only in constructor bodies, not field declarations
+- Use initializers only in constructor bodies, not field declarations (except for static constants and simple static readonly values)
 - Use zero-allocation APIs (Span\<T\>, ReadOnlySpan\<T\>, stackalloc, etc.) when available
 - net10.0 supports most optimizations natively
 - For netstandard2.1: use official NuGet packages (e.g., `System.Memory` for Span\<T\>, `Microsoft.Bcl.HashCode`)

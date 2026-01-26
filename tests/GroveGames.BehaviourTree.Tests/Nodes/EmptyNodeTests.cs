@@ -2,7 +2,7 @@ using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree.Tests.Nodes;
 
-public class EmptyNodeTests
+public sealed class EmptyNodeTests
 {
     [Fact]
     public void Evaluate_ReturnsFailure()

@@ -55,3 +55,21 @@ dotnet pack -c Release
 - Polyfills in `Polyfills/` folder for netstandard2.1 compatibility
 - Unity package extends core via `netstandard2.1` dependency
 - Godot addon extends core via `net10.0` dependency
+
+## Unity/Godot Configuration Patterns
+
+**Unity Settings:**
+
+- Use ScriptableObject for project-wide settings (stored in ProjectSettings/)
+- Use EditorBuildSettings.AddConfigObject() for runtime access
+- Settings provider in Editor/ folder using UI Toolkit (PropertyField, VisualElement)
+- No singletons - settings accessed via GetOrCreate()
+- No Resources.Load() - EditorBuildSettings.TryGetConfigObject() for runtime
+- Factory accepts settings instance for DI-friendly architecture
+
+**Godot Settings:**
+
+- Use ProjectSettings for project-wide configuration
+- Wrap with GodotSetting\<T\> for type-safe access
+- Static readonly holders for settings values
+- Factory reads from GodotSettings at creation time

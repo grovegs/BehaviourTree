@@ -9,9 +9,11 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "GroveGames.BehaviourTree.dll"
+    ],
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

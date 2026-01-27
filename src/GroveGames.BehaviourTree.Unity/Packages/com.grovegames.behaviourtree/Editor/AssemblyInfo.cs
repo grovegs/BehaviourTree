@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("GroveGames.ObjectPool.Unity.Editor.Tests")]
+[assembly: InternalsVisibleTo("GroveGames.BehaviourTree.Unity.Editor.Tests")]

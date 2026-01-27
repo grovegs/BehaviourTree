@@ -1,39 +1,47 @@
 <Project>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591;1573</NoWarn>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-
-    <Version>1.0.1</Version>
-    <FileVersion>$(Version)</FileVersion>
-    <AssemblyVersion>$(Version)</AssemblyVersion>
 
     <RootNamespace>GroveGames.BehaviourTree</RootNamespace>
-    <Title>GroveGames.BehaviourTree</Title>
-    <Description>A lightweight behaviour tree framework developed by Grove Games for .NET and Godot</Description>
     <Company>Grove Games</Company>
     <Authors>Grove Games</Authors>
-    <PackageId>$(AssemblyName)</PackageId>
-    <PackageVersion>$(Version)</PackageVersion>
-    <PackageTags>godot; behaviour-tree</PackageTags>
-    <Copyright>© $(CurrentYear) Grove Games</Copyright>
-    <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageIcon>Icon.png</PackageIcon>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/grovegs/BehaviourTree</RepositoryUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>© $([System.DateTime]::Now.ToString("yyyy")) Grove Games</Copyright>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
+    <Version>1.0.1</Version>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/grovegs/BehaviourTree</RepositoryUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>A lightweight behaviour tree framework developed by Grove Games for .NET and Godot</Description>
+    <PackageTags>godot;behaviour-tree</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <Using Include="System" />
+    <Using Include="System.Buffers" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
     <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="/" />
     <None Include="$(MSBuildThisFileDirectory)Icon.png" Pack="true" PackagePath="/" />

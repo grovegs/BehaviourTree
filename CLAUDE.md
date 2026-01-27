@@ -56,11 +56,21 @@ dotnet pack -c Release
 - Unity package extends core via `netstandard2.1` dependency
 - Godot addon extends core via `net10.0` dependency
 
+## Unity/Godot Engine Code Rules
+
+- Never throw C# exceptions (ArgumentNullException, ArgumentException, etc.) in engine implementations
+- Use engine-specific error handling instead:
+  - Unity: `Debug.LogError()`, `Debug.LogWarning()`, `Debug.Assert()`
+  - Godot: `GD.PushError()`, `GD.PushWarning()`, `GD.Assert()`
+- Check parameters for null and provide fallback values with engine logging
+- Example Unity: `if (settings == null) { Debug.LogError("Settings cannot be null"); settings = CreateInstance<Settings>(); }`
+- Example Godot: `if (settings == null) { GD.PushError("Settings cannot be null"); settings = new(); }`
+
 ## Unity/Godot Configuration Patterns
 
 **Unity Settings:**
 
-- Use ScriptableObject for project-wide settings (stored in ProjectSettings/)
+- Use ScriptableObject for project-wide settings (stored in Assets/Settings/)
 - Use EditorBuildSettings.AddConfigObject() for runtime access
 - Settings provider in Editor/ folder using UI Toolkit (PropertyField, VisualElement)
 - No singletons - settings accessed via GetOrCreate()

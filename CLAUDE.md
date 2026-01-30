@@ -14,7 +14,8 @@ dotnet pack -c Release
 - Use initializers only in constructor bodies, not field declarations (except for static constants and simple static readonly values)
 - Use zero-allocation APIs (Span\<T\>, ReadOnlySpan\<T\>, stackalloc, etc.) when available
 - net10.0 supports most optimizations natively
-- For netstandard2.1: use official NuGet packages (e.g., `System.Memory` for Span\<T\>, `Microsoft.Bcl.HashCode`)
+- netstandard2.1 includes Span\<T\>/ReadOnlySpan\<T\> natively
+- For netstandard2.1: use official NuGet packages only when needed (e.g., `System.Threading.Channels`, `Microsoft.Bcl.TimeProvider`)
 - When no official package exists, write polyfills in `Polyfills/` using C# 14 extension members
 - Follow `.editorconfig` naming: `_camelCase` for private fields, `s_camelCase` for static, `IPascalCase` for interfaces
 - Seal implementation classes unless designed for inheritance
@@ -76,6 +77,19 @@ dotnet pack -c Release
 - No singletons - settings accessed via GetOrCreate()
 - No Resources.Load() - EditorBuildSettings.TryGetConfigObject() for runtime
 - Factory accepts settings instance for DI-friendly architecture
+
+**Unity C# Configuration:**
+
+- Unity projects must include `csc.rsp` file in `Assets/` directory to enable C# 10 features:
+
+  ```text
+  -langversion:10
+  -nullable:enable
+  ```
+
+- This enables nullable reference types and C# 10 language features (pattern matching, global usings, etc.)
+- Required for compatibility with the core library that uses modern C# features
+- The `csc.rsp` file is in the Unity project, not the package root (Unity compiles the project, not individual packages)
 
 **Godot Settings:**
 

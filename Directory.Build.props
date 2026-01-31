@@ -18,7 +18,7 @@
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
+  <PropertyGroup>
     <Version>1.0.2</Version>
     <PackageId>$(AssemblyName)</PackageId>
     <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
@@ -30,18 +30,7 @@
     <PackageTags>godot;behaviour-tree</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <Using Include="System" />
-    <Using Include="System.Buffers" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.Globalization" />
-    <Using Include="System.IO" />
-    <Using Include="System.Linq" />
-    <Using Include="System.Threading" />
-    <Using Include="System.Threading.Tasks" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+  <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
     <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="/" />
     <None Include="$(MSBuildThisFileDirectory)Icon.png" Pack="true" PackagePath="/" />

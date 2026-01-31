@@ -178,6 +178,13 @@ indent_size = 2
 [*.{csproj,xml,props,targets,resx}]
 indent_size = 2
 
+[*.{tscn,tres,godot,import}]
+indent_size = 2
+
+[*.gd]
+indent_style = tab
+indent_size = 4
+
 [*.sh]
 end_of_line = lf
 

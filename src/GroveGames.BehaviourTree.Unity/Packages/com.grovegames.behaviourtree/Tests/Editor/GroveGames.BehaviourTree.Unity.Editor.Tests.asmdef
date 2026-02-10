@@ -1,6 +1,6 @@
 {
-    "name": "GroveGames.ObjectPool.Unity.Editor.Tests",
-    "rootNamespace": "GroveGames.ObjectPool.Unity.Editor.Tests",
+    "name": "GroveGames.BehaviourTree.Unity.Editor.Tests",
+    "rootNamespace": "GroveGames.BehaviourTree.Unity.Editor.Tests",
     "references": [
         "GUID:0acc523941302664db1f4e527237feb3",
         "GUID:26824aa0c3b764d7c840d7ae283d4d7f"

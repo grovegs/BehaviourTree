@@ -1,4 +1,4 @@
-namespace GroveGames.BehaviourTree.Nodes;
+﻿namespace GroveGames.BehaviourTree.Nodes;
 
 public sealed class EmptyBehaviourNode : INode
 {

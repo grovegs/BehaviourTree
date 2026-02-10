@@ -1,4 +1,4 @@
-namespace GroveGames.BehaviourTree.Collections;
+﻿namespace GroveGames.BehaviourTree.Collections;
 
 public class Blackboard : IBlackboard
 {

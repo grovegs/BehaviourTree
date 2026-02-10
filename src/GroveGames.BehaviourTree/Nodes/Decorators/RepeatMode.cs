@@ -1,4 +1,4 @@
-namespace GroveGames.BehaviourTree.Nodes.Decorators;
+﻿namespace GroveGames.BehaviourTree.Nodes.Decorators;
 
 public enum RepeatMode
 {

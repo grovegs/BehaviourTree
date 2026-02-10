@@ -1,10 +1,10 @@
-using GroveGames.BehaviourTree.Collections;
+﻿using GroveGames.BehaviourTree.Collections;
 
 namespace GroveGames.BehaviourTree.Nodes;
 
 public interface IParent
 {
-    IParent Attach(INode node);
-    IParent Attach(IChildTree tree);
-    IBlackboard Blackboard { get; }
+    public IParent Attach(INode node);
+    public IParent Attach(IChildTree tree);
+    public IBlackboard Blackboard { get; }
 }

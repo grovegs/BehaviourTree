@@ -1,4 +1,4 @@
-using GroveGames.BehaviourTree.Collections;
+﻿using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 
 namespace GroveGames.BehaviourTree.Tests.Nodes;

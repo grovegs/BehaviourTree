@@ -1,4 +1,4 @@
-using GroveGames.BehaviourTree.Collections;
+﻿using GroveGames.BehaviourTree.Collections;
 using GroveGames.BehaviourTree.Nodes;
 using GroveGames.BehaviourTree.Nodes.Composites;
 

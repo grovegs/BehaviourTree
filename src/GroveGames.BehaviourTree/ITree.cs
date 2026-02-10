@@ -1,11 +1,11 @@
-namespace GroveGames.BehaviourTree;
+﻿namespace GroveGames.BehaviourTree;
 
 public interface ITree
 {
-    void SetupTree();
-    void Reset();
-    void Abort();
-    void Enable();
-    void Disable();
-    void Tick(float deltaTime);
+    public void SetupTree();
+    public void Reset();
+    public void Abort();
+    public void Enable();
+    public void Disable();
+    public void Tick(float deltaTime);
 }

@@ -1,12 +1,12 @@
-namespace GroveGames.BehaviourTree.Nodes;
+﻿namespace GroveGames.BehaviourTree.Nodes;
 
 public interface INode
 {
-    NodeState Evaluate(float deltaTime);
-    void Reset();
-    void Abort();
-    void StartEvaluate();
-    void EndEvaluate();
-    void SetParent(IParent parent);
-    NodeState State { get; }
+    public NodeState Evaluate(float deltaTime);
+    public void Reset();
+    public void Abort();
+    public void StartEvaluate();
+    public void EndEvaluate();
+    public void SetParent(IParent parent);
+    public NodeState State { get; }
 }

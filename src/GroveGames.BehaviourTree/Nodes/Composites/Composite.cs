@@ -1,4 +1,4 @@
-namespace GroveGames.BehaviourTree.Nodes.Composites;
+﻿namespace GroveGames.BehaviourTree.Nodes.Composites;
 
 public abstract class Composite : BehaviourNode, IParent
 {

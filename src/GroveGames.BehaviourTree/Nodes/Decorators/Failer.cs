@@ -2,6 +2,8 @@
 
 public sealed class Failer : Decorator
 {
+    public Failer(string? name = null) : base(name) { }
+
     public override NodeState Evaluate(float deltaTime)
     {
         var status = base.Evaluate(deltaTime);
@@ -12,9 +14,9 @@ public sealed class Failer : Decorator
 
 public static partial class ParentExtensions
 {
-    public static IParent Failer(this IParent parent)
+    public static IParent Failer(this IParent parent, string? name = null)
     {
-        var failer = new Failer();
+        var failer = new Failer(name);
         parent.Attach(failer);
         return failer;
     }

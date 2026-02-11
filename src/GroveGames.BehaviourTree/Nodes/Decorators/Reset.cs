@@ -4,7 +4,7 @@ public class Reset : Decorator
 {
     private readonly Func<bool> _condition;
 
-    public Reset(Func<bool> condition)
+    public Reset(Func<bool> condition, string? name = null) : base(name)
     {
         _condition = condition;
     }
@@ -23,9 +23,9 @@ public class Reset : Decorator
 
 public static partial class ParentExtensions
 {
-    public static IParent Reset(this IParent parent, Func<bool> condition)
+    public static IParent Reset(this IParent parent, Func<bool> condition, string? name = null)
     {
-        var reset = new Reset(condition);
+        var reset = new Reset(condition, name);
         parent.Attach(reset);
         return reset;
     }

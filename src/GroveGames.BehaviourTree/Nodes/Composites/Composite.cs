@@ -6,7 +6,7 @@ public abstract class Composite : BehaviourNode, IParent
 
     protected IReadOnlyList<INode> Children => _children;
 
-    public Composite()
+    public Composite(string? name = null) : base(name)
     {
         _children = [];
     }

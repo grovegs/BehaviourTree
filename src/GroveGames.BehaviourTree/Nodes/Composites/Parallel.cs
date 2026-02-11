@@ -4,7 +4,7 @@ public sealed class Parallel : Composite
 {
     private readonly ParallelPolicy _policy;
 
-    public Parallel(ParallelPolicy policy)
+    public Parallel(ParallelPolicy policy, string? name = null) : base(name)
     {
         _policy = policy;
     }
@@ -55,9 +55,9 @@ public sealed class Parallel : Composite
 
 public static partial class ParentExtensions
 {
-    public static IParent Parallel(this IParent parent, ParallelPolicy policy)
+    public static IParent Parallel(this IParent parent, ParallelPolicy policy, string? name = null)
     {
-        var parallel = new Parallel(policy);
+        var parallel = new Parallel(policy, name);
         parent.Attach(parallel);
         return parallel;
     }

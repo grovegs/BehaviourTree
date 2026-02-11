@@ -4,7 +4,7 @@ public sealed class Selector : Composite
 {
     private int _processingChildIndex;
 
-    public Selector()
+    public Selector(string? name = null) : base(name)
     {
         _processingChildIndex = 0;
     }
@@ -59,9 +59,9 @@ public sealed class Selector : Composite
 
 public static partial class ParentExtensions
 {
-    public static IParent Selector(this IParent parent)
+    public static IParent Selector(this IParent parent, string? name = null)
     {
-        var selector = new Selector();
+        var selector = new Selector(name);
         parent.Attach(selector);
         return selector;
     }

@@ -6,7 +6,7 @@ public sealed class Repeater : Decorator
     private readonly int _maxCount;
     private int _currentCount;
 
-    public Repeater(RepeatMode repeatMode, int maxCount = -1)
+    public Repeater(RepeatMode repeatMode, int maxCount = -1, string? name = null) : base(name)
     {
         _repeatMode = repeatMode;
         _maxCount = maxCount;
@@ -69,9 +69,9 @@ public sealed class Repeater : Decorator
 
 public static partial class ParentExtensions
 {
-    public static IParent Repeater(this IParent parent, RepeatMode repeatMode)
+    public static IParent Repeater(this IParent parent, RepeatMode repeatMode, string? name = null)
     {
-        var repeater = new Repeater(repeatMode);
+        var repeater = new Repeater(repeatMode, name: name);
         parent.Attach(repeater);
         return repeater;
     }

@@ -4,7 +4,7 @@ public sealed class Sequence : Composite
 {
     private int _processingChildIndex;
 
-    public Sequence()
+    public Sequence(string? name = null) : base(name)
     {
         _processingChildIndex = 0;
     }
@@ -64,9 +64,9 @@ public sealed class Sequence : Composite
 
 public static partial class ParentExtensions
 {
-    public static IParent Sequence(this IParent parent)
+    public static IParent Sequence(this IParent parent, string? name = null)
     {
-        var sequence = new Sequence();
+        var sequence = new Sequence(name);
         parent.Attach(sequence);
         return sequence;
     }

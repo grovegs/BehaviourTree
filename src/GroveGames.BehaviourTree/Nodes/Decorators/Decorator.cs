@@ -4,7 +4,7 @@ public abstract class Decorator : BehaviourNode, IParent
 {
     private INode _child;
 
-    public Decorator()
+    public Decorator(string? name = null) : base(name)
     {
         _child = Empty;
     }

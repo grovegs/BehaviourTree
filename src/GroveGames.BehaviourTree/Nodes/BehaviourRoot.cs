@@ -7,14 +7,17 @@ public sealed class BehaviourRoot : IRoot
     private readonly IBlackboard _blackboard;
     private INode _child;
     private NodeState _nodeState;
+    private string _name;
 
     public IBlackboard Blackboard => _blackboard;
     public NodeState State => _nodeState;
+    public string Name => _name;
 
     public BehaviourRoot(IBlackboard blackboard)
     {
         _blackboard = blackboard;
         _child = BehaviourNode.Empty;
+        _name = GetType().Name;
     }
 
     public NodeState Evaluate(float deltaTime)
@@ -63,5 +66,10 @@ public sealed class BehaviourRoot : IRoot
     public void SetParent(IParent parent)
     {
 
+    }
+
+    public void SetName(string name)
+    {
+        _name = name;
     }
 }

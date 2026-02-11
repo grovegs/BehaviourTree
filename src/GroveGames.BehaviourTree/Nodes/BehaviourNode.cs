@@ -7,11 +7,18 @@ public abstract class BehaviourNode : INode
     public static readonly INode Empty = new EmptyBehaviourNode();
 
     private IParent _parent = null!;
+    private string _name;
     protected NodeState _nodeState;
 
     protected IParent Parent => _parent;
     public IBlackboard Blackboard => _parent.Blackboard;
     public NodeState State => _nodeState;
+    public string Name => _name;
+
+    public BehaviourNode()
+    {
+        _name = GetType().Name;
+    }
 
     public virtual void SetParent(IParent parent)
     {
@@ -41,5 +48,9 @@ public abstract class BehaviourNode : INode
     public virtual void EndEvaluate()
     {
 
+    }
+    public void SetName(string name)
+    {
+        _name = name;
     }
 }

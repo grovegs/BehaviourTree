@@ -4,6 +4,8 @@ public sealed class EmptyBehaviourNode : INode
 {
     public NodeState State => NodeState.Failure;
 
+    public string Name => string.Empty;
+
     public NodeState Evaluate(float deltaTime)
     {
         return NodeState.Failure;
@@ -30,6 +32,11 @@ public sealed class EmptyBehaviourNode : INode
     }
 
     public void SetParent(IParent parent)
+    {
+
+    }
+
+    public void SetName(string name)
     {
 
     }

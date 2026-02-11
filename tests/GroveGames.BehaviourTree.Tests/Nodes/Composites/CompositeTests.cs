@@ -50,6 +50,8 @@ public class CompositeTests
         public int ResetCallCount { get; private set; }
         public NodeState State { get; set; } = NodeState.Success;
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime) => State;
 
         public void Reset()
@@ -61,6 +63,10 @@ public class CompositeTests
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
+
+        public void SetName(string name)
+        {
+        }
     }
 
     [Fact]

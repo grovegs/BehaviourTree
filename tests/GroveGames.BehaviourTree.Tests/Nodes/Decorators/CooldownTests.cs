@@ -20,6 +20,8 @@ public class CooldownTests
         public NodeState ReturnState { get; set; } = NodeState.Success;
         public NodeState State => ReturnState;
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime)
         {
             EvaluateCount++;
@@ -31,6 +33,10 @@ public class CooldownTests
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
+
+        public void SetName(string name)
+        {
+        }
     }
 
     private sealed class TestParent : IParent

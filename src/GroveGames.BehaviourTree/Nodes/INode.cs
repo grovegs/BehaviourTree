@@ -8,5 +8,7 @@ public interface INode
     public void StartEvaluate();
     public void EndEvaluate();
     public void SetParent(IParent parent);
+    public void SetName(string name);
     public NodeState State { get; }
+    public string Name { get; }
 }

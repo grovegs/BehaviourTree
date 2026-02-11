@@ -15,9 +15,9 @@ public abstract class BehaviourNode : INode
     public NodeState State => _nodeState;
     public string Name => _name;
 
-    public BehaviourNode()
+    public BehaviourNode(string? name = null)
     {
-        _name = GetType().Name;
+        _name = name ?? GetType().Name;
     }
 
     public virtual void SetParent(IParent parent)

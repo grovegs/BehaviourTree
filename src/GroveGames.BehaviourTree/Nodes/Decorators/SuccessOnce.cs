@@ -4,7 +4,7 @@ public class SuccessOnce : Decorator
 {
     private bool _hasSucceeded;
 
-    public SuccessOnce()
+    public SuccessOnce(string? name = null) : base(name)
     {
         _hasSucceeded = false;
     }

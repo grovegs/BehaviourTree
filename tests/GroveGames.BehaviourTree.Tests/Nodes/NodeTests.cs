@@ -42,6 +42,32 @@ public class NodeTests
 
     private sealed class TestNode : BehaviourNode
     {
+        public TestNode(string? name = null) : base(name) { }
+    }
+
+    [Fact]
+    public void Name_ShouldReturnTypeName_WhenNoNameProvided()
+    {
+        var node = new TestNode();
+
+        Assert.Equal(nameof(TestNode), node.Name);
+    }
+
+    [Fact]
+    public void Name_ShouldReturnCustomName_WhenNameProvidedInConstructor()
+    {
+        var node = new TestNode("MyNode");
+
+        Assert.Equal("MyNode", node.Name);
+    }
+
+    [Fact]
+    public void SetName_ShouldOverrideName()
+    {
+        var node = new TestNode();
+        node.SetName("UpdatedName");
+
+        Assert.Equal("UpdatedName", node.Name);
     }
 
     [Fact]

@@ -2,6 +2,8 @@
 
 public sealed class Inverter : Decorator
 {
+    public Inverter(string? name = null) : base(name) { }
+
     public override NodeState Evaluate(float deltaTime)
     {
         var status = base.Evaluate(deltaTime);
@@ -18,9 +20,9 @@ public sealed class Inverter : Decorator
 
 public static partial class ParentExtensions
 {
-    public static IParent Inverter(this IParent parent)
+    public static IParent Inverter(this IParent parent, string? name = null)
     {
-        var inverter = new Inverter();
+        var inverter = new Inverter(name);
         parent.Attach(inverter);
         return inverter;
     }

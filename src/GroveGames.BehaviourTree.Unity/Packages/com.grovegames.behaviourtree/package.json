@@ -1,6 +1,6 @@
 {
   "name": "com.grovegames.behaviourtree",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "GroveGames.BehaviourTree",
   "description": "A lightweight behaviour tree framework developed by Grove Games for .NET and Godot",
   "unity": "2021.3",

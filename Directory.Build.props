@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.3</Version>
+    <Version>1.1.0</Version>
     <PackageId>$(AssemblyName)</PackageId>
     <PackageProjectUrl>https://github.com/grovegs/BehaviourTree</PackageProjectUrl>
     <RepositoryUrl>https://github.com/grovegs/BehaviourTree</RepositoryUrl>

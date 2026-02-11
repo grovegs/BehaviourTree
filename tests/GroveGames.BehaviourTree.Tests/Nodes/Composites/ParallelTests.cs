@@ -21,12 +21,18 @@ public class ParallelTests
         public NodeState ReturnState { get; set; } = NodeState.Success;
         public NodeState State => ReturnState;
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime) => ReturnState;
         public void Reset() { }
         public void Abort() { }
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
+
+        public void SetName(string name)
+        {
+        }
     }
 
     private sealed class TestParent : IParent

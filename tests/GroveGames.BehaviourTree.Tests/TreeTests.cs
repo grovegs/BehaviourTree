@@ -35,6 +35,8 @@ public class TreeTests
         public NodeState State { get; private set; } = NodeState.None;
         public IBlackboard Blackboard => throw new NotImplementedException();
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime)
         {
             EvaluateCallCount++;
@@ -71,6 +73,11 @@ public class TreeTests
 
         public void SetParent(IParent parent)
         {
+        }
+
+        public void SetName(string name)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -22,6 +22,8 @@ public class RootTests
         public float LastDeltaTime { get; private set; }
         public NodeState State { get; set; } = NodeState.Success;
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime)
         {
             EvaluateCallCount++;
@@ -48,6 +50,10 @@ public class RootTests
         }
 
         public void SetParent(IParent parent)
+        {
+        }
+
+        public void SetName(string name)
         {
         }
     }

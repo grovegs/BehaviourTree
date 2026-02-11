@@ -22,6 +22,8 @@ public class DecoratorTests
         public float LastDeltaTime { get; private set; }
         public NodeState State => NodeState.Success;
 
+        public string Name => string.Empty;
+
         public NodeState Evaluate(float deltaTime)
         {
             EvaluateCount++;
@@ -34,6 +36,10 @@ public class DecoratorTests
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
+
+        public void SetName(string name)
+        {
+        }
     }
 
     private sealed class TestParent : IParent

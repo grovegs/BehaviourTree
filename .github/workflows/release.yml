@@ -38,7 +38,7 @@ jobs:
       publish-discord: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
-      app-id: ${{ secrets.APP_ID }}
+      client-id: ${{ secrets.CLIENT_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
       nuget-api-key: ${{ secrets.NUGET_API_KEY }}
       discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}

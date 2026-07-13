@@ -10,16 +10,20 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 {
     public sealed class BehaviourTreeDebuggerWindow : EditorWindow
     {
-        private const float LEFT_PANEL_WIDTH = 250f;
+        private const float MIN_LEFT_PANEL_WIDTH = 150f;
+        private const float SPLITTER_WIDTH = 4f;
         private const float NODE_WIDTH = 180f;
         private const float NODE_HEIGHT = 40f;
         private const float HORIZONTAL_SPACING = 60f;
         private const float VERTICAL_SPACING = 20f;
 
+        [SerializeField] private float _leftPanelWidth = 250f;
+
         private List<BehaviourTreeMono> _controllers = new();
         private BehaviourTreeMono _selectedController;
         private Vector2 _leftPanelScroll;
         private Vector2 _treePanelScroll;
+        private bool _isResizingLeftPanel;
 
         private GUIStyle _nodeStyleRunning;
         private GUIStyle _nodeStyleSuccess;
@@ -170,6 +174,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             EditorGUILayout.BeginHorizontal();
 
             DrawLeftPanel();
+            DrawSplitter();
             DrawTreePanel();
 
             EditorGUILayout.EndHorizontal();
@@ -182,7 +187,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 
         private void DrawLeftPanel()
         {
-            EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_PANEL_WIDTH));
+            EditorGUILayout.BeginVertical(GUILayout.Width(_leftPanelWidth));
 
             EditorGUILayout.LabelField($"Behaviour Trees ({_controllers.Count})", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
@@ -224,9 +229,34 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             }
 
             EditorGUILayout.EndVertical();
+        }
 
-            var rect = GUILayoutUtility.GetLastRect();
-            EditorGUI.DrawRect(new Rect(rect.xMax, rect.y, 1, rect.height), new Color(0.2f, 0.2f, 0.2f));
+        private void DrawSplitter()
+        {
+            var rect = GUILayoutUtility.GetRect(SPLITTER_WIDTH, 0, GUILayout.Width(SPLITTER_WIDTH), GUILayout.ExpandHeight(true));
+            EditorGUI.DrawRect(new Rect(rect.x + (rect.width - 1f) / 2f, rect.y, 1f, rect.height), new Color(0.2f, 0.2f, 0.2f));
+            EditorGUIUtility.AddCursorRect(rect, MouseCursor.ResizeHorizontal);
+
+            var currentEvent = Event.current;
+            switch (currentEvent.type)
+            {
+                case EventType.MouseDown when rect.Contains(currentEvent.mousePosition):
+                    _isResizingLeftPanel = true;
+                    currentEvent.Use();
+                    break;
+
+                case EventType.MouseDrag when _isResizingLeftPanel:
+                    _leftPanelWidth = Mathf.Clamp(currentEvent.mousePosition.x, MIN_LEFT_PANEL_WIDTH, position.width - MIN_LEFT_PANEL_WIDTH);
+                    currentEvent.Use();
+                    Repaint();
+                    break;
+
+                case EventType.MouseUp when _isResizingLeftPanel:
+                case EventType.Ignore when _isResizingLeftPanel:
+                    _isResizingLeftPanel = false;
+                    currentEvent.Use();
+                    break;
+            }
         }
 
         private void DrawTreePanel()

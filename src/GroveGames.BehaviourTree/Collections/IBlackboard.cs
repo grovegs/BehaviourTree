@@ -2,8 +2,8 @@
 
 public interface IBlackboard
 {
-    public void SetValue<T>(string key, T obj) where T : notnull;
-    public T? GetValue<T>(string key);
-    public void DeleteValue(string key);
+    public void SetValue<T>(BlackboardKey<T> key, T value);
+    public bool TryGetValue<T>(BlackboardKey<T> key, out T value);
+    public void DeleteValue<T>(BlackboardKey<T> key);
     public void Clear();
 }

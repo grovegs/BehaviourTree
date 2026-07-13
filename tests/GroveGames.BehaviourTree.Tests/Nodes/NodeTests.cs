@@ -33,10 +33,9 @@ public class NodeTests
 
     private sealed class TestBlackboard : IBlackboard
     {
-        public T GetValue<T>(string key) => default!;
-        public void SetValue<T>(string key, T value) where T : notnull { }
-        public bool ContainsKey(string key) => false;
-        public void DeleteValue(string key) { }
+        public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
+        public void SetValue<T>(BlackboardKey<T> key, T value) { }
+        public void DeleteValue<T>(BlackboardKey<T> key) { }
         public void Clear() { }
     }
 

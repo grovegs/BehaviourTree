@@ -26,6 +26,8 @@ namespace GroveGames.BehaviourTree.Unity.Editor
         private GUIStyle _nodeStyleFailure;
         private GUIStyle _nodeStyleDefault;
         private GUIStyle _selectedButtonStyle;
+        private GUIStyle _controllerButtonStyle;
+        private GUIStyle _orderStyle;
 
         private bool _stylesInitialized;
 
@@ -60,6 +62,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             _controllers.Clear();
             var found = FindObjectsByType<BehaviourTreeMono>(FindObjectsSortMode.None);
             _controllers.AddRange(found);
+            _controllers.Sort(CompareControllersByPath);
 
             if (_selectedController != null && !_controllers.Contains(_selectedController))
             {
@@ -67,9 +70,34 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             }
         }
 
+        private static int CompareControllersByPath(BehaviourTreeMono a, BehaviourTreeMono b)
+        {
+            if (a == null || b == null)
+            {
+                return a == null ? (b == null ? 0 : 1) : -1;
+            }
+
+            return string.Compare(GetHierarchyPath(a.transform), GetHierarchyPath(b.transform), StringComparison.Ordinal);
+        }
+
+        private static string GetHierarchyPath(Transform transform)
+        {
+            var path = transform.name;
+            var current = transform.parent;
+
+            while (current != null)
+            {
+                path = current.name + " / " + path;
+                current = current.parent;
+            }
+
+            return path;
+        }
+
         private void InitStyles()
         {
-            if (_stylesInitialized)
+            // Textures can be destroyed on play mode change / domain reload; re-init when they are gone
+            if (_stylesInitialized && _nodeStyleDefault != null && _nodeStyleDefault.normal.background != null)
             {
                 return;
             }
@@ -79,10 +107,28 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             _nodeStyleFailure = CreateNodeStyle(new Color(0.9f, 0.3f, 0.3f));
             _nodeStyleDefault = CreateNodeStyle(new Color(0.4f, 0.4f, 0.4f));
 
-            _selectedButtonStyle = new GUIStyle(EditorStyles.miniButton)
+            _controllerButtonStyle = new GUIStyle(EditorStyles.miniButton)
             {
-                normal = { background = CreateColorTexture(new Color(0.3f, 0.5f, 0.8f)) },
+                alignment = TextAnchor.MiddleLeft,
+                padding = new RectOffset(8, 8, 0, 0)
+            };
+
+            _selectedButtonStyle = new GUIStyle(_controllerButtonStyle)
+            {
+                normal =
+                {
+                    background = CreateColorTexture(new Color(0.3f, 0.5f, 0.8f)),
+                    textColor = Color.white
+                },
                 fontStyle = FontStyle.Bold
+            };
+
+            _orderStyle = new GUIStyle(EditorStyles.miniLabel)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white },
+                fontStyle = FontStyle.Bold,
+                fontSize = 9
             };
 
             _stylesInitialized = true;
@@ -108,7 +154,10 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 
         private Texture2D CreateColorTexture(Color color)
         {
-            var texture = new Texture2D(1, 1);
+            var texture = new Texture2D(1, 1)
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
             texture.SetPixel(0, 0, color);
             texture.Apply();
             return texture;
@@ -135,7 +184,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
         {
             EditorGUILayout.BeginVertical(GUILayout.Width(LEFT_PANEL_WIDTH));
 
-            EditorGUILayout.LabelField("Behaviour Trees", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField($"Behaviour Trees ({_controllers.Count})", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
             if (GUILayout.Button("Refresh", GUILayout.Height(25)))
@@ -147,7 +196,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 
             if (_controllers.Count == 0)
             {
-                EditorGUILayout.HelpBox("No BehaviourTreeController found in scene.", MessageType.Info);
+                EditorGUILayout.HelpBox("No BehaviourTreeMono found in scene.", MessageType.Info);
             }
             else
             {
@@ -161,10 +210,10 @@ namespace GroveGames.BehaviourTree.Unity.Editor
                     }
 
                     var isSelected = _selectedController == controller;
-                    var style = isSelected ? _selectedButtonStyle : EditorStyles.miniButton;
-                    var label = controller.gameObject.name;
+                    var style = isSelected ? _selectedButtonStyle : _controllerButtonStyle;
+                    var path = GetHierarchyPath(controller.transform);
 
-                    if (GUILayout.Button(label, style, GUILayout.Height(28)))
+                    if (GUILayout.Button(new GUIContent(path, path), style, GUILayout.Height(28)))
                     {
                         _selectedController = controller;
                         Selection.activeGameObject = controller.gameObject;
@@ -186,7 +235,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 
             if (_selectedController == null)
             {
-                EditorGUILayout.HelpBox("Select a BehaviourTreeController from the list.", MessageType.Info);
+                EditorGUILayout.HelpBox("Select a behaviour tree from the list.", MessageType.Info);
                 EditorGUILayout.EndVertical();
                 return;
             }
@@ -206,20 +255,76 @@ namespace GroveGames.BehaviourTree.Unity.Editor
                 return;
             }
 
-            _treePanelScroll = EditorGUILayout.BeginScrollView(_treePanelScroll);
-
             var treeData = ExtractTreeData(behaviourTree);
-            if (treeData != null)
-            {
-                DrawTreeVisualization(treeData);
-            }
-            else
+            if (treeData == null)
             {
                 EditorGUILayout.HelpBox("Could not extract tree data. Check if the BehaviourTree has a valid root.", MessageType.Error);
+                EditorGUILayout.EndVertical();
+                return;
             }
 
-            EditorGUILayout.EndScrollView();
+            DrawTreeHeader();
+
+            CalculateActivePath(treeData);
+
+            var positions = new Dictionary<NodeData, Vector2>();
+            CalculateNodePositions(treeData, positions, 0, 20f);
+
+            float contentWidth = 0f;
+            float contentHeight = 0f;
+            foreach (var pos in positions.Values)
+            {
+                contentWidth = Mathf.Max(contentWidth, pos.x + NODE_WIDTH);
+                contentHeight = Mathf.Max(contentHeight, pos.y + NODE_HEIGHT);
+            }
+
+            contentWidth += 20f;
+            contentHeight += 20f;
+
+            var viewRect = GUILayoutUtility.GetRect(0, 0, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            var contentRect = new Rect(0, 0, Mathf.Max(contentWidth, viewRect.width), Mathf.Max(contentHeight, viewRect.height));
+
+            _treePanelScroll = GUI.BeginScrollView(viewRect, _treePanelScroll, contentRect);
+
+            var verticalOffset = Mathf.Max(0f, (contentRect.height - contentHeight) / 2f);
+            DrawTreeVisualization(positions, verticalOffset);
+
+            GUI.EndScrollView();
+
+            DrawLegend();
+
             EditorGUILayout.EndVertical();
+        }
+
+        private void DrawTreeHeader()
+        {
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUILayout.Label(GetHierarchyPath(_selectedController.transform), EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawLegend()
+        {
+            EditorGUILayout.BeginHorizontal(GUILayout.Height(20));
+            GUILayout.Space(8);
+            DrawLegendItem(new Color(0.9f, 0.75f, 0.2f), "Running");
+            DrawLegendItem(new Color(0.3f, 0.8f, 0.3f), "Success");
+            DrawLegendItem(new Color(0.9f, 0.3f, 0.3f), "Failure");
+            DrawLegendItem(new Color(0.4f, 0.4f, 0.4f), "Idle");
+            DrawLegendItem(new Color(0.3f, 0.8f, 1f), "Active Path");
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawLegendItem(Color color, string label)
+        {
+            var rect = GUILayoutUtility.GetRect(10, 10, GUILayout.Width(10));
+            rect.y += 4;
+            rect.height = 10;
+            EditorGUI.DrawRect(rect, color);
+            GUILayout.Label(label, EditorStyles.miniLabel, GUILayout.ExpandWidth(false));
+            GUILayout.Space(10);
         }
 
         private NodeData ExtractTreeData(object behaviourTree)
@@ -571,37 +676,15 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             return true;
         }
 
-        private void DrawTreeVisualization(NodeData rootNode)
+        private void DrawTreeVisualization(Dictionary<NodeData, Vector2> positions, float verticalOffset)
         {
-            // Calculate active evaluation path
-            CalculateActivePath(rootNode);
-
-            var positions = new Dictionary<NodeData, Vector2>();
-            CalculateNodePositions(rootNode, positions, 0, 0);
-
-            float maxX = 0;
-            float maxY = 0;
-            foreach (var pos in positions.Values)
-            {
-                maxX = Mathf.Max(maxX, pos.x + NODE_WIDTH);
-                maxY = Mathf.Max(maxY, pos.y + NODE_HEIGHT);
-            }
-
-            // Calculate available space and center the tree vertically
-            var availableHeight = position.height - 100;
-            var treeHeight = maxY + 50;
-            var verticalOffset = Mathf.Max(20, (availableHeight - treeHeight) / 2);
-
-            var areaRect = GUILayoutUtility.GetRect(maxX + 50, Mathf.Max(maxY + 50, availableHeight));
-
-            var offsetRect = new Rect(areaRect.x, areaRect.y + verticalOffset, areaRect.width, areaRect.height);
-            GUI.BeginGroup(offsetRect);
+            var offset = new Vector2(0f, verticalOffset);
 
             // Draw connections - inactive first, then active on top
             foreach (var kvp in positions)
             {
                 var node = kvp.Key;
-                var pos = kvp.Value;
+                var pos = kvp.Value + offset;
 
                 foreach (var child in node.Children)
                 {
@@ -610,7 +693,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
                         var isActivePath = node.IsOnActivePath && child.IsOnActivePath;
                         if (isActivePath) continue; // Draw active paths later
 
-                        DrawConnection(pos, childPos, new Color(0.4f, 0.4f, 0.4f), 2f);
+                        DrawConnection(pos, childPos + offset, new Color(0.4f, 0.4f, 0.4f), 2f);
                     }
                 }
             }
@@ -619,7 +702,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             foreach (var kvp in positions)
             {
                 var node = kvp.Key;
-                var pos = kvp.Value;
+                var pos = kvp.Value + offset;
 
                 foreach (var child in node.Children)
                 {
@@ -630,11 +713,11 @@ namespace GroveGames.BehaviourTree.Unity.Editor
 
                         // Glow effect - draw wider line behind
                         var glowColor = new Color(0.3f, 0.8f, 1f, 0.3f);
-                        DrawConnection(pos, childPos, glowColor, 8f);
+                        DrawConnection(pos, childPos + offset, glowColor, 8f);
 
                         // Main active path line
                         var activeColor = new Color(0.3f, 0.8f, 1f);
-                        DrawConnection(pos, childPos, activeColor, 3f);
+                        DrawConnection(pos, childPos + offset, activeColor, 3f);
                     }
                 }
             }
@@ -643,7 +726,7 @@ namespace GroveGames.BehaviourTree.Unity.Editor
             foreach (var kvp in positions)
             {
                 var node = kvp.Key;
-                var pos = kvp.Value;
+                var pos = kvp.Value + offset;
                 var nodeRect = new Rect(pos.x, pos.y, NODE_WIDTH, NODE_HEIGHT);
 
                 var style = node.State switch
@@ -687,19 +770,10 @@ namespace GroveGames.BehaviourTree.Unity.Editor
                 if (node.EvaluationOrder > 0)
                 {
                     var orderRect = new Rect(nodeRect.xMax - 20, nodeRect.y + 5, 15, 15);
-                    var orderStyle = new GUIStyle(EditorStyles.miniLabel)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        normal = { textColor = Color.white },
-                        fontStyle = FontStyle.Bold,
-                        fontSize = 9
-                    };
                     EditorGUI.DrawRect(orderRect, new Color(0.2f, 0.2f, 0.2f, 0.8f));
-                    GUI.Label(orderRect, node.EvaluationOrder.ToString(), orderStyle);
+                    GUI.Label(orderRect, node.EvaluationOrder.ToString(), _orderStyle);
                 }
             }
-
-            GUI.EndGroup();
         }
 
         private void DrawConnection(Vector2 startPos, Vector2 endPos, Color color, float width)

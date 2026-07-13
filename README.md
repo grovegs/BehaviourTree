@@ -169,15 +169,14 @@ public sealed class CharacterBT : BehaviourTree
 ```mermaid
 graph TD
     Root(Root) --> Selector
-    Selector --> Conditional1[Conditional: IsEnemyVisible]
-    Conditional1 --> Cooldown1[Cooldown 1s]
-    Cooldown1 --> Repeater1[Repeater: UntilSuccess]
-    Repeater1 --> Attack[Attack]
-
-    Selector --> Conditional2[Conditional: IsUnderAttack]
-    Conditional2 --> Cooldown2[Cooldown 1s]
-    Cooldown2 --> Repeater2[Repeater: UntilSuccess]
-    Repeater2 --> Defend[Defend]
+    Selector --> Conditional1["Conditional: IsEnemyVisible"]
+    Conditional1 --> Cooldown1["Cooldown 1s"]
+    Cooldown1 --> Repeater1["Repeater: UntilSuccess"]
+    Repeater1 --> Attack
+    Selector --> Conditional2["Conditional: IsUnderAttack"]
+    Conditional2 --> Cooldown2["Cooldown 1s"]
+    Cooldown2 --> Repeater2["Repeater: UntilSuccess"]
+    Repeater2 --> Defend
 ```
 
 ### Running the Tree

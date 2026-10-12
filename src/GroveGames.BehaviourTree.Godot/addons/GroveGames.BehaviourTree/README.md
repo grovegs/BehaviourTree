@@ -321,7 +321,9 @@ Open **Tools → GroveGames → Behaviour Tree Debugger** to inspect trees live.
 
 - Node states colored in real time (Running / Success / Failure / Idle)
 - The active evaluation path highlighted, with evaluation order numbers
-- A scrollable canvas for large trees
+- A scrollable canvas for large trees and a resizable tree list panel
+
+![Unity Visual Debugger](docs/ExampleUnityTree.png)
 
 ## Godot Integration
 
@@ -350,7 +352,7 @@ public partial class Character : Godot.Node
 
 With the addon enabled, node states are displayed under the editor's **Debugger** tab so you can track the tree's evaluation frame by frame.
 
-![Example Visual Tree](docs/ExampleTree.png)
+![Godot Visual Debugger](docs/ExampleGodotTree.png)
 
 ## Customization
 

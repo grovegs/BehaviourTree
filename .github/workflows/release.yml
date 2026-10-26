@@ -12,15 +12,24 @@ on:
           - major
           - minor
           - patch
+      environment:
+        description: Development publishes to GitHub Packages, Production publishes to nuget.org and GitHub Releases
+        required: true
+        default: Development
+        type: choice
+        options:
+          - Development
+          - Production
 
 permissions:
   contents: write
   actions: read
+  packages: write
 
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.3.6
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.1
     with:
       package-name: Behaviour Tree
       version-type: ${{ inputs.version-type }}
@@ -33,8 +42,9 @@ jobs:
       godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
       unity-package: src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
       create-tag: true
-      publish-github: true
-      publish-nuget: true
+      publish-github: ${{ inputs.environment == 'Production' }}
+      publish-nuget: ${{ inputs.environment == 'Production' }}
+      publish-github-packages: ${{ inputs.environment == 'Development' }}
       publish-discord: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -29,7 +29,7 @@ permissions:
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.1
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.2
     with:
       package-name: Behaviour Tree
       version-type: ${{ inputs.version-type }}

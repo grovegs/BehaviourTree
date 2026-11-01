@@ -1,19 +1,22 @@
 name: 🚀 Release
 
 on:
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       version-type:
-        description: Select the version to increment such as major, minor, or patch
+        description: Select the version to increment, or auto to read it from the commits
         required: true
-        default: patch
+        default: auto
         type: choice
         options:
+          - auto
           - major
           - minor
           - patch
       environment:
-        description: Development publishes to GitHub Packages, Production publishes to nuget.org and GitHub Releases
+        description: Development publishes a -dev version to GitHub Packages, Production publishes to nuget.org and GitHub Releases. Scheduled runs release Development when src changed.
         required: true
         default: Development
         type: choice
@@ -29,10 +32,11 @@ permissions:
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.4.4
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.5.0
     with:
       package-name: Behaviour Tree
-      version-type: ${{ inputs.version-type }}
+      version-type: ${{ inputs.version-type || 'auto' }}
+      version-suffix: ${{ inputs.environment != 'Production' && 'dev' || '' }}
       runs-on: ubuntu-latest
       dotnet-project: src/GroveGames.BehaviourTree
       global-json-file: global.json
@@ -44,8 +48,9 @@ jobs:
       create-tag: true
       publish-github: ${{ inputs.environment == 'Production' }}
       publish-nuget: ${{ inputs.environment == 'Production' }}
-      publish-github-packages: ${{ inputs.environment == 'Development' }}
+      publish-github-packages: ${{ inputs.environment != 'Production' }}
       publish-discord: true
+      skip-unchanged: ${{ github.event_name == 'schedule' }}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       client-id: ${{ secrets.CLIENT_ID }}

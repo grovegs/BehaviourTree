@@ -16,7 +16,7 @@ on:
           - minor
           - patch
       environment:
-        description: Development publishes a -dev version to GitHub Packages, Production publishes to nuget.org and GitHub Releases. Scheduled runs release Development when src changed.
+        description: Development publishes a -dev version to GitHub Packages, Production publishes to nuget.org and GitHub Releases. Scheduled runs release Production when src changed.
         required: true
         default: Development
         type: choice
@@ -36,7 +36,7 @@ jobs:
     with:
       package-name: Behaviour Tree
       version-type: ${{ inputs.version-type || 'auto' }}
-      version-suffix: ${{ inputs.environment != 'Production' && 'dev' || '' }}
+      version-suffix: ${{ inputs.environment == 'Development' && 'dev' || '' }}
       runs-on: ubuntu-latest
       dotnet-project: src/GroveGames.BehaviourTree
       global-json-file: global.json
@@ -46,9 +46,9 @@ jobs:
       godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
       unity-package: src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
       create-tag: true
-      publish-github: ${{ inputs.environment == 'Production' }}
-      publish-nuget: ${{ inputs.environment == 'Production' }}
-      publish-github-packages: ${{ inputs.environment != 'Production' }}
+      publish-github: ${{ inputs.environment != 'Development' }}
+      publish-nuget: ${{ inputs.environment != 'Development' }}
+      publish-github-packages: ${{ inputs.environment == 'Development' }}
       publish-discord: true
       skip-unchanged: ${{ github.event_name == 'schedule' }}
     secrets:

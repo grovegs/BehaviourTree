@@ -1,0 +1,17 @@
+name: 🔎 Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  check-title:
+    name: Check Title
+    uses: grovegs/workflows/.github/workflows/pull-request-title.yml@v1.5.0

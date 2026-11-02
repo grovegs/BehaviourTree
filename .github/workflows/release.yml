@@ -32,7 +32,7 @@ permissions:
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.5.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.6.0
     with:
       package-name: Behaviour Tree
       version-type: ${{ inputs.version-type || 'auto' }}
@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: 📤 Publish to NuGet
-        uses: grovegs/actions/.github/actions/publish-nuget@v1.6.0
+        uses: grovegs/actions/.github/actions/publish-nuget@v1.7.0
         with:
           artifact: nuget-package
           user: ${{ secrets.NUGET_USER }}
@@ -75,7 +75,7 @@ jobs:
       - name: 📢 Notify Discord Failure
         if: failure()
         continue-on-error: true
-        uses: grovegs/actions/.github/actions/notify-discord@v1.6.0
+        uses: grovegs/actions/.github/actions/notify-discord@v1.7.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           title: ❌ ${{ github.event.repository.name }} NuGet publish failed (${{ github.ref_name }})

@@ -14,4 +14,4 @@ permissions:
 jobs:
   check-title:
     name: Check Title
-    uses: grovegs/workflows/.github/workflows/pull-request-title.yml@v1.5.0
+    uses: grovegs/workflows/.github/workflows/pull-request-title.yml@v1.6.0

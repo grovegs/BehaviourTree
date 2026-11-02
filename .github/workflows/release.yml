@@ -47,7 +47,7 @@ jobs:
       unity-package: src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
       create-tag: true
       publish-github: ${{ inputs.environment != 'Development' }}
-      publish-nuget: ${{ inputs.environment != 'Development' }}
+      publish-nuget: false
       publish-github-packages: ${{ inputs.environment == 'Development' }}
       publish-discord: true
       skip-unchanged: ${{ github.event_name == 'schedule' }}
@@ -55,5 +55,32 @@ jobs:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       client-id: ${{ secrets.CLIENT_ID }}
       app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      nuget-api-key: ${{ secrets.NUGET_API_KEY }}
       discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
+
+  publish-nuget:
+    name: Publish to NuGet
+    needs: release
+    if: needs.release.outputs.has-changes == 'true' && inputs.environment != 'Development'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: 📤 Publish to NuGet
+        uses: grovegs/actions/.github/actions/publish-nuget@v1.6.0
+        with:
+          artifact: nuget-package
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: 📢 Notify Discord Failure
+        if: failure()
+        continue-on-error: true
+        uses: grovegs/actions/.github/actions/notify-discord@v1.6.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          title: ❌ ${{ github.event.repository.name }} NuGet publish failed (${{ github.ref_name }})
+          description: |
+            The release was created, but publishing to nuget.org failed. Check the trusted publishing policy, then rerun the failed job.
+
+            [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          color: "15158332"

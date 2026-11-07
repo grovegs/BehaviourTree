@@ -1,0 +1,25 @@
+name: 🧹 Stale Branches
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: List the branches that would be deleted without deleting them
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  delete-stale-branches:
+    name: Delete Stale Branches
+    uses: grovegs/workflows/.github/workflows/stale-branches.yml@v1.7.0
+    permissions:
+      contents: write
+      pull-requests: read
+    with:
+      dry-run: ${{ inputs.dry-run == true }}

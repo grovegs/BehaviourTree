@@ -9,7 +9,7 @@
     <RootNamespace>GroveGames.BehaviourTree</RootNamespace>
     <Company>Grove Games</Company>
     <Authors>Grove Games</Authors>
-    <Copyright>© $([System.DateTime]::Now.ToString("yyyy")) Grove Games</Copyright>
+    <Copyright>© $([System.DateTime]::Now.ToString("yyyy")) Grove Games Teknoloji A.Ş.</Copyright>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

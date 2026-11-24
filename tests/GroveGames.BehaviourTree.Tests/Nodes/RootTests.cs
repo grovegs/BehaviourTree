@@ -5,7 +5,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes;
 
 public class RootTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -13,7 +13,7 @@ public class RootTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCallCount { get; private set; }
         public int ResetCallCount { get; private set; }
@@ -60,7 +60,7 @@ public class RootTests
     [Fact]
     public void Constructor_ShouldInitializeBlackboard()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
 
         var root = new BehaviourRoot(blackboard);
 
@@ -70,9 +70,9 @@ public class RootTests
     [Fact]
     public void Attach_ShouldSetChild_WhenChildIsEmpty()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
         var root = new BehaviourRoot(blackboard);
-        var node = new TestNode();
+        var node = new FakeNode();
 
         root.Attach(node);
 
@@ -82,10 +82,10 @@ public class RootTests
     [Fact]
     public void Attach_ShouldThrowException_WhenChildAlreadyAttached()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
         var root = new BehaviourRoot(blackboard);
-        var node = new TestNode();
-        var secondNode = new TestNode();
+        var node = new FakeNode();
+        var secondNode = new FakeNode();
 
         root.Attach(node);
 
@@ -95,9 +95,9 @@ public class RootTests
     [Fact]
     public void Evaluate_ShouldCallEvaluateOnChild()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
         var root = new BehaviourRoot(blackboard);
-        var node = new TestNode();
+        var node = new FakeNode();
         root.Attach(node);
 
         root.Evaluate(0.5f);
@@ -109,9 +109,9 @@ public class RootTests
     [Fact]
     public void Abort_ShouldCallAbortOnChild()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
         var root = new BehaviourRoot(blackboard);
-        var node = new TestNode();
+        var node = new FakeNode();
         root.Attach(node);
 
         root.Abort();
@@ -122,9 +122,9 @@ public class RootTests
     [Fact]
     public void Reset_ShouldCallResetOnChild()
     {
-        var blackboard = new TestBlackboard();
+        var blackboard = new FakeBlackboard();
         var root = new BehaviourRoot(blackboard);
-        var node = new TestNode();
+        var node = new FakeNode();
         root.Attach(node);
 
         root.Reset();

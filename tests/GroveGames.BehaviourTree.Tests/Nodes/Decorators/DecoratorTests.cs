@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class DecoratorTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class DecoratorTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public int ResetCount { get; private set; }
@@ -42,9 +42,9 @@ public class DecoratorTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -56,9 +56,9 @@ public class DecoratorTests
     [Fact]
     public void Attach_ShouldSetChild_WhenChildIsEmpty()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var decorator = new TestDecorator();
-        var node = new TestNode();
+        var node = new FakeNode();
 
         decorator.Attach(node);
 
@@ -68,10 +68,10 @@ public class DecoratorTests
     [Fact]
     public void Attach_ShouldThrowException_WhenChildAlreadyAttached()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var decorator = new TestDecorator();
-        var node1 = new TestNode();
-        var node2 = new TestNode();
+        var node1 = new FakeNode();
+        var node2 = new FakeNode();
 
         decorator.Attach(node1);
 
@@ -81,9 +81,9 @@ public class DecoratorTests
     [Fact]
     public void Evaluate_ShouldCallEvaluateOnChild()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var decorator = new TestDecorator();
-        var node = new TestNode();
+        var node = new FakeNode();
         decorator.Attach(node);
 
         decorator.Evaluate(0.5f);
@@ -95,9 +95,9 @@ public class DecoratorTests
     [Fact]
     public void Abort_ShouldCallAbortOnChild()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var decorator = new TestDecorator();
-        var node = new TestNode();
+        var node = new FakeNode();
         decorator.Attach(node);
 
         decorator.Abort();
@@ -108,9 +108,9 @@ public class DecoratorTests
     [Fact]
     public void Reset_ShouldCallResetOnChild()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var decorator = new TestDecorator();
-        var node = new TestNode();
+        var node = new FakeNode();
         decorator.Attach(node);
 
         decorator.Reset();

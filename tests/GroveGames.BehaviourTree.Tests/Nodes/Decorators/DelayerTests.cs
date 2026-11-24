@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class DelayerTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class DelayerTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public NodeState ReturnState { get; set; } = NodeState.Success;
@@ -39,9 +39,9 @@ public class DelayerTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -50,7 +50,7 @@ public class DelayerTests
     public void Evaluate_ShouldReturnRunningWhenIntervalIsLessThanWaitTime()
     {
         float waitTime = 2.0f;
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var delayer = new Delayer(waitTime);
 
         var result = delayer.Evaluate(1.0f);
@@ -63,8 +63,8 @@ public class DelayerTests
     public void Evaluate_ShouldExecuteChildWhenIntervalReachesWaitTime()
     {
         float waitTime = 2.0f;
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
@@ -81,8 +81,8 @@ public class DelayerTests
     public void Evaluate_ShouldResetIntervalWhenChildCompletes()
     {
         float waitTime = 2.0f;
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
@@ -98,8 +98,8 @@ public class DelayerTests
     public void Abort_ShouldResetIntervalWhenAbortIsCalled()
     {
         float waitTime = 2.0f;
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 
@@ -116,8 +116,8 @@ public class DelayerTests
     public void Reset_ShouldResetIntervalWhenResetIsCalled()
     {
         float waitTime = 2.0f;
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var delayer = new Delayer(waitTime);
         delayer.Attach(child);
 

@@ -21,9 +21,9 @@ public class CompositeTests
     {
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
 
         public IParent Attach(INode node)
         {
@@ -36,7 +36,7 @@ public class CompositeTests
         }
     }
 
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -44,7 +44,7 @@ public class CompositeTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int ResetCallCount { get; private set; }
         public NodeState State { get; set; } = NodeState.Success;
@@ -71,8 +71,8 @@ public class CompositeTests
     [Fact]
     public void Attach_AddsNodeToChildren()
     {
-        var parent = new TestParent();
-        var node = new TestNode();
+        var parent = new FakeParent();
+        var node = new FakeNode();
         var composite = new TestComposite();
 
         composite.Attach(node);
@@ -83,9 +83,9 @@ public class CompositeTests
     [Fact]
     public void Reset_CallsResetOnAllChildren()
     {
-        var parent = new TestParent();
-        var child1 = new TestNode();
-        var child2 = new TestNode();
+        var parent = new FakeParent();
+        var child1 = new FakeNode();
+        var child2 = new FakeNode();
         var composite = new TestComposite();
 
         composite.Attach(child1);

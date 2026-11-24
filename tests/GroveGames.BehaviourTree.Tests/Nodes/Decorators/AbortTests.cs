@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class AbortTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class AbortTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public int AbortCount { get; private set; }
@@ -40,9 +40,9 @@ public class AbortTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -50,8 +50,8 @@ public class AbortTests
     [Fact]
     public void Evaluate_ShouldReturnSuccessWhenConditionIsTrue()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
@@ -65,8 +65,8 @@ public class AbortTests
     [Fact]
     public void Evaluate_ShouldCallChildEvaluateWhenConditionIsFalse()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var abortDecorator = new Abort(() => false);
         abortDecorator.Attach(child);
 
@@ -80,8 +80,8 @@ public class AbortTests
     [Fact]
     public void Evaluate_ShouldNotCallChildEvaluateWhenConditionIsTrue()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
@@ -93,8 +93,8 @@ public class AbortTests
     [Fact]
     public void Abort_ShouldCallChildAbortWhenConditionIsTrue()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var abortDecorator = new Abort(() => true);
         abortDecorator.Attach(child);
 
@@ -106,8 +106,8 @@ public class AbortTests
     [Fact]
     public void Abort_ShouldNotCallChildAbortWhenConditionIsFalse()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var abortDecorator = new Abort(() => false);
         abortDecorator.Attach(child);
 

@@ -32,7 +32,7 @@ permissions:
 jobs:
   release:
     name: Release Package
-    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.6.0
+    uses: grovegs/workflows/.github/workflows/package-release.yml@v1.11.0
     with:
       package-name: Behaviour Tree
       version-type: ${{ inputs.version-type || 'auto' }}
@@ -43,6 +43,7 @@ jobs:
       directory-build-props: Directory.Build.props
       readme-file: README.md
       license-file: LICENSE
+      agent-skills: skills
       godot-addon: src/GroveGames.BehaviourTree.Godot/addons/GroveGames.BehaviourTree
       unity-package: src/GroveGames.BehaviourTree.Unity/Packages/com.grovegames.behaviourtree
       create-tag: true

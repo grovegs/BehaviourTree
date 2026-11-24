@@ -100,3 +100,9 @@ dotnet pack -c Release
 - ResourceLoader.Load() for runtime (path from ProjectSettings)
 - Factory accepts settings instance for DI-friendly architecture
 - Optional: Reference same resource via [Export] in nodes for DI
+
+## Agent Skills
+
+- The rules for game code that uses this package are an agent skill. Its source is `skills/grovegames-behaviourtree/`: `SKILL.md` holds the rules that apply everywhere, `unity.md` holds only what differs in Unity. It is optional.
+- The release writes the skill the Unity package ships, the same way it copies the README and the license: `SKILL.md` followed by `unity.md`, when there is one. Never edit the copy under `Skills~/`; the next release replaces it.
+- The NuGet package ships `skills/grovegames-behaviourtree/SKILL.md` as it is.

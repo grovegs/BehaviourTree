@@ -8,7 +8,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class ParallelTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -16,7 +16,7 @@ public class ParallelTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public NodeState ReturnState { get; set; } = NodeState.Success;
         public NodeState State => ReturnState;
@@ -35,9 +35,9 @@ public class ParallelTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -45,10 +45,10 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AnySuccessPolicy_ShouldReturnSuccessIfAnyChildSucceeds()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var parallel = new Parallel(ParallelPolicy.AnySuccess);
-        var child1 = new TestNode { ReturnState = NodeState.Failure };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var child1 = new FakeNode { ReturnState = NodeState.Failure };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
 
         parallel.Attach(child1).Attach(child2);
 
@@ -61,10 +61,10 @@ public class ParallelTests
     [Fact]
     public void Evaluate_FirstFailurePolicy_ShouldReturnFailureIfAnyChildFails()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var parallel = new Parallel(ParallelPolicy.FirstFailure);
-        var child1 = new TestNode { ReturnState = NodeState.Running };
-        var child2 = new TestNode { ReturnState = NodeState.Failure };
+        var child1 = new FakeNode { ReturnState = NodeState.Running };
+        var child2 = new FakeNode { ReturnState = NodeState.Failure };
 
         parallel.Attach(child1).Attach(child2);
 
@@ -77,10 +77,10 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnSuccessIfAllChildrenSucceed()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var parallel = new Parallel(ParallelPolicy.AllSuccess);
-        var child1 = new TestNode { ReturnState = NodeState.Success };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var child1 = new FakeNode { ReturnState = NodeState.Success };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
 
         parallel.Attach(child1).Attach(child2);
 
@@ -93,10 +93,10 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnRunningIfAnyChildIsRunning()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var parallel = new Parallel(ParallelPolicy.AllSuccess);
-        var child1 = new TestNode { ReturnState = NodeState.Running };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var child1 = new FakeNode { ReturnState = NodeState.Running };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
 
         parallel.Attach(child1).Attach(child2);
 
@@ -109,10 +109,10 @@ public class ParallelTests
     [Fact]
     public void Evaluate_AllSuccessPolicy_ShouldReturnFailureIfAllChildrenFail()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var parallel = new Parallel(ParallelPolicy.AllSuccess);
-        var child1 = new TestNode { ReturnState = NodeState.Failure };
-        var child2 = new TestNode { ReturnState = NodeState.Failure };
+        var child1 = new FakeNode { ReturnState = NodeState.Failure };
+        var child2 = new FakeNode { ReturnState = NodeState.Failure };
 
         parallel.Attach(child1).Attach(child2);
 

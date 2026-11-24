@@ -27,7 +27,7 @@ public class TreeTests
         }
     }
 
-    private sealed class TestRoot : IRoot
+    private sealed class FakeRoot : IRoot
     {
         public int EvaluateCallCount { get; private set; }
         public int ResetCallCount { get; private set; }
@@ -84,7 +84,7 @@ public class TreeTests
     [Fact]
     public void Tick_ShouldNotEvaluate_WhenTreeIsDisabled()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
 
         tree.Tick(1.0f);
@@ -95,7 +95,7 @@ public class TreeTests
     [Fact]
     public void Tick_ShouldEvaluate_WhenTreeIsEnabled()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
         tree.Enable();
 
@@ -107,7 +107,7 @@ public class TreeTests
     [Fact]
     public void Reset_ShouldCallResetOnRoot()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
 
         tree.Reset();
@@ -118,7 +118,7 @@ public class TreeTests
     [Fact]
     public void Abort_ShouldCallAbortOnRoot()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
 
         tree.Abort();
@@ -129,7 +129,7 @@ public class TreeTests
     [Fact]
     public void Enable_ShouldSetIsEnabledToTrue()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
 
         tree.Enable();
@@ -140,7 +140,7 @@ public class TreeTests
     [Fact]
     public void Disable_ShouldSetIsEnabledToFalse()
     {
-        var root = new TestRoot();
+        var root = new FakeRoot();
         var tree = new TestTree(root);
 
         tree.Disable();

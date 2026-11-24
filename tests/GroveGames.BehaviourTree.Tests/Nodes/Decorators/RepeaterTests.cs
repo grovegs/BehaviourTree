@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class RepeaterTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class RepeaterTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public NodeState ReturnState { get; set; } = NodeState.Success;
@@ -39,9 +39,9 @@ public class RepeaterTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -49,8 +49,8 @@ public class RepeaterTests
     [Fact]
     public void Evaluate_WithFixedCount_ShouldReturnRunningUntilMaxCountReached()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 
@@ -68,8 +68,8 @@ public class RepeaterTests
     [Fact]
     public void Evaluate_WithUntilSuccess_ShouldReturnSuccessWhenChildSucceeds()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var repeater = new Repeater(RepeatMode.UntilSuccess);
         repeater.Attach(child);
 
@@ -83,8 +83,8 @@ public class RepeaterTests
     [Fact]
     public void Evaluate_WithUntilFailure_ShouldReturnFailureWhenChildFails()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Failure };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Failure };
         var repeater = new Repeater(RepeatMode.UntilFailure);
         repeater.Attach(child);
 
@@ -97,8 +97,8 @@ public class RepeaterTests
     [Fact]
     public void Evaluate_WithInfiniteRepeat_ShouldAlwaysReturnRunning()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var repeater = new Repeater(RepeatMode.Infinite);
         repeater.Attach(child);
 
@@ -114,8 +114,8 @@ public class RepeaterTests
     [Fact]
     public void Evaluate_WithReset_ShouldResetCurrentCount()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 
@@ -133,8 +133,8 @@ public class RepeaterTests
     [Fact]
     public void Abort_ShouldResetCurrentCount()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var repeater = new Repeater(RepeatMode.FixedCount, 2);
         repeater.Attach(child);
 

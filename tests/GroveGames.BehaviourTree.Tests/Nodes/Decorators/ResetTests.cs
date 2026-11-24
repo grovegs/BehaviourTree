@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class ResetTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class ResetTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public int ResetCount { get; private set; }
@@ -40,9 +40,9 @@ public class ResetTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -50,8 +50,8 @@ public class ResetTests
     [Fact]
     public void Evaluate_WithConditionTrue_ShouldCallResetAndReturnSuccess()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var resetDecorator = new Reset(() => true);
         resetDecorator.Attach(child);
 
@@ -66,8 +66,8 @@ public class ResetTests
     [Fact]
     public void Evaluate_WithConditionFalse_ShouldNotCallResetAndReturnChildState()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var resetDecorator = new Reset(() => false);
         resetDecorator.Attach(child);
 
@@ -82,8 +82,8 @@ public class ResetTests
     [Fact]
     public void Evaluate_WithConditionTrue_ShouldResetChildWhenCalledMultipleTimes()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var resetDecorator = new Reset(() => true);
         resetDecorator.Attach(child);
 
@@ -98,8 +98,8 @@ public class ResetTests
     [Fact]
     public void Reset_ShouldNotCallChildResetWhenConditionIsFalse()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var resetDecorator = new Reset(() => false);
         resetDecorator.Attach(child);
 

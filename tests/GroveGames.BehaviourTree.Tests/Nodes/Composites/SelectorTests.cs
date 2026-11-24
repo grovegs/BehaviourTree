@@ -8,7 +8,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class SelectorTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -16,7 +16,7 @@ public class SelectorTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public int AbortCount { get; private set; }
@@ -42,9 +42,9 @@ public class SelectorTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -58,10 +58,10 @@ public class SelectorTests
     [Fact]
     public void Evaluate_ReturnsRunningAndMovesToNextChildOnFailure()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child1 = new TestNode { ReturnState = NodeState.Failure };
-        var child2 = new TestNode { ReturnState = NodeState.Running };
+        var child1 = new FakeNode { ReturnState = NodeState.Failure };
+        var child2 = new FakeNode { ReturnState = NodeState.Running };
 
         selector.Attach(child1).Attach(child2);
 
@@ -75,9 +75,9 @@ public class SelectorTests
     [Fact]
     public void Evaluate_ReturnsRunningIfCurrentChildIsRunning()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var child = new FakeNode { ReturnState = NodeState.Running };
 
         selector.Attach(child);
 
@@ -91,10 +91,10 @@ public class SelectorTests
     [Fact]
     public void Evaluate_ReturnsSuccessAndResetsIfAnyChildSucceeds()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child1 = new TestNode { ReturnState = NodeState.Failure };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var child1 = new FakeNode { ReturnState = NodeState.Failure };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
 
         selector.Attach(child1).Attach(child2);
 
@@ -109,10 +109,10 @@ public class SelectorTests
     [Fact]
     public void Evaluate_ReturnsFailureIfAllChildrenFail()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child1 = new TestNode { ReturnState = NodeState.Failure };
-        var child2 = new TestNode { ReturnState = NodeState.Failure };
+        var child1 = new FakeNode { ReturnState = NodeState.Failure };
+        var child2 = new FakeNode { ReturnState = NodeState.Failure };
 
         selector.Attach(child1).Attach(child2);
 
@@ -128,9 +128,9 @@ public class SelectorTests
     [Fact]
     public void Reset_ResetsProcessingChildIndex()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child = new TestNode { ReturnState = NodeState.Failure };
+        var child = new FakeNode { ReturnState = NodeState.Failure };
 
         selector.Attach(child);
         selector.Evaluate(0.1f);
@@ -143,9 +143,9 @@ public class SelectorTests
     [Fact]
     public void Abort_CallsAbortOnCurrentChildAndResetsProcessingChildIndex()
     {
-        var parent = new TestParent();
+        var parent = new FakeParent();
         var selector = new Selector();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var child = new FakeNode { ReturnState = NodeState.Running };
 
         selector.Attach(child);
         selector.Evaluate(0.1f);

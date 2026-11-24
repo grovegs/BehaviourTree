@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Composites;
 
 public class SequenceTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class SequenceTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public NodeState ReturnState { get; set; } = NodeState.Success;
@@ -39,9 +39,9 @@ public class SequenceTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -49,8 +49,8 @@ public class SequenceTests
     [Fact]
     public void Evaluate_ShouldReturnRunningWhenFirstChildIsRunning()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var sequence = new Sequence();
         sequence.Attach(child);
 
@@ -64,8 +64,8 @@ public class SequenceTests
     [Fact]
     public void Evaluate_ShouldReturnFailureWhenChildFails()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Failure };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Failure };
         var sequence = new Sequence();
         sequence.Attach(child);
 
@@ -79,9 +79,9 @@ public class SequenceTests
     [Fact]
     public void Evaluate_ShouldReturnSuccessWhenAllChildrenSucceed()
     {
-        var parent = new TestParent();
-        var child1 = new TestNode { ReturnState = NodeState.Success };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child1 = new FakeNode { ReturnState = NodeState.Success };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
         var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
@@ -95,9 +95,9 @@ public class SequenceTests
     [Fact]
     public void Evaluate_ShouldResetOnFailureAfterSuccess()
     {
-        var parent = new TestParent();
-        var child1 = new TestNode { ReturnState = NodeState.Success };
-        var child2 = new TestNode { ReturnState = NodeState.Failure };
+        var parent = new FakeParent();
+        var child1 = new FakeNode { ReturnState = NodeState.Success };
+        var child2 = new FakeNode { ReturnState = NodeState.Failure };
         var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
@@ -111,9 +111,9 @@ public class SequenceTests
     [Fact]
     public void Reset_ShouldResetProcessingChildIndex()
     {
-        var parent = new TestParent();
-        var child1 = new TestNode { ReturnState = NodeState.Success };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child1 = new FakeNode { ReturnState = NodeState.Success };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
         var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 
@@ -128,9 +128,9 @@ public class SequenceTests
     [Fact]
     public void Abort_ShouldResetProcessingChildIndex()
     {
-        var parent = new TestParent();
-        var child1 = new TestNode { ReturnState = NodeState.Success };
-        var child2 = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child1 = new FakeNode { ReturnState = NodeState.Success };
+        var child2 = new FakeNode { ReturnState = NodeState.Success };
         var sequence = new Sequence();
         sequence.Attach(child1).Attach(child2);
 

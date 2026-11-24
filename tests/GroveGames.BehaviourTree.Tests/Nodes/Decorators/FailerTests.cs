@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class FailerTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class FailerTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public NodeState ReturnState { get; set; } = NodeState.Success;
@@ -39,9 +39,9 @@ public class FailerTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -49,8 +49,8 @@ public class FailerTests
     [Fact]
     public void Evaluate_ShouldReturnFailureWhenChildReturnsSuccess()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var failer = new Failer();
         failer.Attach(child);
 
@@ -64,8 +64,8 @@ public class FailerTests
     [Fact]
     public void Evaluate_ShouldReturnFailureWhenChildReturnsFailure()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Failure };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Failure };
         var failer = new Failer();
         failer.Attach(child);
 
@@ -79,8 +79,8 @@ public class FailerTests
     [Fact]
     public void Evaluate_ShouldReturnRunningWhenChildReturnsRunning()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var failer = new Failer();
         failer.Attach(child);
 

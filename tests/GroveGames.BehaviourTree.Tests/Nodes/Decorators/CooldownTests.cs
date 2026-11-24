@@ -6,7 +6,7 @@ namespace GroveGames.BehaviourTree.Tests.Nodes.Decorators;
 
 public class CooldownTests
 {
-    private sealed class TestBlackboard : IBlackboard
+    private sealed class FakeBlackboard : IBlackboard
     {
         public bool TryGetValue<T>(BlackboardKey<T> key, out T value) { value = default!; return false; }
         public void SetValue<T>(BlackboardKey<T> key, T value) { }
@@ -14,7 +14,7 @@ public class CooldownTests
         public void Clear() { }
     }
 
-    private sealed class TestNode : INode
+    private sealed class FakeNode : INode
     {
         public int EvaluateCount { get; private set; }
         public NodeState ReturnState { get; set; } = NodeState.Success;
@@ -39,9 +39,9 @@ public class CooldownTests
         }
     }
 
-    private sealed class TestParent : IParent
+    private sealed class FakeParent : IParent
     {
-        public IBlackboard Blackboard { get; } = new TestBlackboard();
+        public IBlackboard Blackboard { get; } = new FakeBlackboard();
         public IParent Attach(INode node) => this;
         public IParent Attach(IChildTree tree) => this;
     }
@@ -49,8 +49,8 @@ public class CooldownTests
     [Fact]
     public void Evaluate_ShouldReturnFailureWhenRemainingTimeIsGreaterThanZero()
     {
-        var parent = new TestParent();
-        var child = new TestNode();
+        var parent = new FakeParent();
+        var child = new FakeNode();
         var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
@@ -65,8 +65,8 @@ public class CooldownTests
     [Fact]
     public void Evaluate_ShouldReturnSuccessAfterCooldownExpires()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
@@ -81,8 +81,8 @@ public class CooldownTests
     [Fact]
     public void Evaluate_ShouldCallChildEvaluateAfterCooldownExpires()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Running };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Running };
         var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
@@ -97,8 +97,8 @@ public class CooldownTests
     [Fact]
     public void Reset_ShouldResetRemainingTimeToZero()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 
@@ -114,8 +114,8 @@ public class CooldownTests
     [Fact]
     public void Abort_ShouldResetRemainingTimeToZero()
     {
-        var parent = new TestParent();
-        var child = new TestNode { ReturnState = NodeState.Success };
+        var parent = new FakeParent();
+        var child = new FakeNode { ReturnState = NodeState.Success };
         var cooldown = new Cooldown(2.0f);
         cooldown.Attach(child);
 

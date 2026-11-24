@@ -17,7 +17,7 @@ permissions:
 jobs:
   delete-stale-branches:
     name: Delete Stale Branches
-    uses: grovegs/workflows/.github/workflows/stale-branches.yml@v1.11.0
+    uses: grovegs/workflows/.github/workflows/stale-branches.yml@v1.12.0
     permissions:
       contents: write
       pull-requests: read

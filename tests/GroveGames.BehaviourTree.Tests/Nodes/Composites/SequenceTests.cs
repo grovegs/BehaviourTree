@@ -141,4 +141,15 @@ public class SequenceTests
         Assert.Equal(NodeState.Success, resultAfterAbort);
         Assert.Equal(2, child1.EvaluateCount);
     }
+
+    [Fact]
+    public void Evaluate_ChildReturnsNone_TreatsItAsFailure()
+    {
+        var sequence = new Sequence();
+        sequence.Attach(new FakeNode { ReturnState = NodeState.None });
+
+        var result = sequence.Evaluate(0.1f);
+
+        Assert.Equal(NodeState.Failure, result);
+    }
 }

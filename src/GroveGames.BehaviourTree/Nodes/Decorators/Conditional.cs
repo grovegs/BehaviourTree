@@ -11,7 +11,17 @@ public sealed class Conditional : Decorator
 
     public override NodeState Evaluate(float deltaTime)
     {
-        return _condition() ? _nodeState = base.Evaluate(deltaTime) : _nodeState = NodeState.Failure;
+        if (_condition())
+        {
+            return _nodeState = base.Evaluate(deltaTime);
+        }
+
+        if (_nodeState == NodeState.Running)
+        {
+            base.Abort();
+        }
+
+        return _nodeState = NodeState.Failure;
     }
 }
 

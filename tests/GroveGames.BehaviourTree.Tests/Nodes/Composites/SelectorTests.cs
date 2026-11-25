@@ -155,4 +155,15 @@ public class SelectorTests
         Assert.Equal(1, child.AbortCount);
         Assert.Equal(0, GetProcessingChildIndex(selector));
     }
+
+    [Fact]
+    public void Evaluate_ChildReturnsNone_TreatsItAsFailure()
+    {
+        var selector = new Selector();
+        selector.Attach(new FakeNode { ReturnState = NodeState.None });
+
+        var result = selector.Evaluate(0.1f);
+
+        Assert.Equal(NodeState.Failure, result);
+    }
 }

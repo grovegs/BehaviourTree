@@ -30,7 +30,7 @@ public sealed class Selector : Composite
                     _processingChildIndex = 0;
                     return _nodeState = NodeState.Success;
 
-                case NodeState.Failure:
+                default:
                     _processingChildIndex++;
                     break;
             }

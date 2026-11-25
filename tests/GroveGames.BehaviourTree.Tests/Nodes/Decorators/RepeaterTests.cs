@@ -148,4 +148,26 @@ public class RepeaterTests
         Assert.Equal(NodeState.Running, repeater.State);
         Assert.Equal(3, child.EvaluateCount);
     }
+
+    [Fact]
+    public void Constructor_FixedCountWithoutCount_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Repeater(RepeatMode.FixedCount));
+    }
+
+    [Fact]
+    public void Repeater_FluentFixedCount_RunsTheChildThatManyTimes()
+    {
+        var root = new Repeater(RepeatMode.UntilSuccess);
+        var child = new FakeNode { ReturnState = NodeState.Success };
+        var repeater = (Repeater)root.Repeater(RepeatMode.FixedCount, maxCount: 2);
+        repeater.Attach(child);
+
+        repeater.Evaluate(0.1f);
+        repeater.Evaluate(0.1f);
+        var result = repeater.Evaluate(0.1f);
+
+        Assert.Equal(NodeState.Success, result);
+        Assert.Equal(2, child.EvaluateCount);
+    }
 }

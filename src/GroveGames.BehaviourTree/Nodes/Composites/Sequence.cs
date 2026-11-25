@@ -26,13 +26,13 @@ public sealed class Sequence : Composite
                 case NodeState.Running:
                     return _nodeState = NodeState.Running;
 
-                case NodeState.Failure:
-                    _processingChildIndex = 0;
-                    return _nodeState = NodeState.Failure;
-
                 case NodeState.Success:
                     _processingChildIndex++;
                     break;
+
+                default:
+                    _processingChildIndex = 0;
+                    return _nodeState = NodeState.Failure;
             }
         }
 

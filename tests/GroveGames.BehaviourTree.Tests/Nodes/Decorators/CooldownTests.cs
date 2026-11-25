@@ -127,4 +127,23 @@ public class CooldownTests
         Assert.Equal(NodeState.Success, cooldown.State);
         Assert.Equal(2, child.EvaluateCount);
     }
+
+    [Fact]
+    public void Evaluate_ChildRunning_PassesThroughUntilItFinishes()
+    {
+        var child = new FakeNode { ReturnState = NodeState.Running };
+        var cooldown = new Cooldown(2.0f);
+        cooldown.Attach(child);
+
+        cooldown.Evaluate(0.1f);
+        var whileRunning = cooldown.Evaluate(0.1f);
+        child.ReturnState = NodeState.Success;
+        var finished = cooldown.Evaluate(0.1f);
+        var cooling = cooldown.Evaluate(0.1f);
+
+        Assert.Equal(NodeState.Running, whileRunning);
+        Assert.Equal(NodeState.Success, finished);
+        Assert.Equal(NodeState.Failure, cooling);
+        Assert.Equal(3, child.EvaluateCount);
+    }
 }

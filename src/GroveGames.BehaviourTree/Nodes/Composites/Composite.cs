@@ -26,9 +26,17 @@ public abstract class Composite : BehaviourNode, IParent
 
     public override void Reset()
     {
-        foreach (var child in _children)
+        for (var i = 0; i < _children.Count; i++)
         {
-            child.Reset();
+            _children[i].Reset();
+        }
+    }
+
+    public override void Abort()
+    {
+        for (var i = 0; i < _children.Count; i++)
+        {
+            _children[i].Abort();
         }
     }
 }

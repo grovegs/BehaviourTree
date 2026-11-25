@@ -13,16 +13,18 @@ public sealed class Parallel : Composite
     {
         var allSuccess = true;
         var anyChildRunning = false;
+        var children = Children;
 
-        foreach (var child in Children)
+        for (var i = 0; i < children.Count; i++)
         {
-            var status = child.Evaluate(deltaTime);
+            var status = children[i].Evaluate(deltaTime);
 
             switch (status)
             {
                 case NodeState.Success:
                     if (_policy == ParallelPolicy.AnySuccess)
                     {
+                        AbortRunning(i);
                         return _nodeState = NodeState.Success;
                     }
 
@@ -33,13 +35,15 @@ public sealed class Parallel : Composite
                     anyChildRunning = true;
                     break;
 
-                case NodeState.Failure:
+                default:
                     allSuccess = false;
 
                     if (_policy == ParallelPolicy.FirstFailure)
                     {
+                        AbortRunning(i);
                         return _nodeState = NodeState.Failure;
                     }
+
                     break;
             }
         }
@@ -50,6 +54,19 @@ public sealed class Parallel : Composite
         }
 
         return anyChildRunning ? _nodeState = NodeState.Running : _nodeState = NodeState.Failure;
+    }
+
+    private void AbortRunning(int except)
+    {
+        var children = Children;
+
+        for (var i = 0; i < children.Count; i++)
+        {
+            if (i != except && children[i].State == NodeState.Running)
+            {
+                children[i].Abort();
+            }
+        }
     }
 }
 

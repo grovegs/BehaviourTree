@@ -25,7 +25,8 @@ public class ParallelTests
 
         public NodeState Evaluate(float deltaTime) => ReturnState;
         public void Reset() { }
-        public void Abort() { }
+        public int AbortCount { get; private set; }
+        public void Abort() => AbortCount++;
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
@@ -120,5 +121,35 @@ public class ParallelTests
 
         Assert.Equal(NodeState.Failure, result);
         Assert.Equal(NodeState.Failure, parallel.State);
+    }
+
+    [Fact]
+    public void Evaluate_AnySuccessResolved_AbortsRunningSiblings()
+    {
+        var parallel = new Parallel(ParallelPolicy.AnySuccess);
+        var running = new FakeNode { ReturnState = NodeState.Running };
+        var succeeding = new FakeNode { ReturnState = NodeState.Success };
+        parallel.Attach(running);
+        parallel.Attach(succeeding);
+
+        parallel.Evaluate(0.1f);
+
+        Assert.Equal(1, running.AbortCount);
+        Assert.Equal(0, succeeding.AbortCount);
+    }
+
+    [Fact]
+    public void Abort_AbortsEveryChild()
+    {
+        var parallel = new Parallel(ParallelPolicy.AllSuccess);
+        var first = new FakeNode { ReturnState = NodeState.Running };
+        var second = new FakeNode { ReturnState = NodeState.Running };
+        parallel.Attach(first);
+        parallel.Attach(second);
+
+        parallel.Abort();
+
+        Assert.Equal(1, first.AbortCount);
+        Assert.Equal(1, second.AbortCount);
     }
 }

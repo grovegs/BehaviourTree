@@ -8,6 +8,11 @@ public sealed class Repeater : Decorator
 
     public Repeater(RepeatMode repeatMode, int maxCount = -1, string? name = null) : base(name)
     {
+        if (repeatMode == RepeatMode.FixedCount)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxCount);
+        }
+
         _repeatMode = repeatMode;
         _maxCount = maxCount;
         _currentCount = 0;
@@ -69,9 +74,9 @@ public sealed class Repeater : Decorator
 
 public static partial class ParentExtensions
 {
-    public static IParent Repeater(this IParent parent, RepeatMode repeatMode, string? name = null)
+    public static IParent Repeater(this IParent parent, RepeatMode repeatMode, string? name = null, int maxCount = -1)
     {
-        var repeater = new Repeater(repeatMode, name: name);
+        var repeater = new Repeater(repeatMode, maxCount, name);
         parent.Attach(repeater);
         return repeater;
     }

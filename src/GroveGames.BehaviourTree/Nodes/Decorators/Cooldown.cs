@@ -13,16 +13,25 @@ public sealed class Cooldown : Decorator
 
     public override NodeState Evaluate(float deltaTime)
     {
-        var remainingTime = _remainingTime - deltaTime;
-
-        if (remainingTime > 0f)
+        if (_nodeState != NodeState.Running)
         {
-            _remainingTime = remainingTime;
-            return _nodeState = NodeState.Failure;
+            var remainingTime = _remainingTime - deltaTime;
+
+            if (remainingTime > 0f)
+            {
+                _remainingTime = remainingTime;
+                return _nodeState = NodeState.Failure;
+            }
         }
 
-        _remainingTime = _waitTime;
-        return _nodeState = base.Evaluate(deltaTime);
+        var state = base.Evaluate(deltaTime);
+
+        if (state != NodeState.Running)
+        {
+            _remainingTime = _waitTime;
+        }
+
+        return _nodeState = state;
     }
 
     public override void Reset()

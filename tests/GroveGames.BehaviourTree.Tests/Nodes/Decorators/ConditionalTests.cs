@@ -29,7 +29,8 @@ public class ConditionalTests
         }
 
         public void Reset() { }
-        public void Abort() { }
+        public int AbortCount { get; private set; }
+        public void Abort() => AbortCount++;
         public void StartEvaluate() { }
         public void EndEvaluate() { }
         public void SetParent(IParent parent) { }
@@ -87,5 +88,21 @@ public class ConditionalTests
         conditional.Evaluate(1.0f);
 
         Assert.Equal(0, child.EvaluateCount);
+    }
+
+    [Fact]
+    public void Evaluate_ConditionTurnsFalseWhileChildRuns_AbortsTheChild()
+    {
+        var isAllowed = true;
+        var child = new FakeNode { ReturnState = NodeState.Running };
+        var conditional = new Conditional(() => isAllowed);
+        conditional.Attach(child);
+
+        conditional.Evaluate(0.1f);
+        isAllowed = false;
+        var result = conditional.Evaluate(0.1f);
+
+        Assert.Equal(NodeState.Failure, result);
+        Assert.Equal(1, child.AbortCount);
     }
 }
